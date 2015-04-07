@@ -1,0 +1,103 @@
+<html>
+    <head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+		<!-- AmCharts includes -->
+		<script type="text/javascript" src="../../../amcharts.js"></script>
+		<script type="text/javascript" src="../../../pie.js"></script>
+
+		<!-- Export plugin includes and styles -->
+		<script type="text/javascript" src="../export.js"></script>
+		<link  type="text/css" href="../export.css" rel="stylesheet">
+
+		<!-- Include a universal export menu config -->
+		<script type="text/javascript" src="../export.config.js"></script>
+
+		<style>
+			body, html {
+				height: 100%;
+				padding: 0;
+				margin: 0;
+				overflow: hidden;
+				font-size: 11px;
+				font-family: Verdana;
+			}
+			#chartdiv, #chartdiv2 {
+				width: 50%;
+				height: 100%;
+				float: left;
+				position: relative;
+			}
+		</style>
+
+		<script type="text/javascript">
+			// OVERWRITE GLOBAL EXPORT CONFIG
+			AmCharts.exportCFG.legend = {
+				position: "bottom"
+			}
+
+			var chart = AmCharts.makeChart( "chartdiv", {
+				"type": "pie",
+				"pathToImages": "../../../images/",
+				"dataProvider": [ {
+					"country": "Czech Republic",
+					"litres": 156.9
+				}, {
+					"country": "Ireland",
+					"litres": 131.1
+				}, {
+					"country": "Germany",
+					"litres": 115.8
+				}, {
+					"country": "Australia",
+					"litres": 109.9
+				}, {
+					"country": "Austria",
+					"litres": 108.3
+				}, {
+					"country": "UK",
+					"litres": 65
+				}, {
+					"country": "Belgium",
+					"litres": 50
+				} ],
+				"titleField": "country",
+				"valueField": "litres",
+				"balloonText": "[[title]]<br><span style='font-size:14px'><b>[[value]]</b> ([[percents]]%)</span>",
+				"innerRadius": "30%",
+				"labelsEnabled": false,
+				"export": AmCharts.exportCFG
+			} );
+
+			var chart2 = AmCharts.makeChart( "chartdiv2", {
+				"type": "pie",
+				"pathToImages": "../../../images/",
+				"dataProvider": [ {
+					"country": "Czech Republic",
+					"litres": 20
+				}, {
+					"country": "Ireland",
+					"litres": 30
+				}, {
+					"country": "Germany",
+					"litres": 15
+				}, {
+					"country": "Australia",
+					"litres": 10
+				} ],
+				"titleField": "country",
+				"valueField": "litres",
+				"balloonText": "[[title]]<br><span style='font-size:14px'><b>[[value]]</b> ([[percents]]%)</span>",
+				"innerRadius": "30%",
+				"labelsEnabled": false,
+				"export": AmCharts.exportCFG
+			} );
+		</script>
+	</head>
+	<body>
+		<div id="chartdiv"></div>
+		<div id="chartdiv2"></div>
+	</body>
+</html>

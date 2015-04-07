@@ -1,0 +1,114 @@
+<html>
+    <head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		
+		<!-- AmCharts includes -->
+		<script type="text/javascript" src="../../../amcharts.js"></script>
+		<script type="text/javascript" src="../../../serial.js"></script>
+		<script type="text/javascript" src="../../../themes/dark.js"></script>
+		
+		<!-- Export plugin includes and styles -->
+		<script type="text/javascript" src="../export.js"></script>
+		<link  type="text/css" href="../export.css" rel="stylesheet">
+
+		<!-- Include a universal export menu config -->
+		<script type="text/javascript" src="../export.config.js"></script>
+
+		<style>
+			body, html {
+				height: 100%;
+				padding: 0;
+				margin: 0;
+				overflow: hidden;
+				background-color: #282828;
+				font-size: 11px;
+				font-family: Verdana;
+			}
+			#chartdiv {
+				width: 100%;
+				height: 100%;
+			}
+
+			/**
+			 * Override default export icon styles so it looks better on dark 
+			 * background
+			 */
+			.amcharts-export-menu li > a {
+				color: #F2F2F2;
+				background-color: rgba(255, 255, 255, 0.4);
+			}
+			.amcharts-export-menu ul > li:hover > a {
+				background-color: rgba(255, 255, 255, 0.6);
+			}
+		</style>
+
+		<script type="text/javascript">
+			// OVERWRITE GLOBAL EXPORT CONFIG
+			AmCharts.exportCFG.fabric = {
+				backgroundColor: "#282828"
+			}
+
+			var chart = AmCharts.makeChart( "chartdiv", {
+				"type": "serial",
+				"theme": "dark",
+				"pathToImages": "../../../images/",
+				"dataProvider": [ {
+					"year": 2005,
+					"income": 23.5,
+					"expenses": 18.1
+				}, {
+					"year": 2006,
+					"income": 26.2,
+					"expenses": 22.8
+				}, {
+					"year": 2007,
+					"income": 30.1,
+					"expenses": 23.9
+				}, {
+					"year": 2008,
+					"income": 29.5,
+					"expenses": 25.1
+				}, {
+					"year": 2009,
+					"income": 24.6,
+					"expenses": 25
+				} ],
+				"categoryField": "year",
+				"startDuration": 1,
+				"rotate": true,
+				"categoryAxis": {
+					"gridPosition": "start"
+				},
+				"valueAxes": [ {
+					"position": "bottom",
+					"title": "Million USD",
+					"minorGridEnabled": true
+				} ],
+				"graphs": [ {
+					"type": "column",
+					"title": "Income",
+					"valueField": "income",
+					"fillAlphas": 1,
+					"balloonText": "<span style='font-size:13px;'>[[title]] in [[category]]:<b>[[value]]</b></span>"
+				}, {
+					"type": "line",
+					"title": "Expenses",
+					"valueField": "expenses",
+					"lineThickness": 2,
+					"bullet": "round",
+					"balloonText": "<span style='font-size:13px;'>[[title]] in [[category]]:<b>[[value]]</b></span>"
+				} ],
+				"legend": {
+					"useGraphSettings": true
+				},
+				"creditsPosition": "top-right",
+				"export": AmCharts.exportCFG
+			} );
+		</script>
+	</head>
+	<body>
+		<div id="chartdiv"></div>
+	</body>
+</html>
