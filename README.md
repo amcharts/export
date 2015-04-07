@@ -33,7 +33,7 @@ bundled CSS file. I.e.:
 
 ### 2) Add `export` options to your chart config:
 
-```json
+```
 AmCharts.makeChart( "chartdiv", {
   ...,
   "export": {
@@ -69,7 +69,7 @@ To use it, simply include "export.config.js":
 
 It will populate the `AmCharts.exportCFG` variable which you can supply to the chart:
 
-```json
+```
 AmCharts.makeChart( "chartdiv", {
   ...,
   "export": AmCharts.exportCFG
@@ -148,7 +148,7 @@ Simple format codes will assume you need an export to that format.
 
 Here's a sample of the simple menu setup that allows export to PNG, JPG and CSV:
 
-```json
+```
 "export": {
   "enabled": true,
   "libs": {
@@ -188,7 +188,7 @@ submenus.
 
 To add a submenu to a menu item, simply add a `menu` array as its own property:
 
-```json
+```
 "export": {
   "enabled": true,
   "libs": {
@@ -196,10 +196,10 @@ To add a submenu to a menu item, simply add a `menu` array as its own property:
   },
   "menu": [ {
     "class": "export-main",
-    "menu": [ {}
+    "menu": [ {
       "label": "Download as image",
       "menu": [ "PNG", "JPG", "SVG" ]
-    }, {}
+    }, {
       "label": "Download data",
       "menu": [ "CSV", "XLSX" ]
     } ]
@@ -219,10 +219,10 @@ Now we have a hierarchical menu with the following topology:
 
 We can mix "string" and "object" formats the way we see fit, i.e.:
 
-```json
+```
 "menu": [
   "PNG", 
-  { "label": "JPEG"
+  { "label": "JPEG",
     "format": "JPG" },
   "SVG"
 ]
@@ -237,10 +237,10 @@ Just like we set `label` and `format` properties for menu item, we can set
 
 This needs to be a function reference. I.e.:
 
-```json
+```
 "menu": [
   "PNG", 
-  { "label": "JPEG"
+  { "label": "JPEG",
     "click": function () {
       alert( "Clicked JPEG. Wow cool!" );
     } },
@@ -253,7 +253,7 @@ This needs to be a function reference. I.e.:
 Adding menu item to print the chart or map is as easy as adding export ones. You 
 just use "PRINT" as `format`. I.e.:
 
-```json
+```
 "menu": [
   "PNG", 
   "SVG",
@@ -263,7 +263,7 @@ just use "PRINT" as `format`. I.e.:
 
 Or if you want to change the label:
 
-```json
+```
 "menu": [
   "PNG", 
   "SVG",
@@ -280,7 +280,7 @@ OK, this one is so cool, you'll need a class 700 insulation jacket.
 By default each menu item triggers some kind of export. You can trigger an 
 "annotation" mode instead by including `"action": "draw"` instead.
 
-```json
+```
 "menu": [ {
   "class": "export-main",
   "menu": [ {
@@ -301,7 +301,7 @@ can't save the result image.
 
 That's where sub-menus come for the rescue again:
 
-```json
+```
 "menu": [ {
   "class": "export-main",
   "menu": [ {
@@ -310,7 +310,7 @@ That's where sub-menus come for the rescue again:
   }, {
     "label": "Annotate",
     "action": "draw",
-    "menu": [ "JPG", PNG", "SVG", PDF" ]
+    "menu": [ "JPG", "PNG", "SVG", PDF" ]
   } ]
 } ]
 ```
@@ -320,7 +320,7 @@ export the image into either PNG,JPG,SVG or PDF.
 
 And that's not even the end of it. You can add menu items to cancel, undo, redo.
 
-```json
+```
 "menu": [ {
   "class": "export-main",
   "menu": [ {
@@ -384,11 +384,11 @@ you want the image to be scaled to fit into.
 
 Here's an example of such export menu item:
 
-```json
+```
 {
   "format": "PDF",
   "content": [ "Saved from:", window.location.href, {
-    "image": 'reference',
+    "image": "reference",
     "fit": [ 523.28, 769.89 ] // fit image to A4
   } ]
 }
@@ -417,7 +417,7 @@ functionality.
 
 Here's an example:
 
-```json
+```
 menu: [ {
   label: "JPG",
   click: function() {
