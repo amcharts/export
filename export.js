@@ -1,5 +1,5 @@
 /*
-Plugin Name: amCharts export
+Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
 Version: 1.0
@@ -120,7 +120,42 @@ AmCharts.addInitHandler( function( chart ) {
 					fit: [ 523.28, 769.89 ]
 				} ]
 			},
-			menu: []
+			menu: [ {
+				class: "export-main",
+				label: "Export",
+				menu: [ {
+					label: "Download as ...",
+					menu: [ "PNG", "JPG", "SVG", {
+						format: "PDF",
+						content: [ "Saved from:", window.location.href, {
+							image: "reference",
+							fit: [ 523.28, 769.89 ] // fit image to A4
+						} ]
+					} ]
+				}, {
+					label: "Save data ...",
+					menu: [ "CSV", "XLSX", "JSON" ]
+				}, {
+					label: "Annotate",
+					action: "draw",
+					menu: [ "UNDO", "REDO", "CANCEL", {
+						label: "Save as ...",
+						menu: [ "PNG", "JPG", "SVG", {
+							format: "PDF",
+							content: [ "Saved from:", window.location.href, {
+								image: "reference",
+								fit: [ 523.28, 769.89 ] // fit image to A4
+							} ]
+						} ]
+					}, {
+						format: "PRINT",
+						label: "Print"
+					} ]
+				}, {
+					format: "PRINT",
+					label: "Print"
+				} ]
+			} ]
 		},
 
 		download: function( data, type, filename ) {

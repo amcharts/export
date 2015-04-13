@@ -13,9 +13,6 @@
 		<script type="text/javascript" src="../export.js"></script>
 		<link  type="text/css" href="../export.css" rel="stylesheet">
 
-		<!-- Include a universal export menu config -->
-		<script type="text/javascript" src="../export.config.js"></script>
-
 		<style>
 		body, html {
 			height: 100%;
@@ -303,7 +300,12 @@
 					"valueLineEnabled": true,
 					"fullWidth": true
 				},
-				"export": AmCharts.exportCFG
+				"export": {
+					"enabled": true,
+					"libs": {
+						"path": "../libs/"
+					}
+				}
 			} );
 		</script>
 	</head>

@@ -12,9 +12,6 @@
 		<script type="text/javascript" src="../export.js"></script>
 		<link  type="text/css" href="../export.css" rel="stylesheet">
 
-		<!-- Include a universal export menu config -->
-		<script type="text/javascript" src="../export.config.js"></script>
-
 		<style>
 			body, html {
 				height: 100%;
@@ -33,11 +30,6 @@
 		</style>
 
 		<script type="text/javascript">
-			// OVERWRITE GLOBAL EXPORT CONFIG
-			AmCharts.exportCFG.legend = {
-				position: "bottom"
-			}
-
 			var chart = AmCharts.makeChart( "chartdiv", {
 				"type": "pie",
 				"pathToImages": "../../../images/",
@@ -92,7 +84,15 @@
 				"balloonText": "[[title]]<br><span style='font-size:14px'><b>[[value]]</b> ([[percents]]%)</span>",
 				"innerRadius": "30%",
 				"labelsEnabled": false,
-				"export": AmCharts.exportCFG
+				"export": {
+					"enabled": true,
+					"libs": {
+						"path": "../libs/"
+					},
+					"legend": {
+						"position": "bottom"
+					}
+				}
 			} );
 		</script>
 	</head>

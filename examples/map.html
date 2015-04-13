@@ -1,5 +1,5 @@
 <html>
-    <head>
+		<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -10,9 +10,6 @@
 		<!-- Export plugin includes and styles -->
 		<script type="text/javascript" src="../export.js"></script>
 		<link  type="text/css" href="../export.css" rel="stylesheet">
-
-		<!-- Include a universal export menu config -->
-		<script type="text/javascript" src="../export.config.js"></script>
 
 		<style>
 		body, html {
@@ -201,7 +198,17 @@
 					"minValue": "little",
 					"maxValue": "a lot!"
 				},
-				"export":AmCharts.exportCFG
+				"export": {
+					"enabled": true,
+					"libs": {
+						"path": "../libs/"
+					},
+					"menu": [ {
+						"class": "export-main",
+						"label": "Export",
+						"menu": [ "PNG", "JPG", "SVG" ]
+					} ]
+				}
 			} );
 		</script>
 	</head>

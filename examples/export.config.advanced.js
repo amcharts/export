@@ -1,4 +1,14 @@
-var exportDrawingMenu = [ {
+/**
+ * This is a sample chart export config file. It is provided as a reference on
+ * how miscelaneous items in export menu can be used and set up.
+ *
+ * Please refer to README.md for more information.
+ */
+
+/**
+ * PDF-specfic configuration
+ */
+AmCharts.exportPDF = [ {
   label: "Undo",
   click: function() {
     this.drawing.undo();
@@ -50,7 +60,11 @@ var exportDrawingMenu = [ {
   } ]
 } ];
 
-var exportCFG = {
+
+/**
+ * Define main universal config
+ */
+AmCharts.exportCFG = {
   enabled: true,
   libs: {
     path: "../libs/"
@@ -77,7 +91,7 @@ var exportCFG = {
               }
             }
           }, function() {
-            this.createMenu( exportDrawingMenu );
+            this.createMenu( AmCharts.exportPDF );
           } );
         }
       },
