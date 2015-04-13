@@ -26,7 +26,7 @@ not apply to any other amCharts products that are covered by different licenses.
 AmCharts.addInitHandler( function( chart ) {
 	var _this = {
 		name: "export",
-		version: "1.0",
+		version: "1.0.1",
 		libs: {
 			autoLoad: true,
 			path: "./plugins/export/libs/",
@@ -109,7 +109,8 @@ AmCharts.addInitHandler( function( chart ) {
 			fabric: {
 				backgroundColor: "#FFFFFF",
 				isDrawingMode: false,
-				selection: false
+				selection: false,
+				removeImages: true
 			},
 			pdfMake: {
 				pageSize: "A4",
@@ -459,6 +460,12 @@ AmCharts.addInitHandler( function( chart ) {
 						};
 
 						for ( i1 in g.paths ) {
+
+							// CHECK ORIGIN; REMOVE TAINTED
+							if ( cfg.removeImages && g.paths[ i1 ][ "xlink:href" ] && g.paths[ i1 ][ "xlink:href" ].indexOf( location.origin ) == -1 ) {
+								g.paths.splice( i1, 1 );
+							}
+
 							// OPACITY; TODO: Distinguish opacity types
 							if ( g.paths[ i1 ].fill instanceof Object ) {
 								g.paths[ i1 ].set( {
@@ -596,6 +603,7 @@ AmCharts.addInitHandler( function( chart ) {
 
 			return data;
 		},
+
 		toBlob: function( options, callback ) {
 			var cfg = _this.deepMerge( {
 				data: "empty",
@@ -624,6 +632,7 @@ AmCharts.addInitHandler( function( chart ) {
 
 			return data;
 		},
+
 		toJPG: function( options, callback ) {
 			var cfg = _this.deepMerge( {
 				format: "jpeg",
@@ -637,6 +646,7 @@ AmCharts.addInitHandler( function( chart ) {
 
 			return data;
 		},
+
 		toPNG: function( options, callback ) {
 			var cfg = _this.deepMerge( {
 				format: "png",
@@ -649,6 +659,7 @@ AmCharts.addInitHandler( function( chart ) {
 
 			return data;
 		},
+
 		toSVG: function( options, callback ) {
 			var cfg = _this.deepMerge( {
 				// nothing in here
@@ -659,6 +670,7 @@ AmCharts.addInitHandler( function( chart ) {
 
 			return data;
 		},
+
 		toPDF: function( options, callback ) {
 			var cfg = _this.deepMerge( _this.deepMerge( {
 				multiplier: 2
@@ -714,7 +726,7 @@ AmCharts.addInitHandler( function( chart ) {
 
 		toJSON: function( options, callback ) {
 			var cfg = _this.deepMerge( {
-				data: _this.setup.chart.type == "stock" ? _this.setup.chart.mainDataSet.dataProvider : _this.setup.chart.dataProvider
+				data: _this.getChartData()
 			}, options || {}, true );
 			var data = JSON.stringify( cfg.data, undefined, "\t" );
 
@@ -722,9 +734,10 @@ AmCharts.addInitHandler( function( chart ) {
 
 			return data;
 		},
+
 		toCSV: function( options, callback ) {
 			var cfg = _this.deepMerge( {
-				data: _this.setup.chart.type == "stock" ? _this.setup.chart.mainDataSet.dataProvider : _this.setup.chart.dataProvider,
+				data: _this.getChartData(),
 				delimiter: ",",
 				quotes: true,
 				escape: true,
@@ -777,10 +790,10 @@ AmCharts.addInitHandler( function( chart ) {
 
 		toXLSX: function( options, callback ) {
 			var cfg = _this.deepMerge( {
-				data: _this.setup.chart.type == "stock" ? _this.setup.chart.mainDataSet.dataProvider : _this.setup.chart.dataProvider,
-				name: "amCharts"
+				data: _this.getChartData(),
+				name: "amCharts",
+				withHeader: true
 			}, options || {}, true );
-			var tmp = _this.toArray( cfg );
 			var data = "";
 			var wb = {
 				SheetNames: [],
@@ -836,7 +849,7 @@ AmCharts.addInitHandler( function( chart ) {
 			}
 
 			wb.SheetNames.push( cfg.name );
-			wb.Sheets[ cfg.name ] = sheet_from_array_of_arrays( tmp );
+			wb.Sheets[ cfg.name ] = sheet_from_array_of_arrays( _this.toArray( cfg ) );
 
 			data = XLSX.write( wb, {
 				bookType: "xlsx",
@@ -853,20 +866,32 @@ AmCharts.addInitHandler( function( chart ) {
 
 		toArray: function( options, callback ) {
 			var cfg = _this.deepMerge( {
-				data: _this.setup.chart.type == "stock" ? _this.setup.chart.mainDataSet.dataProvider : _this.setup.chart.dataProvider,
+				data: _this.getChartData(),
 				dateFields: [],
-				dateFormat: _this.setup.chart.dataDateFormat || "YYYY-MM-DD"
+				dateFormat: _this.setup.chart.dataDateFormat || "YYYY-MM-DD",
+				withHeader: false
 			}, options || {}, true );
 			var data = [];
+			var cols = [];
 
 			if ( _this.setup.chart.categoryAxis && _this.setup.chart.categoryAxis.parseDates && _this.setup.chart.categoryField ) {
 				cfg.dateFields.push( _this.setup.chart.categoryField );
 			}
 
+			// HEADER
+			if ( cfg.withHeader ) {
+				for ( col in cfg.data[ 0 ] ) {
+					cols.push( col );
+				}
+				data.push( cols );
+			}
+
+			// BODY
 			for ( row in cfg.data ) {
 				var buffer = [];
-				for ( col in cfg.data[ row ] ) {
-					var value = cfg.data[ row ][ col ];
+				for ( col in cols ) {
+					var col = cols[ col ];
+					var value = cfg.data[ row ][ col ] || "";
 
 					if ( cfg.dateFormat && value instanceof Date && cfg.dateFields.indexOf( col ) != -1 ) {
 						value = AmCharts.formatDate( value, cfg.dateFormat );
@@ -970,6 +995,27 @@ AmCharts.addInitHandler( function( chart ) {
 			}
 		},
 
+		getChartData: function() {
+			var data = [];
+
+			if ( _this.setup.chart.type == "stock" ) {
+				data = _this.setup.chart.mainDataSet.dataProvider;
+			} else if ( _this.setup.chart.type == "gantt" ) {
+				var segmentsField = _this.setup.chart.segmentsField;
+				for ( var i1 = 0; i1 < _this.setup.chart.dataProvider.length; i1++ ) {
+					if ( _this.setup.chart.dataProvider[ i1 ][ segmentsField ] ) {
+						for ( var i2 = 0; i2 < _this.setup.chart.dataProvider[ i1 ][ segmentsField ].length; i2++ ) {
+							data.push( _this.setup.chart.dataProvider[ i1 ][ segmentsField ][ i2 ] )
+						}
+					}
+				}
+			} else {
+				data = _this.setup.chart.dataProvider;
+			}
+
+			return data;
+		},
+
 		capitalize: function( string ) {
 			return string.charAt( 0 ).toUpperCase() + string.slice( 1 ).toLowerCase();
 		},
@@ -1005,6 +1051,11 @@ AmCharts.addInitHandler( function( chart ) {
 						item.label = item.label ? item.label : _this.capitalize( action );
 					}
 
+					// FILTER; TOGGLE FLAG
+					if ( [ "CSV", "JSON", "XLSX" ].indexOf( item.format ) != -1 && [ "map", "gauge" ].indexOf( _this.setup.chart.type ) != -1 ) {
+						continue;
+					}
+
 					// ADD CLICK HANDLER
 					if ( !item.click && !item.menu && !item.items ) {
 
@@ -1017,12 +1068,14 @@ AmCharts.addInitHandler( function( chart ) {
 								}
 							} )( item );
 
-							// DRAWINF
+							// DRAWING
 						} else if ( _this.drawing.enabled ) {
 							item.click = ( function( item ) {
 								return function() {
 									this[ "to" + item.format ]( item, function( data ) {
-										this.download( data, item.mimeType, [ item.fileName, item.extension ].join( "." ) );
+										if ( item.action != "print" && item.format != "PRINT" ) {
+											this.download( data, item.mimeType, [ item.fileName, item.extension ].join( "." ) );
+										}
 										this.drawing.done();
 									} );
 								}
@@ -1041,10 +1094,12 @@ AmCharts.addInitHandler( function( chart ) {
 											} );
 										} )
 
-									} else {
+									} else if ( this[ "to" + item.format ] ) {
 										this[ "to" + item.format ]( item, function( data ) {
 											this.download( data, item.mimeType, [ item.fileName, item.extension ].join( "." ) );
 										} );
+									} else {
+										throw new Error( 'Invalid format. Could not determine output type.' );
 									}
 								}
 							} )( item );
@@ -1071,13 +1126,12 @@ AmCharts.addInitHandler( function( chart ) {
 					} )( item.click || function( e ) {
 						e.preventDefault();
 					} ) );
+					li.appendChild( a );
 
 					// ADD LABEL
 					span.innerHTML = item.label;
 
 					// APPEND ITEMS
-					ul.appendChild( li );
-					li.appendChild( a );
 					if ( item.class ) {
 						li.className = item.class;
 					}
@@ -1092,18 +1146,23 @@ AmCharts.addInitHandler( function( chart ) {
 						a.setAttribute( "title", item.title );
 					}
 
-					// REVIVER
+					// CALLBACK; REVIVER FOR MENU ITEMS
 					if ( _this.config.menuReviver ) {
 						li = _this.config.menuReviver.apply( _this, [ item, li ] );
 					}
 
-					// SUBLIST
+					// ADD SUBLIST; JUST WITH ENTRIES
 					if ( ( item.menu || item.items ) && item.action != "draw" ) {
-						buildList( item.menu || item.items, li, item );
+						if ( buildList( item.menu || item.items, li ).childNodes.length ) {
+							ul.appendChild( li );
+						}
+					} else {
+						ul.appendChild( li );
 					}
 				}
 
-				container.appendChild( ul );
+				// JUST ADD THOSE WITH ENTRIES
+				return container.appendChild( ul );
 			}
 
 			var div = _this.setup.chart.containerDiv.getElementsByClassName( "amcharts-export-menu" );
@@ -1116,7 +1175,7 @@ AmCharts.addInitHandler( function( chart ) {
 				_this.setup.menu = div;
 			}
 
-			// REPLACER
+			// CALLBACK; REPLACES THE MENU WALKER
 			if ( _this.config.menuWalker ) {
 				buildList = _this.config.menuWalker;
 			}
@@ -1183,7 +1242,7 @@ AmCharts.addInitHandler( function( chart ) {
 	_this.setup.chart = _this.migrateSetup( chart );
 
 	// ENABLED-I-O?
-	if ( undefined === _this.setup.chart[ "export" ] || !_this.setup.chart[ "export" ].enabled || ( AmCharts.isIE && AmCharts.IEversion < 10 ) ) {
+	if ( undefined === _this.setup.chart[ "export" ] || !_this.setup.chart[ "export" ].enabled ) {
 		return;
 	}
 
@@ -1193,13 +1252,18 @@ AmCharts.addInitHandler( function( chart ) {
 	}
 
 	// MERGE SETTINGS
-	_this.libs = _this.deepMerge( _this.libs, _this.setup.chart[ "export" ].libs || {}, true );
-
-	_this.config = _this.deepMerge( _this.defaults, _this.setup.chart[ "export" ] );
-	_this.config.menu = _this.deepMerge( _this.defaults.menu, _this.config.menu || [], true );
+	_this.deepMerge( _this.libs, _this.setup.chart[ "export" ].libs || {}, true );
+	_this.deepMerge( _this.defaults.pdfMake, _this.setup.chart[ "export" ] );
+	_this.deepMerge( _this.defaults.fabric, _this.setup.chart[ "export" ] );
+	_this.config = _this.deepMerge( _this.defaults, _this.setup.chart[ "export" ], true );
 
 	_this.setup.chart[ "export" ] = _this;
 	_this.setup.chart.addClassNames = true;
+
+	// WITH IE?
+	if ( AmCharts.isIE && AmCharts.IEversion < 9 ) {
+		return;
+	}
 
 	// LOAD DEPENDENCIES
 	_this.loadDependencies();
