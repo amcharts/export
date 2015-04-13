@@ -31,8 +31,9 @@
 	-ms-transition: all 0.5s ease-out;
 	-o-transition: all 0.5s ease-out;
 	transition: all 0.5s ease-out;
+	color: #000;
 }
-.amcharts-main-div:hover .amcharts-export-menu {
+.amcharts-main-div:hover .amcharts-export-menu, .amcharts-stock-div:hover .amcharts-export-menu {
 	opacity: 1;
 }
 .amcharts-export-menu > ul > li > ul:after {
@@ -72,6 +73,7 @@
 	display: none;
 	border: 1px solid #e2e2e2;
 	margin-top: -1px;
+	background: #fff;
 }
 .amcharts-export-menu li > a {
 	position: relative;
@@ -82,6 +84,9 @@
 	z-index: 2;
 	white-space: nowrap;
 	border-bottom: 1px solid #f2f2f2;
+}
+.amcharts-export-menu li:last-child > a {
+	border-bottom: none;
 }
 .amcharts-export-menu li > a > img {
 	border: none;
