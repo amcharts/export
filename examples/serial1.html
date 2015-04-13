@@ -5,12 +5,14 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
 		<!-- AmCharts includes -->
-		<script type="text/javascript" src="../../../amcharts.js"></script>
-		<script type="text/javascript" src="../../../serial.js"></script>
+		<script src="http://www.amcharts.com/lib/3/amcharts.js"></script>
+		<script src="http://www.amcharts.com/lib/3/serial.js"></script>
 
 		<!-- Export plugin includes and styles -->
-		<script type="text/javascript" src="../export.js"></script>
+		<script src="../export.js"></script>
 		<link  type="text/css" href="../export.css" rel="stylesheet">
+
+		<script src="export.config.default.js"></script>
 
 		<style>
 		body, html {
@@ -127,7 +129,7 @@
 
 			AmCharts.makeChart( "chartdiv", {
 				"type": "serial",
-				"pathToImages": "../../../images/",
+				"pathToImages": "http://www.amcharts.com/lib/3/images/",
 				"dataProvider": chartData,
 				"rotate": false,
 				"marginTop": 10,
@@ -201,12 +203,8 @@
 				"chartScrollbar": {
 					"color": "FFFFFF"
 				},
-				"export": {
-					"enabled": true,
-					"libs": {
-						"path": "../libs/"
-					}
-				}
+				// this shows how externally included config file can be used
+				"export": AmCharts.exportCFG
 			} );
 		</script>
 	</head>

@@ -1,15 +1,15 @@
 <html>
-    <head>
+		<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
 		<!-- AmCharts includes -->
-		<script type="text/javascript" src="../../../amcharts.js"></script>
-		<script type="text/javascript" src="../../../pie.js"></script>
+		<script src="http://www.amcharts.com/lib/3/amcharts.js"></script>
+		<script src="http://www.amcharts.com/lib/3/pie.js"></script>
 
 		<!-- Export plugin includes and styles -->
-		<script type="text/javascript" src="../export.js"></script>
+		<script src="../export.js"></script>
 		<link  type="text/css" href="../export.css" rel="stylesheet">
 
 		<style>
@@ -30,7 +30,7 @@
 		<script type="text/javascript">
 			var chart = AmCharts.makeChart( "chartdiv", {
 				"type": "pie",
-				"pathToImages": "../../../images/",
+				"pathToImages": "http://www.amcharts.com/lib/3/images/",
 				"titles": [ {
 					"text": "Visitors countries",
 					"size": 16
@@ -76,7 +76,21 @@
 					"enabled": true,
 					"libs": {
 						"path": "../libs/"
-					}
+					},
+					"menu": [ {
+						"class": "export-main",
+						"menu": [ {
+							"label": "Download",
+							"menu": [ "PNG", "JPG", "CSV" ]
+						}, {
+							"label": "Annotate",
+							"action": "draw",
+							"menu": [ {
+								"class": "export-drawing",
+								"menu": [ "PNG", "JPG" ]
+							} ]
+						} ]
+					} ]
 				}
 			} );
 		</script>

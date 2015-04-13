@@ -31,7 +31,21 @@ bundled CSS file. I.e.:
 
 (this needs to go after all the other amCharts includes)
 
-### 2) Add `export` options to your chart config:
+### 2) Enable `export` with default options:
+
+```
+AmCharts.makeChart( "chartdiv", {
+  ...,
+  "export": {
+    "enabled": true,
+    "libs": {
+      "path": "../libs/"
+    }
+  }
+} );
+```
+
+### ... OR set your own custom options:
 
 ```
 AmCharts.makeChart( "chartdiv", {
@@ -49,35 +63,15 @@ AmCharts.makeChart( "chartdiv", {
       }, {
         "label": "Annotate",
         "action": "draw",
-        "menu": [ "PNG", "JPG" ]
+        "menu": [ {
+          "class": "export-drawing",
+          "menu": [ "PNG", "JPG" ]
+        } ]
       } ]
     } ]
   }
 } );
 ```
-
-### ... OR just use a sample config
-
-We have included a sample config with this plugin that should get you started 
-quickly.
-
-To use it, simply include "export.config.js":
-
-```
-<script src="amcharts/plugins/export/export.config.js"></script>
-```
-
-It will populate the `AmCharts.exportCFG` variable which you can supply to the chart:
-
-```
-AmCharts.makeChart( "chartdiv", {
-  ...,
-  "export": AmCharts.exportCFG
-} );
-```
-
-Please note that you may still need to modify the above file so the `libs` path 
-corresponds to your setup. Read the next section for more details.
 
 
 ## Loading external libraries needed for operation of this plugin
@@ -121,11 +115,13 @@ xlsx.js | libs/xlsx/ | Export to XLSX format
 
 Property | Default | Description
 -------- | ------- | -----------
+backgroundColor | #FFFFFF | RGB code of the color for the background of the exported image
 enabled | true | Enables or disables export functionality
 legend | {} | Places the legend in case it is within an external container
 menu | [] | A list of menu or submenu items (see the next chapter for details)
 fabric | {} | Overwrites the default drawing settings (Frabric library)
 pdfMake | {} | Overwrites the default settings for PDF export (pdfMake library)
+removeImages | true | If true export checks for and removes "tainted" images that area lodead from different domains
 
 
 ## Configuring export menu
@@ -310,7 +306,10 @@ That's where sub-menus come for the rescue again:
   }, {
     "label": "Annotate",
     "action": "draw",
-    "menu": [ "JPG", "PNG", "SVG", PDF" ]
+    "menu": [ {
+      "class": "export-drawing",
+      "menu": [ "JPG", "PNG", "SVG", PDF" ]
+    } ]
   } ]
 } ]
 ```
@@ -327,14 +326,17 @@ And that's not even the end of it. You can add menu items to cancel, undo, redo.
     "label": "Download",
     "menu": [ "PNG", "JPG", "CSV", "XLSX" ]
   }, {
-    "label": "Annotation",
+    "label": "Annotate",
     "action": "draw",
     "menu": [ {
-      "label": "Edit",
-      "menu": [ "UNDO", "REDO", "CANCEL" ]
-    }, {
-      "label": "Save",
-      "format": "PNG"
+      "class": "export-drawing",
+      "menu": [ {
+        "label": "Edit",
+        "menu": [ "UNDO", "REDO", "CANCEL" ]
+      }, {
+        "label": "Save",
+        "format": "PNG"
+      } ]
     } ]
   } ]
 } ]
@@ -459,7 +461,9 @@ Stock Chart or JavaScript Maps.
 
 The export will also need relatively recent browsers.
 
-IE10 and up are support, with IE9 only partial support.
+IE10 and up are supported.
+
+Partial support for IE9 will be implemented in the future versions.
 
 IE8 and older are not supported I'm afraid. Hey, it's time to upgrade!
 

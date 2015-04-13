@@ -48,10 +48,46 @@ AmCharts.exportCFG = {
     }, {
       "label": "Annotate",
       "action": "draw",
-      "menu": [ "UNDO", "REDO", "CANCEL", {
-        "label": "Save as ...",
-        "menu": [ "PNG", "JPG", "SVG", AmCharts.exportPDF ]
-      }, AmCharts.exportPrint ]
+      "menu": [ {
+        "class": "export-drawing",
+        "menu": [ {
+          "label": "Color ...",
+          "menu": [ {
+            "class": "export-drawing-color export-drawing-color-black",
+            "label": "Black",
+            "click": function () {
+              this.setup.fabric.freeDrawingBrush.color = "#000";
+            }
+          }, {
+            "class": "export-drawing-color export-drawing-color-white",
+            "label": "White",
+            "click": function () {
+              this.setup.fabric.freeDrawingBrush.color = "#fff";
+            }
+          }, {
+            "class": "export-drawing-color export-drawing-color-red",
+            "label": "Red",
+            "click": function () {
+              this.setup.fabric.freeDrawingBrush.color = "#f00";
+            }
+          }, {
+            "class": "export-drawing-color export-drawing-color-green",
+            "label": "Green",
+            "click": function () {
+              this.setup.fabric.freeDrawingBrush.color = "#0f0";
+            }
+          }, {
+            "class": "export-drawing-color export-drawing-color-blue",
+            "label": "Blue",
+            "click": function () {
+              this.setup.fabric.freeDrawingBrush.color = "#00f";
+            }
+          } ]
+        }, "UNDO", "REDO", "CANCEL", {
+          "label": "Save as ...",
+          "menu": [ "PNG", "JPG", "SVG", AmCharts.exportPDF ]
+        }, AmCharts.exportPrint ]
+      } ]
     }, AmCharts.exportPrint ]
   } ]
 };

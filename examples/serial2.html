@@ -5,12 +5,12 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		
 		<!-- AmCharts includes -->
-		<script type="text/javascript" src="../../../amcharts.js"></script>
-		<script type="text/javascript" src="../../../serial.js"></script>
-		<script type="text/javascript" src="../../../themes/dark.js"></script>
+		<script src="http://www.amcharts.com/lib/3/amcharts.js"></script>
+		<script src="http://www.amcharts.com/lib/3/serial.js"></script>
+		<script src="http://www.amcharts.com/lib/3/themes/dark.js"></script>
 		
 		<!-- Export plugin includes and styles -->
-		<script type="text/javascript" src="../export.js"></script>
+		<script src="../export.js"></script>
 		<link  type="text/css" href="../export.css" rel="stylesheet">
 
 		<style>
@@ -33,7 +33,7 @@
 			var chart = AmCharts.makeChart( "chartdiv", {
 				"type": "serial",
 				"theme": "dark",
-				"pathToImages": "../../../images/",
+				"pathToImages": "http://www.amcharts.com/lib/3/images/",
 				"dataProvider": [ {
 					"year": 2005,
 					"income": 23.5,
@@ -90,9 +90,7 @@
 						"path": "../libs/"
 					},
 					// set background color for exported image
-					"fabric": {
-						"backgroundColor": "#282828"
-					}
+					"backgroundColor": "#282828"
 				}
 			} );
 		</script>
