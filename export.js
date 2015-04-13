@@ -283,7 +283,7 @@ AmCharts.addInitHandler( function( chart ) {
 				}
 
 				if ( !( v instanceof Function || v instanceof Date ) && ( v instanceof Object || v instanceof Array ) ) {
-					_this.deepMerge( a[ i ], v, overwrite );
+					_this.deepMerge( a[ i ] || {}, v, overwrite );
 				} else {
 					if ( a instanceof Array && !overwrite ) {
 						a.push( v );

@@ -60,7 +60,12 @@
 				"balloonText": "[[title]]<br><span style='font-size:14px'><b>[[value]]</b> ([[percents]]%)</span>",
 				"innerRadius": "30%",
 				"labelsEnabled": false,
-				"export": AmCharts.exportCFG
+				"export": {
+					"enabled": true,
+					"libs": {
+						"path": "../libs/"
+					}
+				}
 			} );
 
 			var chart2 = AmCharts.makeChart( "chartdiv2", {
@@ -88,9 +93,6 @@
 					"enabled": true,
 					"libs": {
 						"path": "../libs/"
-					},
-					"legend": {
-						"position": "bottom"
 					}
 				}
 			} );
