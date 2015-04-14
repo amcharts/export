@@ -13,81 +13,81 @@
  * PDF-specfic configuration
  */
 AmCharts.exportPDF = {
-  "format": "PDF",
-  "content": [ "Saved from:", window.location.href, {
-    "image": "reference",
-    "fit": [ 523.28, 769.89 ] // fit image to A4
-  } ]
+	"format": "PDF",
+	"content": [ "Saved from:", window.location.href, {
+		"image": "reference",
+		"fit": [ 523.28, 769.89 ] // fit image to A4
+	} ]
 };
 
 /**
  * Print-specfic configuration
  */
 AmCharts.exportPrint = {
-  "format": "PRINT",
-  "label": "Print"
+	"format": "PRINT",
+	"label": "Print"
 };
 
 /**
  * Define main universal config
  */
 AmCharts.exportCFG = {
-  "enabled": true,
-  "libs": {
-    "path": "../libs/"
-  },
-  "menu": [ {
-    "class": "export-main",
-    "label": "Export",
-    "menu": [ {
-      "label": "Download as ...",
-      "menu": [ "PNG", "JPG", "SVG", AmCharts.exportPDF ]
-    }, {
-      "label": "Save data ...",
-      "menu": [ "CSV", "XLSX", "JSON" ]
-    }, {
-      "label": "Annotate",
-      "action": "draw",
-      "menu": [ {
-        "class": "export-drawing",
-        "menu": [ {
-          "label": "Color ...",
-          "menu": [ {
-            "class": "export-drawing-color export-drawing-color-black",
-            "label": "Black",
-            "click": function () {
-              this.setup.fabric.freeDrawingBrush.color = "#000";
-            }
-          }, {
-            "class": "export-drawing-color export-drawing-color-white",
-            "label": "White",
-            "click": function () {
-              this.setup.fabric.freeDrawingBrush.color = "#fff";
-            }
-          }, {
-            "class": "export-drawing-color export-drawing-color-red",
-            "label": "Red",
-            "click": function () {
-              this.setup.fabric.freeDrawingBrush.color = "#f00";
-            }
-          }, {
-            "class": "export-drawing-color export-drawing-color-green",
-            "label": "Green",
-            "click": function () {
-              this.setup.fabric.freeDrawingBrush.color = "#0f0";
-            }
-          }, {
-            "class": "export-drawing-color export-drawing-color-blue",
-            "label": "Blue",
-            "click": function () {
-              this.setup.fabric.freeDrawingBrush.color = "#00f";
-            }
-          } ]
-        }, "UNDO", "REDO", "CANCEL", {
-          "label": "Save as ...",
-          "menu": [ "PNG", "JPG", "SVG", AmCharts.exportPDF ]
-        }, AmCharts.exportPrint ]
-      } ]
-    }, AmCharts.exportPrint ]
-  } ]
+	"enabled": true,
+	"libs": {
+		"path": "../libs/"
+	},
+	"menu": [ {
+		"class": "export-main",
+		"label": "Export",
+		"menu": [ {
+			"label": "Download as ...",
+			"menu": [ "PNG", "JPG", "SVG", AmCharts.exportPDF ]
+		}, {
+			"label": "Save data ...",
+			"menu": [ "CSV", "XLSX", "JSON" ]
+		}, {
+			"label": "Annotate",
+			"action": "draw",
+			"menu": [ {
+				"class": "export-drawing",
+				"menu": [ {
+					"label": "Color ...",
+					"menu": [ {
+						"class": "export-drawing-color export-drawing-color-black",
+						"label": "Black",
+						"click": function () {
+							this.setup.fabric.freeDrawingBrush.color = "#000";
+						}
+					}, {
+						"class": "export-drawing-color export-drawing-color-white",
+						"label": "White",
+						"click": function () {
+							this.setup.fabric.freeDrawingBrush.color = "#fff";
+						}
+					}, {
+						"class": "export-drawing-color export-drawing-color-red",
+						"label": "Red",
+						"click": function () {
+							this.setup.fabric.freeDrawingBrush.color = "#f00";
+						}
+					}, {
+						"class": "export-drawing-color export-drawing-color-green",
+						"label": "Green",
+						"click": function () {
+							this.setup.fabric.freeDrawingBrush.color = "#0f0";
+						}
+					}, {
+						"class": "export-drawing-color export-drawing-color-blue",
+						"label": "Blue",
+						"click": function () {
+							this.setup.fabric.freeDrawingBrush.color = "#00f";
+						}
+					} ]
+				}, "UNDO", "REDO", {
+					"label": "Save as ...",
+					"menu": [ "PNG", "JPG", "SVG", AmCharts.exportPDF ]
+				}, AmCharts.exportPrint, "CANCEL" ]
+			} ]
+		}, AmCharts.exportPrint ]
+	} ]
 };
