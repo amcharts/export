@@ -174,7 +174,7 @@ AmCharts.addInitHandler( function( chart ) {
 									this.setup.fabric.freeDrawingBrush.color = "#00f";
 								}
 							} ]
-						}, "UNDO", "REDO", "CANCEL", {
+						}, "UNDO", "REDO", {
 							"label": "Save as ...",
 							"menu": [ "PNG", "JPG", "SVG", {
 								"format": "PDF",
@@ -186,7 +186,7 @@ AmCharts.addInitHandler( function( chart ) {
 						}, {
 							"format": "PRINT",
 							"label": "Print"
-						} ]
+						}, "CANCEL" ]
 					} ]
 				}, {
 					"format": "PRINT",
@@ -283,7 +283,7 @@ AmCharts.addInitHandler( function( chart ) {
 				}
 
 				if ( !( v instanceof Function || v instanceof Date ) && ( v instanceof Object || v instanceof Array ) ) {
-					_this.deepMerge( a[ i ] || {}, v, overwrite );
+					_this.deepMerge( a[ i ], v, overwrite );
 				} else {
 					if ( a instanceof Array && !overwrite ) {
 						a.push( v );
