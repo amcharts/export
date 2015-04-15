@@ -1168,8 +1168,8 @@ AmCharts.addInitHandler( function( chart ) {
 					span.innerHTML = item.label;
 
 					// APPEND ITEMS
-					if ( item.class ) {
-						li.className = item.class;
+					if ( item[ "class" ] ) {
+						li.className = item[ "class" ];
 					}
 					if ( item.icon ) {
 						img.setAttribute( "src", ( item.icon.slice( 0, 10 ).indexOf( "//" ) == -1 ? chart.pathToImages : "" ) + item.icon );
