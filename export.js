@@ -33,7 +33,7 @@ AmCharts.addInitHandler( function( chart ) {
 			resources: [ {
 				"pdfmake/pdfmake.js": [ "pdfmake/vfs_fonts.js" ],
 				"jszip/jszip.js": [ "xlsx/xlsx.js" ]
-			}, "fabric.js/fabric.js", "Filesaver.js/FileSaver.js" ],
+			}, "fabric.js/fabric.js", "FileSaver.js/FileSaver.js" ],
 			loaded: 0
 		},
 		config: {},
