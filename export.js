@@ -73,35 +73,35 @@ AmCharts.addInitHandler( function( chart ) {
 			fileName: "amCharts",
 			action: "download",
 			formats: {
-				"JPG": {
+				JPG: {
 					mimeType: "image/jpg",
 					extension: "jpg",
 					capture: true
 				},
-				"PNG": {
+				PNG: {
 					mimeType: "image/png",
 					extension: "png",
 					capture: true
 				},
-				"SVG": {
+				SVG: {
 					mimeType: "text/xml",
 					extension: "svg",
 					capture: true
 				},
-				"PDF": {
+				PDF: {
 					mimeType: "application/pdf",
 					extension: "pdf",
 					capture: true
 				},
-				"CSV": {
+				CSV: {
 					mimeType: "text/plain",
 					extension: "csv"
 				},
-				"JSON": {
+				JSON: {
 					mimeType: "text/plain",
 					extension: "json"
 				},
-				"XLSX": {
+				XLSX: {
 					mimeType: "application/octet-stream",
 					extension: "xlsx"
 				}
@@ -121,76 +121,76 @@ AmCharts.addInitHandler( function( chart ) {
 					fit: [ 523.28, 769.89 ]
 				} ]
 			},
-			"menu": [ {
-				"class": "export-main",
-				"label": "Export",
-				"menu": [ {
-					"label": "Download as ...",
-					"menu": [ "PNG", "JPG", "SVG", {
-						"format": "PDF",
-						"content": [ "Saved from:", window.location.href, {
-							"image": "reference",
-							"fit": [ 523.28, 769.89 ] // fit image to A4
+			menu: [ {
+				class: "export-main",
+				label: "Export",
+				menu: [ {
+					label: "Download as ...",
+					menu: [ "PNG", "JPG", "SVG", {
+						format: "PDF",
+						content: [ "Saved from:", window.location.href, {
+							image: "reference",
+							fit: [ 523.28, 769.89 ] // fit image to A4
 						} ]
 					} ]
 				}, {
-					"label": "Save data ...",
-					"menu": [ "CSV", "XLSX", "JSON" ]
+					label: "Save data ...",
+					menu: [ "CSV", "XLSX", "JSON" ]
 				}, {
-					"label": "Annotate",
-					"action": "draw",
-					"menu": [ {
-						"class": "export-drawing",
-						"menu": [ {
-							"label": "Color ...",
-							"menu": [ {
-								"class": "export-drawing-color export-drawing-color-black",
-								"label": "Black",
-								"click": function () {
+					label: "Annotate",
+					action: "draw",
+					menu: [ {
+						class: "export-drawing",
+						menu: [ {
+							label: "Color ...",
+							menu: [ {
+								class: "export-drawing-color export-drawing-color-black",
+								label: "Black",
+								click: function() {
 									this.setup.fabric.freeDrawingBrush.color = "#000";
 								}
 							}, {
-								"class": "export-drawing-color export-drawing-color-white",
-								"label": "White",
-								"click": function () {
+								class: "export-drawing-color export-drawing-color-white",
+								label: "White",
+								click: function() {
 									this.setup.fabric.freeDrawingBrush.color = "#fff";
 								}
 							}, {
-								"class": "export-drawing-color export-drawing-color-red",
-								"label": "Red",
-								"click": function () {
+								class: "export-drawing-color export-drawing-color-red",
+								label: "Red",
+								click: function() {
 									this.setup.fabric.freeDrawingBrush.color = "#f00";
 								}
 							}, {
-								"class": "export-drawing-color export-drawing-color-green",
-								"label": "Green",
-								"click": function () {
+								class: "export-drawing-color export-drawing-color-green",
+								label: "Green",
+								click: function() {
 									this.setup.fabric.freeDrawingBrush.color = "#0f0";
 								}
 							}, {
-								"class": "export-drawing-color export-drawing-color-blue",
-								"label": "Blue",
-								"click": function () {
+								class: "export-drawing-color export-drawing-color-blue",
+								label: "Blue",
+								click: function() {
 									this.setup.fabric.freeDrawingBrush.color = "#00f";
 								}
 							} ]
 						}, "UNDO", "REDO", {
-							"label": "Save as ...",
-							"menu": [ "PNG", "JPG", "SVG", {
-								"format": "PDF",
-								"content": [ "Saved from:", window.location.href, {
-									"image": "reference",
-									"fit": [ 523.28, 769.89 ] // fit image to A4
+							label: "Save as ...",
+							menu: [ "PNG", "JPG", "SVG", {
+								format: "PDF",
+								content: [ "Saved from:", window.location.href, {
+									image: "reference",
+									fit: [ 523.28, 769.89 ] // fit image to A4
 								} ]
 							} ]
 						}, {
-							"format": "PRINT",
-							"label": "Print"
+							format: "PRINT",
+							label: "Print"
 						}, "CANCEL" ]
 					} ]
 				}, {
-					"format": "PRINT",
-					"label": "Print"
+					format: "PRINT",
+					label: "Print"
 				} ]
 			} ]
 		},
@@ -497,14 +497,23 @@ AmCharts.addInitHandler( function( chart ) {
 
 						for ( i1 in g.paths ) {
 
-							// CHECK ORIGIN; REMOVE TAINTED
-							if ( cfg.removeImages && g.paths[ i1 ][ "xlink:href" ] && g.paths[ i1 ][ "xlink:href" ].indexOf( location.origin ) == -1 ) {
-								g.paths.splice( i1, 1 );
-							}
-
 							// OPACITY; TODO: Distinguish opacity types
 							if ( g.paths[ i1 ] ) {
+
+								// CHECK ORIGIN; REMOVE TAINTED
+								if ( cfg.removeImages && g.paths[ i1 ][ "xlink:href" ] && g.paths[ i1 ][ "xlink:href" ].indexOf( location.origin ) == -1 ) {
+									g.paths.splice( i1, 1 );
+								}
+
+								// SET OPACITY
 								if ( g.paths[ i1 ].fill instanceof Object ) {
+
+									// MISINTERPRETATION OF FABRIC
+									if ( g.paths[ i1 ].fill.type == "radial" ) {
+										g.paths[ i1 ].fill.coords.r2 = g.paths[ i1 ].fill.coords.r1 * -1;
+										g.paths[ i1 ].fill.coords.r1 = 0;
+									}
+
 									g.paths[ i1 ].set( {
 										opacity: g.paths[ i1 ].fillOpacity
 									} );
