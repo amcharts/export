@@ -503,44 +503,44 @@ AmCharts.addInitHandler( function( chart ) {
 							}
 
 							// OPACITY; TODO: Distinguish opacity types
-							if ( g.paths[ i1 ].fill instanceof Object ) {
-								g.paths[ i1 ].set( {
-									opacity: g.paths[ i1 ].fillOpacity
-								} );
-
-								// PATTERN; TODO: Distinguish opacity types
-							} else if ( String( g.paths[ i1 ].fill ).slice( 0, 3 ) == "url" ) {
-								var PID = g.paths[ i1 ].fill.slice( 5, -1 );
-								if ( group.patterns[ PID ] ) {
+							if ( g.paths[ i1 ] ) {
+								if ( g.paths[ i1 ].fill instanceof Object ) {
 									g.paths[ i1 ].set( {
-										fill: group.patterns[ PID ],
 										opacity: g.paths[ i1 ].fillOpacity
 									} );
+
+									// PATTERN; TODO: Distinguish opacity types
+								} else if ( String( g.paths[ i1 ].fill ).slice( 0, 3 ) == "url" ) {
+									var PID = g.paths[ i1 ].fill.slice( 5, -1 );
+									if ( group.patterns[ PID ] ) {
+										g.paths[ i1 ].set( {
+											fill: group.patterns[ PID ],
+											opacity: g.paths[ i1 ].fillOpacity
+										} );
+									}
 								}
-							}
+								if ( String( g.paths[ i1 ].clipPath ).slice( 0, 3 ) == "url" ) {
+									var PID = g.paths[ i1 ].clipPath.slice( 5, -1 );
 
-							// CLIPPING; TODO: check stability
-							if ( String( g.paths[ i1 ].clipPath ).slice( 0, 3 ) == "url" ) {
-								var PID = g.paths[ i1 ].clipPath.slice( 5, -1 );
+									if ( group.clippings[ PID ] ) {
+										var mask = group.clippings[ PID ].childNodes[ 0 ];
+										var transform = g.paths[ i1 ].svg.getAttribute( "transform" ) || "translate(0,0)";
 
-								if ( group.clippings[ PID ] ) {
-									var mask = group.clippings[ PID ].childNodes[ 0 ];
-									var transform = g.paths[ i1 ].svg.getAttribute( "transform" ) || "translate(0,0)";
+										transform = transform.slice( 10, -1 ).split( "," );
 
-									transform = transform.slice( 10, -1 ).split( "," );
+										g.paths[ i1 ].set( {
+											clipTo: ( function( mask, transform ) {
+												return function( ctx ) {
+													var width = Number( mask.getAttribute( "width" ) || "0" );
+													var height = Number( mask.getAttribute( "height" ) || "0" );
+													var x = Number( mask.getAttribute( "x" ) || "0" );
+													var y = Number( mask.getAttribute( "y" ) || "0" );
 
-									g.paths[ i1 ].set( {
-										clipTo: ( function( mask, transform ) {
-											return function( ctx ) {
-												var width = Number( mask.getAttribute( "width" ) || "0" );
-												var height = Number( mask.getAttribute( "height" ) || "0" );
-												var x = Number( mask.getAttribute( "x" ) || "0" );
-												var y = Number( mask.getAttribute( "y" ) || "0" );
-
-												ctx.rect( Number( transform[ 0 ] ) * -1 + x, Number( transform[ 1 ] ) * -1 + y, width, height );
-											}
-										} )( mask, transform )
-									} );
+													ctx.rect( Number( transform[ 0 ] ) * -1 + x, Number( transform[ 1 ] ) * -1 + y, width, height );
+												}
+											} )( mask, transform )
+										} );
+									}
 								}
 							}
 						}
