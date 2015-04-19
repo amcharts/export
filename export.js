@@ -26,15 +26,15 @@ not apply to any other amCharts products that are covered by different licenses.
 AmCharts.addInitHandler( function( chart ) {
 	var _this = {
 		name: "export",
-		version: "1.0",
+		version: "1.0.1",
 		libs: {
 			autoLoad: true,
+			reload: false,
 			path: "./plugins/export/libs/",
 			resources: [ {
 				"pdfmake/pdfmake.js": [ "pdfmake/vfs_fonts.js" ],
 				"jszip/jszip.js": [ "xlsx/xlsx.js" ]
-			}, "fabric.js/fabric.js", "FileSaver.js/FileSaver.js" ],
-			loaded: 0
+			}, "fabric.js/fabric.js", "FileSaver.js/FileSaver.js" ]
 		},
 		config: {},
 		setup: {},
@@ -211,14 +211,12 @@ AmCharts.addInitHandler( function( chart ) {
 		},
 
 		loadResource: function( src, addons ) {
-			var node, url = src.indexOf( "//" ) != -1 ? src : [ _this.libs.path, src ].join( "" );
+			var i1, exist, node, item, check, type;
+			var url = src.indexOf( "//" ) != -1 ? src : [ _this.libs.path, src ].join( "" );
 
 			function callback() {
-				_this.libs.loaded++;
-				if ( addons ) {
-					for ( i in addons ) {
-						_this.loadResource( addons[ i ] );
-					}
+				for ( i1 in addons ) {
+					_this.loadResource( addons[ i1 ] );
 				}
 			}
 
@@ -234,24 +232,37 @@ AmCharts.addInitHandler( function( chart ) {
 				node.setAttribute( "href", url );
 			}
 
-			if ( node ) {
+			for ( i1 in document.head.childNodes ) {
+				item = document.head.childNodes[ i1 ];
+				check = item ? ( item.src || item.href ) : false;
+				type = item ? item.tagName : false;
+
+				if ( item && check && check.indexOf( src ) != -1 ) {
+					if ( _this.libs.reload ) {
+						document.head.removeChild( item );
+					}
+					exist = true;
+					break;
+				}
+			}
+
+			if ( !exist || _this.libs.reload ) {
 				node.addEventListener( "load", callback );
 				document.head.appendChild( node );
-			} else {
-				callback();
 			}
+
 		},
 
 		loadDependencies: function() {
-			if ( !_this.libs.loaded && _this.libs.autoLoad ) {
-				for ( i in _this.libs.resources ) {
-					if ( typeof _this.libs.resources[ i ] == "object" ) {
-						for ( i2 in _this.libs.resources[ i ] ) {
-							var addons = _this.libs.resources[ i ][ i2 ];
-							_this.loadResource( i2, addons );
+			var i1, i2;
+			if ( _this.libs.autoLoad ) {
+				for ( i1 in _this.libs.resources ) {
+					if ( _this.libs.resources[ i1 ] instanceof Object ) {
+						for ( i2 in _this.libs.resources[ i1 ] ) {
+							_this.loadResource( i2, _this.libs.resources[ i1 ][ i2 ] );
 						}
 					} else {
-						_this.loadResource( _this.libs.resources[ i ] );
+						_this.loadResource( _this.libs.resources[ i1 ] );
 					}
 				}
 			}
@@ -262,33 +273,34 @@ AmCharts.addInitHandler( function( chart ) {
 		},
 
 		deepMerge: function( a, b, overwrite ) {
-			for ( i in b ) {
-				var v = b[ i ];
+			var i1, v;
+			for ( i1 in b ) {
+				v = b[ i1 ];
 
 				// NEW
-				if ( a[ i ] == undefined || overwrite ) {
+				if ( a[ i1 ] == undefined || overwrite ) {
 					if ( v instanceof Array ) {
-						a[ i ] = new Array();
+						a[ i1 ] = new Array();
 					} else if ( v instanceof Function ) {
-						a[ i ] = new Function();
+						a[ i1 ] = new Function();
 					} else if ( v instanceof Date ) {
-						a[ i ] = new Date();
+						a[ i1 ] = new Date();
 					} else if ( v instanceof Object ) {
-						a[ i ] = new Object();
+						a[ i1 ] = new Object();
 					} else if ( v instanceof Number ) {
-						a[ i ] = new Number();
+						a[ i1 ] = new Number();
 					} else if ( v instanceof String ) {
-						a[ i ] = new String();
+						a[ i1 ] = new String();
 					}
 				}
 
 				if ( !( v instanceof Function || v instanceof Date ) && ( v instanceof Object || v instanceof Array ) ) {
-					_this.deepMerge( a[ i ], v, overwrite );
+					_this.deepMerge( a[ i1 ], v, overwrite );
 				} else {
 					if ( a instanceof Array && !overwrite ) {
 						a.push( v );
 					} else {
-						a[ i ] = v;
+						a[ i1 ] = v;
 					}
 				}
 			}
@@ -297,8 +309,8 @@ AmCharts.addInitHandler( function( chart ) {
 
 		// CAPTURE EMOTIONAL MOMENT
 		capture: function( options, callback ) {
+			var i1, i2, i3;
 			var cfg = _this.deepMerge( _this.deepMerge( {}, _this.config.fabric ), options || {} );
-			var i1, i2, i3 = 0;
 			var groups = [];
 			var offset = {
 				x: 0,
@@ -489,6 +501,7 @@ AmCharts.addInitHandler( function( chart ) {
 				// ADD TO CANVAS
 				fabric.parseSVGDocument( group.svg, ( function( group ) {
 					return function( objects, options ) {
+						var i1;
 						var g = fabric.util.groupSVGElements( objects, options );
 						var tmp = {
 							top: group.offset.y,
@@ -560,11 +573,11 @@ AmCharts.addInitHandler( function( chart ) {
 
 						// ADD BALLOONS
 						var balloons = group.svg.parentNode.getElementsByClassName( "amcharts-balloon-div" );
-						for ( i = 0; i < balloons.length; i++ ) {
+						for ( i1 = 0; i1 < balloons.length; i1++ ) {
 							if ( cfg.balloonFunction instanceof Function ) {
-								cfg.balloonFunction.apply( _this, [ balloons[ i ], group ] );
+								cfg.balloonFunction.apply( _this, [ balloons[ i1 ], group ] );
 							} else {
-								var parent = balloons[ i ];
+								var parent = balloons[ i1 ];
 								var text = parent.childNodes[ 0 ];
 								var label = new fabric.Text( text.innerText || text.innerHTML, {
 									fontSize: _this.pxToNumber( text.style.fontSize ),
@@ -597,6 +610,7 @@ AmCharts.addInitHandler( function( chart ) {
 
 					// Identify elements through classnames
 				} )( group ), function( svg, obj ) {
+					var i1;
 					var className = svg.getAttribute( "class" ) || svg.parentNode.getAttribute( "class" ) || "";
 					var visibility = svg.getAttribute( "visibility" ) || svg.parentNode.getAttribute( "visibility" ) || svg.parentNode.parentNode.getAttribute( "visibility" ) || "";
 					var clipPath = svg.getAttribute( "clip-path" ) || svg.parentNode.getAttribute( "clip-path" ) || "";
@@ -736,6 +750,7 @@ AmCharts.addInitHandler( function( chart ) {
 		},
 
 		toPRINT: function( options, callback ) {
+			var i1;
 			var cfg = _this.deepMerge( {
 				// nothing in here
 			}, options || {} );
@@ -757,12 +772,12 @@ AmCharts.addInitHandler( function( chart ) {
 			document.body.appendChild( img );
 			window.print();
 
-			for ( i in items ) {
-				if ( items[ i ].nodeType === 1 ) {
-					items[ i ].style.display = states[ i ];
+			for ( i1 in items ) {
+				if ( items[ i1 ].nodeType === 1 ) {
+					items[ i1 ].style.display = states[ i1 ];
 				}
 			}
-			img.remove();
+			document.body.removeChild( img );
 
 			_this.handleCallback( callback, data );
 
@@ -781,6 +796,7 @@ AmCharts.addInitHandler( function( chart ) {
 		},
 
 		toCSV: function( options, callback ) {
+			var row, col;
 			var cfg = _this.deepMerge( {
 				data: _this.getChartData(),
 				delimiter: ",",
@@ -910,6 +926,7 @@ AmCharts.addInitHandler( function( chart ) {
 		},
 
 		toArray: function( options, callback ) {
+			var row, col;
 			var cfg = _this.deepMerge( {
 				data: _this.getChartData(),
 				dateFields: [],
@@ -1068,11 +1085,11 @@ AmCharts.addInitHandler( function( chart ) {
 		// MENU BUILDER
 		createMenu: function( list ) {
 			function buildList( list, container ) {
-				var ul = document.createElement( "ul" );
-				for ( i in list ) {
-					var item = typeof list[ i ] === "string" ? {
-						format: list[ i ]
-					} : list[ i ];
+				var i1, ul = document.createElement( "ul" );
+				for ( i1 in list ) {
+					var item = typeof list[ i1 ] === "string" ? {
+						format: list[ i1 ]
+					} : list[ i1 ];
 					var li = document.createElement( "li" );
 					var a = document.createElement( "a" );
 					var img = document.createElement( "img" );
@@ -1239,9 +1256,12 @@ AmCharts.addInitHandler( function( chart ) {
 					libs: {
 						autoLoad: false
 					}
-				}, _this.defaults );
+				}, _this.deepMerge( _this.defaults, {
+					menu: []
+				}, true ) );
 
 				function crawler( object ) {
+					var key;
 					for ( key in object ) {
 						var value = object[ key ];
 
@@ -1311,7 +1331,7 @@ AmCharts.addInitHandler( function( chart ) {
 	}
 
 	// LOAD DEPENDENCIES
-	_this.loadDependencies();
+	_this.loadDependencies( _this.libs.resources, _this.libs.reload );
 
 	// WAIT FOR CONTAINER
 	_this.timer = setInterval( function() {
