@@ -26,7 +26,7 @@ not apply to any other amCharts products that are covered by different licenses.
 AmCharts.addInitHandler( function( chart ) {
 	var _this = {
 		name: "export",
-		version: "1.0.1",
+		version: "1.0.2",
 		libs: {
 			autoLoad: true,
 			reload: false,
@@ -215,8 +215,10 @@ AmCharts.addInitHandler( function( chart ) {
 			var url = src.indexOf( "//" ) != -1 ? src : [ _this.libs.path, src ].join( "" );
 
 			function callback() {
-				for ( i1 in addons ) {
-					_this.loadResource( addons[ i1 ] );
+				if ( addons ) {
+					for ( i1 = 0; i1 < addons.length; i1++ ) {
+						_this.loadResource( addons[ i1 ] );
+					}
 				}
 			}
 
@@ -232,7 +234,7 @@ AmCharts.addInitHandler( function( chart ) {
 				node.setAttribute( "href", url );
 			}
 
-			for ( i1 in document.head.childNodes ) {
+			for ( i1 = 0; i1 < document.head.childNodes.length; i1++ ) {
 				item = document.head.childNodes[ i1 ];
 				check = item ? ( item.src || item.href ) : false;
 				type = item ? item.tagName : false;
@@ -256,7 +258,7 @@ AmCharts.addInitHandler( function( chart ) {
 		loadDependencies: function() {
 			var i1, i2;
 			if ( _this.libs.autoLoad ) {
-				for ( i1 in _this.libs.resources ) {
+				for ( i1 = 0; i1 < _this.libs.resources.length; i1++ ) {
 					if ( _this.libs.resources[ i1 ] instanceof Object ) {
 						for ( i2 in _this.libs.resources[ i1 ] ) {
 							_this.loadResource( i2, _this.libs.resources[ i1 ][ i2 ] );
@@ -273,8 +275,14 @@ AmCharts.addInitHandler( function( chart ) {
 		},
 
 		deepMerge: function( a, b, overwrite ) {
-			var i1, v;
+			var i1, v, type = b instanceof Array ? "array" : "object";
+
 			for ( i1 in b ) {
+				// PREVENT METHODS
+				if ( type == "array" && isNaN(i1) ) {
+					continue;
+				}
+
 				v = b[ i1 ];
 
 				// NEW
@@ -508,7 +516,7 @@ AmCharts.addInitHandler( function( chart ) {
 							left: group.offset.x
 						};
 
-						for ( i1 in g.paths ) {
+						for ( i1 = 0; i1 < g.paths.length; i1++ ) {
 
 							// OPACITY; TODO: Distinguish opacity types
 							if ( g.paths[ i1 ] ) {
@@ -628,7 +636,7 @@ AmCharts.addInitHandler( function( chart ) {
 
 						// TRANSPORT FILL/STROKE OPACITY
 						var attrs = [ "fill", "stroke" ];
-						for ( i1 in attrs ) {
+						for ( i1 = 0; i1 < attrs.length; i1++ ) {
 							var attr = attrs[ i1 ]
 							var attrVal = String( svg.getAttribute( attr ) || "" );
 							var attrOpacity = Number( svg.getAttribute( attr + "-opacity" ) || "1" );
@@ -735,7 +743,6 @@ AmCharts.addInitHandler( function( chart ) {
 				multiplier: 2
 			}, _this.config.pdfMake ), options || {}, true );
 			cfg.images.reference = _this.toPNG( cfg );
-
 			var data = new pdfMake.createPdf( cfg );
 
 			if ( callback ) {
@@ -762,17 +769,17 @@ AmCharts.addInitHandler( function( chart ) {
 			img.src = data;
 			img.setAttribute( "style", "width: 100%; max-height: 100%;" );
 
-			for ( i in items ) {
-				if ( items[ i ].nodeType === 1 ) {
-					states[ i ] = items[ i ].style.display;
-					items[ i ].style.display = "none";
+			for ( i1 = 0; i1 < items.length; i1++ ) {
+				if ( items[ i1 ].nodeType === 1 ) {
+					states[ i1 ] = items[ i1 ].style.display;
+					items[ i1 ].style.display = "none";
 				}
 			}
 
 			document.body.appendChild( img );
 			window.print();
 
-			for ( i1 in items ) {
+			for ( i1 = 0; i1 < items.length; i1++ ) {
 				if ( items[ i1 ].nodeType === 1 ) {
 					items[ i1 ].style.display = states[ i1 ];
 				}
@@ -813,35 +820,37 @@ AmCharts.addInitHandler( function( chart ) {
 
 			for ( row in cfg.data ) {
 				var buffer = [];
-				for ( col in cfg.data[ row ] ) {
-					var value = cfg.data[ row ][ col ];
+				if ( !isNaN(row) ) {
+					for ( col in cfg.data[ row ] ) {
+						var value = cfg.data[ row ][ col ];
 
-					// HEADER
-					if ( row == 0 ) {
-						value = col;
+						// HEADER
+						if ( row == 0 ) {
+							value = col;
 
-						// BODY
-					} else {
+							// BODY
+						} else {
+							if ( typeof value === "string" ) {
+								value = value;
+							} else if ( cfg.dateFormat && value instanceof Date && cfg.dateFields.indexOf( col ) != -1 ) {
+								value = AmCharts.formatDate( value, cfg.dateFormat );
+							}
+						}
+
+						// WRAP IN QUOTES
 						if ( typeof value === "string" ) {
-							value = value;
-						} else if ( cfg.dateFormat && value instanceof Date && cfg.dateFields.indexOf( col ) != -1 ) {
-							value = AmCharts.formatDate( value, cfg.dateFormat );
+							if ( cfg.escape ) {
+								value = value.replace( '"', '""' );
+							}
+							if ( cfg.quotes ) {
+								value = [ '"', value, '"' ].join( "" );
+							}
 						}
-					}
 
-					// WRAP IN QUOTES
-					if ( typeof value === "string" ) {
-						if ( cfg.escape ) {
-							value = value.replace( '"', '""' );
-						}
-						if ( cfg.quotes ) {
-							value = [ '"', value, '"' ].join( "" );
-						}
+						buffer.push( value );
 					}
-
-					buffer.push( value );
+					data += buffer.join( cfg.delimiter ) + "\n";
 				}
-				data += buffer.join( cfg.delimiter ) + "\n";
 			}
 
 			_this.handleCallback( callback, data );
@@ -951,19 +960,21 @@ AmCharts.addInitHandler( function( chart ) {
 			// BODY
 			for ( row in cfg.data ) {
 				var buffer = [];
-				for ( col in cols ) {
-					var col = cols[ col ];
-					var value = cfg.data[ row ][ col ] || "";
+				if ( !isNaN(row) ) {
+					for ( col in cols ) {
+						var col = cols[ col ];
+						var value = cfg.data[ row ][ col ] || "";
 
-					if ( cfg.dateFormat && value instanceof Date && cfg.dateFields.indexOf( col ) != -1 ) {
-						value = AmCharts.formatDate( value, cfg.dateFormat );
-					} else {
-						value = String( value )
+						if ( cfg.dateFormat && value instanceof Date && cfg.dateFields.indexOf( col ) != -1 ) {
+							value = AmCharts.formatDate( value, cfg.dateFormat );
+						} else {
+							value = String( value )
+						}
+
+						buffer.push( value );
 					}
-
-					buffer.push( value );
+					data.push( buffer );
 				}
-				data.push( buffer );
 			}
 
 			_this.handleCallback( callback, data );
@@ -1086,7 +1097,7 @@ AmCharts.addInitHandler( function( chart ) {
 		createMenu: function( list ) {
 			function buildList( list, container ) {
 				var i1, ul = document.createElement( "ul" );
-				for ( i1 in list ) {
+				for ( i1 = 0; i1 < list.length; i1++ ) {
 					var item = typeof list[ i1 ] === "string" ? {
 						format: list[ i1 ]
 					} : list[ i1 ];
