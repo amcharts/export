@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.0
+Version: 1.0.4
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -26,7 +26,7 @@ not apply to any other amCharts products that are covered by different licenses.
 AmCharts.addInitHandler( function( chart ) {
 	var _this = {
 		name: "export",
-		version: "1.0.3",
+		version: "1.0.4",
 		libs: {
 			autoLoad: true,
 			reload: false,
@@ -59,13 +59,14 @@ AmCharts.addInitHandler( function( chart ) {
 					_this.drawing.undos.push( last );
 				}
 			},
-			done: function() {
+			done: function(print) {
 				_this.drawing.enabled = false;
 				_this.drawing.undos = [];
 				_this.drawing.redos = [];
-				_this.setup.fabric.renderAll();
-				_this.setup.wrapper.setAttribute( "class", "amcharts-export-canvas" );
 				_this.createMenu( _this.config.menu );
+				setTimeout(function() {
+					_this.setup.wrapper.setAttribute( "class", _this.setup.chart.classNamePrefix + "-export-canvas" );
+				},print?100:0);
 			}
 		},
 		defaults: {
@@ -445,7 +446,7 @@ AmCharts.addInitHandler( function( chart ) {
 
 			if ( !_this.setup.wrapper ) {
 				_this.setup.wrapper = document.createElement( "div" );
-				_this.setup.wrapper.setAttribute( "class", "amcharts-export-canvas" );
+				_this.setup.wrapper.setAttribute( "class", _this.setup.chart.classNamePrefix + "-export-canvas" );
 				_this.setup.wrapper.appendChild( _this.setup.canvas );
 			} else {
 				_this.setup.wrapper.innerHTML = "";
@@ -467,9 +468,9 @@ AmCharts.addInitHandler( function( chart ) {
 
 			// DRAWING
 			if ( _this.drawing.enabled ) {
-				_this.setup.wrapper.setAttribute( "class", "amcharts-export-canvas active" );
+				_this.setup.wrapper.setAttribute( "class", _this.setup.chart.classNamePrefix + "-export-canvas active" );
 			} else {
-				_this.setup.wrapper.setAttribute( "class", "amcharts-export-canvas" );
+				_this.setup.wrapper.setAttribute( "class", _this.setup.chart.classNamePrefix + "-export-canvas" );
 			}
 
 			for ( i1 = 0; i1 < groups.length; i1++ ) {
@@ -586,7 +587,7 @@ AmCharts.addInitHandler( function( chart ) {
 						_this.setup.fabric.add( g );
 
 						// ADD BALLOONS
-						var balloons = group.svg.parentNode.getElementsByClassName( "amcharts-balloon-div" );
+						var balloons = group.svg.parentNode.getElementsByClassName( _this.setup.chart.classNamePrefix + "-balloon-div" );
 						for ( i1 = 0; i1 < balloons.length; i1++ ) {
 							if ( cfg.balloonFunction instanceof Function ) {
 								cfg.balloonFunction.apply( _this, [ balloons[ i1 ], group ] );
@@ -649,7 +650,7 @@ AmCharts.addInitHandler( function( chart ) {
 							var attrRGBA = fabric.Color.fromHex( attrVal ).getSource();
 
 							// EXCEPTION
-							if ( obj.className == "amcharts-guide-fill" && !attrVal ) {
+							if ( obj.className == _this.setup.chart.classNamePrefix + "-guide-fill" && !attrVal ) {
 								attrOpacity = 0;
 								attrRGBA = fabric.Color.fromHex( "#000000" ).getSource();
 							}
@@ -1155,7 +1156,7 @@ AmCharts.addInitHandler( function( chart ) {
 										if ( item.action != "print" && item.format != "PRINT" ) {
 											this.download( data, item.mimeType, [ item.fileName, item.extension ].join( "." ) );
 										}
-										this.drawing.done();
+										this.drawing.done(item.action == "print" || item.format == "PRINT");
 									} );
 								}
 							} )( item );
@@ -1252,7 +1253,7 @@ AmCharts.addInitHandler( function( chart ) {
 				var div = document.createElement( "div" );
 				_this.setup.menu = div;
 			}
-			div.setAttribute( "class", "amExportButton amcharts-export-menu amcharts-export-menu-" + _this.config.position );
+			div.setAttribute( "class", "amExportButton " + _this.setup.chart.classNamePrefix + "-export-menu " + _this.setup.chart.classNamePrefix + "-export-menu-" + _this.config.position );
 
 			// CALLBACK; REPLACES THE MENU WALKER
 			if ( _this.config.menuWalker ) {
@@ -1303,7 +1304,7 @@ AmCharts.addInitHandler( function( chart ) {
 		init: function( chart ) {
 			_this.setup.canvas = document.createElement( "canvas" );
 			_this.setup.wrapper = document.createElement( "div" );
-			_this.setup.wrapper.setAttribute( "class", "amcharts-export-canvas" );
+			_this.setup.wrapper.setAttribute( "class", _this.setup.chart.classNamePrefix + "-export-canvas" );
 			_this.setup.wrapper.appendChild( _this.setup.canvas );
 			_this.setup.chart.containerDiv.appendChild( _this.setup.wrapper );
 
