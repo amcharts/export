@@ -26,7 +26,7 @@ not apply to any other amCharts products that are covered by different licenses.
 AmCharts.addInitHandler( function( chart ) {
 	var _this = {
 		name: "export",
-		version: "1.0.2",
+		version: "1.0.3",
 		libs: {
 			autoLoad: true,
 			reload: false,
@@ -522,8 +522,14 @@ AmCharts.addInitHandler( function( chart ) {
 							if ( g.paths[ i1 ] ) {
 
 								// CHECK ORIGIN; REMOVE TAINTED
-								if ( cfg.removeImages && g.paths[ i1 ][ "xlink:href" ] && g.paths[ i1 ][ "xlink:href" ].indexOf( location.origin ) == -1 ) {
+								if (
+									cfg.removeImages &&
+									g.paths[ i1 ][ "xlink:href" ] &&
+									g.paths[ i1 ][ "xlink:href" ].indexOf("//") != -1 &&
+									g.paths[ i1 ][ "xlink:href" ].indexOf( location.origin ) == -1
+								) {
 									g.paths.splice( i1, 1 );
+									continue;
 								}
 
 								// SET OPACITY
@@ -1238,15 +1244,15 @@ AmCharts.addInitHandler( function( chart ) {
 				return container.appendChild( ul );
 			}
 
-			var div = _this.setup.chart.containerDiv.getElementsByClassName( "amcharts-export-menu" );
+			var div = _this.setup.chart.containerDiv.getElementsByClassName( "amExportButton" );
 			if ( div.length ) {
 				div = div[ 0 ];
 				div.innerHTML = "";
 			} else {
 				var div = document.createElement( "div" );
-				div.setAttribute( "class", "amExportButton amcharts-export-menu amcharts-export-menu-" + _this.config.position );
 				_this.setup.menu = div;
 			}
+			div.setAttribute( "class", "amExportButton amcharts-export-menu amcharts-export-menu-" + _this.config.position );
 
 			// CALLBACK; REPLACES THE MENU WALKER
 			if ( _this.config.menuWalker ) {
