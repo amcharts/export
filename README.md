@@ -513,5 +513,20 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 ## Changelog
 
+### 1.0.4
+* Considering classNamePrefix (dont't forget to adapt export.css)
+* Added: safety delay on print restore to ensure capturing the canvas
+
+### 1.0.3
+* Fix: flagged relative image paths as tainted
+
+### 1.0.2
+* Fix: compabitily on array method extension such as PrototypeJS
+
+### 1.0.1
+* Added: libs.reload: false, script tag crawling to avoid multiple insertions
+* Fix: IE10 bug on print
+* Fix: migration bug, replaces menu instead of appending
+
 ### 1.0
 * Initial release
