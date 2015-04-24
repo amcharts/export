@@ -121,6 +121,7 @@ Property | Default | Description
 backgroundColor | #FFFFFF | RGB code of the color for the background of the exported image
 enabled | true | Enables or disables export functionality
 legend | {} | Places the legend in case it is within an external container
+fileName | amCharts | A file name to use for generated export files (an extension will be appended to it based on the export format)
 libs | | 3rd party required library settings (see the above section)
 menu | [] | A list of menu or submenu items (see the next chapter for details)
 fabric | {} | Overwrites the default drawing settings (Frabric library)
