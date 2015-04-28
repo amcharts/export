@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.0.5
+Version: 1.0.4
 
 
 ## Description
@@ -247,30 +247,6 @@ This needs to be a function reference. I.e.:
     } },
   "SVG"
 ]
-```
-
-### Menu item reviver
-
-By passing the `menuReviver` callback you are to adapt or completely replace the
-generated menu item before it gets appended to the list (`ul`).
-It retrieves two arguments and it needs to return a valid DOM element.
-
-```
-"menuReviver": function(item,li) {
-  li.setAttribute("class","something special");
-  return li;
-}
-```
-
-### Menu walker
-
-In case you don't like our structure, go ahead and write your own recursive function
-to create the menu by the given list configured through `menu`.
-
-```
-"menuWalker": function(list,container) {
-  // some magic to generate the nested lists using the given list
-}
 ```
 
 ### Printing the chart
@@ -605,12 +581,6 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
-
-### 1.0.5
-* Added: menuWalker to replace the whole menu generation
-* Added: menuReviver to adapt menu items before being appended to the list
-* Added: menuContainer to be able to place the menu within an external container
-* Added: libs.async to load dependencies asynchronous (default true)
 
 ### 1.0.4
 * Considering classNamePrefix (dont't forget to adapt export.css)

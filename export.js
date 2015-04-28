@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.0.5
+Version: 1.0.4
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -26,9 +26,8 @@ not apply to any other amCharts products that are covered by different licenses.
 AmCharts.addInitHandler( function( chart ) {
 	var _this = {
 		name: "export",
-		version: "1.0.5",
+		version: "1.0.4",
 		libs: {
-			async: true,
 			autoLoad: true,
 			reload: false,
 			path: "./plugins/export/libs/",
@@ -123,9 +122,6 @@ AmCharts.addInitHandler( function( chart ) {
 					fit: [ 523.28, 769.89 ]
 				} ]
 			},
-			menuContainer: null,
-			menuReviver: null,
-			menuWalker: null,
 			menu: [ {
 				class: "export-main",
 				label: "Export",
@@ -231,9 +227,6 @@ AmCharts.addInitHandler( function( chart ) {
 				node = document.createElement( "script" );
 				node.setAttribute( "type", "text/javascript" );
 				node.setAttribute( "src", url );
-				if ( _this.libs.async ) {
-					node.setAttribute( "async", "" );
-				}
 
 			} else if ( src.indexOf( ".css" ) != -1 ) {
 				node = document.createElement( "link" );
@@ -310,7 +303,7 @@ AmCharts.addInitHandler( function( chart ) {
 					}
 				}
 
-				if ( !( v instanceof Function || v instanceof Date || v instanceof Element ) && ( v instanceof Object || v instanceof Array ) ) {
+				if ( !( v instanceof Function || v instanceof Date ) && ( v instanceof Object || v instanceof Array ) ) {
 					_this.deepMerge( a[ i1 ], v, overwrite );
 				} else {
 					if ( a instanceof Array && !overwrite ) {
@@ -1108,7 +1101,7 @@ AmCharts.addInitHandler( function( chart ) {
 		},
 
 		// MENU BUILDER
-		createMenu: function( list, container ) {
+		createMenu: function( list ) {
 			function buildList( list, container ) {
 				var i1, ul = document.createElement( "ul" );
 				for ( i1 = 0; i1 < list.length; i1++ ) {
@@ -1252,12 +1245,12 @@ AmCharts.addInitHandler( function( chart ) {
 				return container.appendChild( ul );
 			}
 
-			var div = container.getElementsByClassName( "amExportButton" );
+			var div = _this.setup.chart.containerDiv.getElementsByClassName( "amExportButton" );
 			if ( div.length ) {
 				div = div[ 0 ];
 				div.innerHTML = "";
 			} else {
-				div = document.createElement( "div" );
+				var div = document.createElement( "div" );
 				_this.setup.menu = div;
 			}
 			div.setAttribute( "class", "amExportButton " + _this.setup.chart.classNamePrefix + "-export-menu " + _this.setup.chart.classNamePrefix + "-export-menu-" + _this.config.position );
@@ -1266,9 +1259,9 @@ AmCharts.addInitHandler( function( chart ) {
 			if ( _this.config.menuWalker ) {
 				buildList = _this.config.menuWalker;
 			}
-			buildList.apply(this, [ list, div ] );
+			buildList( list, div );
 
-			container.appendChild( div );
+			_this.setup.chart.containerDiv.appendChild( div );
 
 			return div;
 		},
@@ -1317,13 +1310,11 @@ AmCharts.addInitHandler( function( chart ) {
 
 			_this.setup.chart.AmExport = _this;
 
-			// CREATE MENU; GET BY ID; OBTAIN GIVEN ELEMENT; TAKE CHART CONTAINER
-			if ( typeof _this.config.menuContainer == "string" ) {
-				_this.config.menuContainer = document.getElementById(_this.config.menuContainer);
-			} else if ( !(_this.config.menuContainer instanceof Element) ) {
-				_this.config.menuContainer = _this.setup.chart.containerDiv;
-			}
-			_this.createMenu( _this.config.menu, _this.config.menuContainer );
+			// CREATE MENU
+			_this.timer = setTimeout( function() {
+				clearTimeout( _this.timer );
+				_this.createMenu( _this.config.menu );
+			}, AmCharts.updateRate );
 		}
 	}
 
