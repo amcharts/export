@@ -60,14 +60,14 @@ AmCharts.addInitHandler( function( chart ) {
 					_this.drawing.undos.push( last );
 				}
 			},
-			done: function(print) {
+			done: function( print ) {
 				_this.drawing.enabled = false;
 				_this.drawing.undos = [];
 				_this.drawing.redos = [];
 				_this.createMenu( _this.config.menu );
-				setTimeout(function() {
+				setTimeout( function() {
 					_this.setup.wrapper.setAttribute( "class", _this.setup.chart.classNamePrefix + "-export-canvas" );
-				},print?100:0);
+				}, print ? 100 : 0 );
 			}
 		},
 		defaults: {
@@ -287,7 +287,7 @@ AmCharts.addInitHandler( function( chart ) {
 
 			for ( i1 in b ) {
 				// PREVENT METHODS
-				if ( type == "array" && isNaN(i1) ) {
+				if ( type == "array" && isNaN( i1 ) ) {
 					continue;
 				}
 
@@ -533,7 +533,7 @@ AmCharts.addInitHandler( function( chart ) {
 								if (
 									cfg.removeImages &&
 									g.paths[ i1 ][ "xlink:href" ] &&
-									g.paths[ i1 ][ "xlink:href" ].indexOf("//") != -1 &&
+									g.paths[ i1 ][ "xlink:href" ].indexOf( "//" ) != -1 &&
 									g.paths[ i1 ][ "xlink:href" ].indexOf( location.origin ) == -1
 								) {
 									g.paths.splice( i1, 1 );
@@ -834,7 +834,7 @@ AmCharts.addInitHandler( function( chart ) {
 
 			for ( row in cfg.data ) {
 				var buffer = [];
-				if ( !isNaN(row) ) {
+				if ( !isNaN( row ) ) {
 					for ( col in cfg.data[ row ] ) {
 						var value = cfg.data[ row ][ col ];
 
@@ -974,7 +974,7 @@ AmCharts.addInitHandler( function( chart ) {
 			// BODY
 			for ( row in cfg.data ) {
 				var buffer = [];
-				if ( !isNaN(row) ) {
+				if ( !isNaN( row ) ) {
 					for ( col in cols ) {
 						var col = cols[ col ];
 						var value = cfg.data[ row ][ col ] || "";
@@ -1109,6 +1109,8 @@ AmCharts.addInitHandler( function( chart ) {
 
 		// MENU BUILDER
 		createMenu: function( list, container ) {
+			var div;
+
 			function buildList( list, container ) {
 				var i1, ul = document.createElement( "ul" );
 				for ( i1 = 0; i1 < list.length; i1++ ) {
@@ -1163,7 +1165,7 @@ AmCharts.addInitHandler( function( chart ) {
 										if ( item.action != "print" && item.format != "PRINT" ) {
 											this.download( data, item.mimeType, [ item.fileName, item.extension ].join( "." ) );
 										}
-										this.drawing.done(item.action == "print" || item.format == "PRINT");
+										this.drawing.done( item.action == "print" || item.format == "PRINT" );
 									} );
 								}
 							} )( item );
@@ -1197,7 +1199,7 @@ AmCharts.addInitHandler( function( chart ) {
 						item.click = ( function( item ) {
 							return function() {
 								this.capture( item, function() {
-									this.createMenu( item.menu, item );
+									this.createMenu( item.menu );
 								} );
 							}
 						} )( item );
@@ -1252,7 +1254,9 @@ AmCharts.addInitHandler( function( chart ) {
 				return container.appendChild( ul );
 			}
 
-			var div = container.getElementsByClassName( "amExportButton" );
+			// DETERMINE CONTAINER; CREATE / RESET MENU CONTAINER
+			container = container ? container : _this.config.divId;
+			div = container.getElementsByClassName( "amExportButton" );
 			if ( div.length ) {
 				div = div[ 0 ];
 				div.innerHTML = "";
@@ -1266,7 +1270,7 @@ AmCharts.addInitHandler( function( chart ) {
 			if ( _this.config.menuWalker ) {
 				buildList = _this.config.menuWalker;
 			}
-			buildList.apply(this, [ list, div ] );
+			buildList.apply( this, [ list, div ] );
 
 			container.appendChild( div );
 
@@ -1319,11 +1323,11 @@ AmCharts.addInitHandler( function( chart ) {
 
 			// CREATE MENU; GET BY ID; OBTAIN GIVEN ELEMENT; TAKE CHART CONTAINER
 			if ( typeof _this.config.divId == "string" ) {
-				_this.config.divId = document.getElementById(_this.config.divId);
-			} else if ( !(_this.config.divId instanceof Element) ) {
+				_this.config.divId = document.getElementById( _this.config.divId );
+			} else if ( !( _this.config.divId instanceof Element ) ) {
 				_this.config.divId = _this.setup.chart.containerDiv;
 			}
-			_this.createMenu( _this.config.menu, _this.config.divId );
+			_this.createMenu( _this.config.menu );
 		}
 	}
 
