@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.0.7
+Version: 1.0.8
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -26,7 +26,7 @@ not apply to any other amCharts products that are covered by different licenses.
 AmCharts.addInitHandler( function( chart ) {
 	var _this = {
 		name: "export",
-		version: "1.0.7",
+		version: "1.0.8",
 		libs: {
 			async: true,
 			autoLoad: true,
@@ -127,7 +127,7 @@ AmCharts.addInitHandler( function( chart ) {
 			menuReviver: null,
 			menuWalker: null,
 			menu: [ {
-				class: "export-main",
+				"class": "export-main",
 				label: "Export",
 				menu: [ {
 					label: "Download as ...",
@@ -145,35 +145,35 @@ AmCharts.addInitHandler( function( chart ) {
 					label: "Annotate",
 					action: "draw",
 					menu: [ {
-						class: "export-drawing",
+						"class": "export-drawing",
 						menu: [ {
 							label: "Color ...",
 							menu: [ {
-								class: "export-drawing-color export-drawing-color-black",
+								"class": "export-drawing-color export-drawing-color-black",
 								label: "Black",
 								click: function() {
 									this.setup.fabric.freeDrawingBrush.color = "#000";
 								}
 							}, {
-								class: "export-drawing-color export-drawing-color-white",
+								"class": "export-drawing-color export-drawing-color-white",
 								label: "White",
 								click: function() {
 									this.setup.fabric.freeDrawingBrush.color = "#fff";
 								}
 							}, {
-								class: "export-drawing-color export-drawing-color-red",
+								"class": "export-drawing-color export-drawing-color-red",
 								label: "Red",
 								click: function() {
 									this.setup.fabric.freeDrawingBrush.color = "#f00";
 								}
 							}, {
-								class: "export-drawing-color export-drawing-color-green",
+								"class": "export-drawing-color export-drawing-color-green",
 								label: "Green",
 								click: function() {
 									this.setup.fabric.freeDrawingBrush.color = "#0f0";
 								}
 							}, {
-								class: "export-drawing-color export-drawing-color-blue",
+								"class": "export-drawing-color export-drawing-color-blue",
 								label: "Blue",
 								click: function() {
 									this.setup.fabric.freeDrawingBrush.color = "#00f";
@@ -311,7 +311,7 @@ AmCharts.addInitHandler( function( chart ) {
 					}
 				}
 
-				if ( !( v instanceof Function || v instanceof Date || v instanceof Element ) && ( v instanceof Object || v instanceof Array ) ) {
+				if ( !( v instanceof Function || v instanceof Date || v.nodeType === 1 ) && ( v instanceof Object || v instanceof Array ) ) {
 					_this.deepMerge( a[ i1 ], v, overwrite );
 				} else {
 					if ( a instanceof Array && !overwrite ) {
@@ -1269,7 +1269,7 @@ AmCharts.addInitHandler( function( chart ) {
 			if ( !container ) {
 				if ( typeof _this.config.divId == "string" ) {
 					_this.config.divId = container = document.getElementById( _this.config.divId );
-				} else if ( _this.config.divId instanceof Element ) {
+				} else if ( _this.config.divId.nodeType === 1 ) {
 					container = _this.config.divId;
 				} else {
 					container = _this.setup.chart.containerDiv;
