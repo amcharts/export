@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.0.6
+Version: 1.0.7
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -26,7 +26,7 @@ not apply to any other amCharts products that are covered by different licenses.
 AmCharts.addInitHandler( function( chart ) {
 	var _this = {
 		name: "export",
-		version: "1.0.6",
+		version: "1.0.7",
 		libs: {
 			async: true,
 			autoLoad: true,
@@ -828,41 +828,55 @@ AmCharts.addInitHandler( function( chart ) {
 				dateFormat: _this.setup.chart.dataDateFormat || "YYYY-MM-DD"
 			}, options || {}, true );
 			var data = "";
+			var cols = [];
+			var buffer = [];
 
 			if ( _this.setup.chart.categoryAxis && _this.setup.chart.categoryAxis.parseDates && _this.setup.chart.categoryField ) {
 				cfg.dateFields.push( _this.setup.chart.categoryField );
 			}
 
+			function enchant( value, column ) {
+
+				// STRING
+				if ( typeof value === "string" ) {
+					value = value;
+
+				// DATE FORMAT
+				} else if ( column && cfg.dateFormat && value instanceof Date && cfg.datecolumns.indexOf( column ) != -1 ) {
+					value = AmCharts.formatDate( value, cfg.dateFormat );
+				}
+
+				// WRAP IN QUOTES				
+				if ( typeof value === "string" ) {
+					if ( cfg.escape ) {
+						value = value.replace( '"', '""' );
+					}
+					if ( cfg.quotes ) {
+						value = [ '"', value, '"' ].join( "" );
+					}
+				}
+
+				return value;
+			}
+
+			// HEADER
+			for ( value in cfg.data[ 0 ] ) {
+				buffer.push( enchant( value ) );
+				cols.push( value );
+			}
+			data += buffer.join( cfg.delimiter ) + "\n";
+
+			// BODY
 			for ( row in cfg.data ) {
-				var buffer = [];
+				buffer = [];
 				if ( !isNaN( row ) ) {
-					for ( col in cfg.data[ row ] ) {
-						var value = cfg.data[ row ][ col ];
+					for ( col in cols ) {
+						if ( !isNaN( col ) ) {
+							var column = cols[ col ];
+							var value = cfg.data[ row ][ column ];
 
-						// HEADER
-						if ( row == 0 ) {
-							value = col;
-
-							// BODY
-						} else {
-							if ( typeof value === "string" ) {
-								value = value;
-							} else if ( cfg.dateFormat && value instanceof Date && cfg.dateFields.indexOf( col ) != -1 ) {
-								value = AmCharts.formatDate( value, cfg.dateFormat );
-							}
+							buffer.push( enchant( value, column ) );
 						}
-
-						// WRAP IN QUOTES
-						if ( typeof value === "string" ) {
-							if ( cfg.escape ) {
-								value = value.replace( '"', '""' );
-							}
-							if ( cfg.quotes ) {
-								value = [ '"', value, '"' ].join( "" );
-							}
-						}
-
-						buffer.push( value );
 					}
 					data += buffer.join( cfg.delimiter ) + "\n";
 				}

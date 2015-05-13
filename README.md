@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.0.6
+Version: 1.0.7
 
 
 ## Description
@@ -596,6 +596,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.0.7
+* Fix: issue on toCSV handling the header (first row)
 
 ### 1.0.6
 * Fix: issue on revalidation the chart/map
