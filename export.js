@@ -1380,7 +1380,7 @@ AmCharts.addInitHandler( function( chart ) {
 	_this.setup.chart.addClassNames = true;
 
 	// WITH IE?
-	if ( AmCharts.isIE && AmCharts.IEversion < 9 ) {
+	if ( AmCharts.isIE && AmCharts.IEversion <= 9 ) {
 		return;
 	}
 
