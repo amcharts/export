@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.0.8
+Version: 1.0.9
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -26,7 +26,7 @@ not apply to any other amCharts products that are covered by different licenses.
 AmCharts.addInitHandler( function( chart ) {
 	var _this = {
 		name: "export",
-		version: "1.0.8",
+		version: "1.0.9",
 		libs: {
 			async: true,
 			autoLoad: true,
@@ -311,7 +311,7 @@ AmCharts.addInitHandler( function( chart ) {
 					}
 				}
 
-				if ( !( v instanceof Function || v instanceof Date || v.nodeType === 1 ) && ( v instanceof Object || v instanceof Array ) ) {
+				if ( !( v instanceof Function || v instanceof Date || _this.isElement( v ) ) && ( v instanceof Object || v instanceof Array ) ) {
 					_this.deepMerge( a[ i1 ], v, overwrite );
 				} else {
 					if ( a instanceof Array && !overwrite ) {
@@ -322,6 +322,11 @@ AmCharts.addInitHandler( function( chart ) {
 				}
 			}
 			return a;
+		},
+
+		// CHECK IF IT'S AN ELEMENT
+		isElement: function( thingy ) {
+			return thingy instanceof Object && thingy && thingy.nodeType === 1;
 		},
 
 		// CAPTURE EMOTIONAL MOMENT
@@ -785,7 +790,7 @@ AmCharts.addInitHandler( function( chart ) {
 			img.setAttribute( "style", "width: 100%; max-height: 100%;" );
 
 			for ( i1 = 0; i1 < items.length; i1++ ) {
-				if ( items[ i1 ].nodeType === 1 ) {
+				if ( _this.isElement( items[ i1 ] ) ) {
 					states[ i1 ] = items[ i1 ].style.display;
 					items[ i1 ].style.display = "none";
 				}
@@ -795,7 +800,7 @@ AmCharts.addInitHandler( function( chart ) {
 			window.print();
 
 			for ( i1 = 0; i1 < items.length; i1++ ) {
-				if ( items[ i1 ].nodeType === 1 ) {
+				if ( _this.isElement( items[ i1 ] ) ) {
 					items[ i1 ].style.display = states[ i1 ];
 				}
 			}
@@ -841,7 +846,7 @@ AmCharts.addInitHandler( function( chart ) {
 				if ( typeof value === "string" ) {
 					value = value;
 
-				// DATE FORMAT
+					// DATE FORMAT
 				} else if ( column && cfg.dateFormat && value instanceof Date && cfg.datecolumns.indexOf( column ) != -1 ) {
 					value = AmCharts.formatDate( value, cfg.dateFormat );
 				}
@@ -1269,7 +1274,7 @@ AmCharts.addInitHandler( function( chart ) {
 			if ( !container ) {
 				if ( typeof _this.config.divId == "string" ) {
 					_this.config.divId = container = document.getElementById( _this.config.divId );
-				} else if ( _this.config.divId.nodeType === 1 ) {
+				} else if ( _this.isElement(_this.config.divId) ) {
 					container = _this.config.divId;
 				} else {
 					container = _this.setup.chart.containerDiv;
@@ -1277,25 +1282,22 @@ AmCharts.addInitHandler( function( chart ) {
 			}
 
 			// CREATE / RESET MENU CONTAINER
-			div = container.getElementsByClassName( "amExportButton" );
-			if ( div.length ) {
-				div = div[ 0 ];
-				div.innerHTML = "";
+			if ( _this.isElement(_this.setup.menu) ) {
+				_this.setup.menu.innerHTML = "";
 			} else {
-				div = document.createElement( "div" );
-				_this.setup.menu = div;
+				_this.setup.menu = document.createElement( "div" );
 			}
-			div.setAttribute( "class", _this.setup.chart.classNamePrefix + "-export-menu " + _this.setup.chart.classNamePrefix + "-export-menu-" + _this.config.position + " amExportButton" );
+			_this.setup.menu.setAttribute( "class", _this.setup.chart.classNamePrefix + "-export-menu " + _this.setup.chart.classNamePrefix + "-export-menu-" + _this.config.position + " amExportButton" );
 
 			// CALLBACK; REPLACES THE MENU WALKER
 			if ( _this.config.menuWalker ) {
 				buildList = _this.config.menuWalker;
 			}
-			buildList.apply( this, [ list, div ] );
+			buildList.apply( this, [ list, _this.setup.menu ] );
 
-			container.appendChild( div );
+			container.appendChild( _this.setup.menu );
 
-			return div;
+			return _this.setup.menu;
 		},
 
 		migrateSetup: function( chart ) {

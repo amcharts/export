@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.0.8
+Version: 1.0.9
 
 
 ## Description
@@ -596,6 +596,10 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.0.9
+* Added: IE9 base64 export
+* Added: Third party updates + minified versions
 
 ### 1.0.8
 * Fix: IE8 issue which prevents the chart from initiating
