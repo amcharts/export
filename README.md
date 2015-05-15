@@ -549,7 +549,22 @@ toImage | (object) options, (function) callback | Generates an image element whi
 ## Fallback for IE9
 
 Unfortunately our lovely Internet Explorer 9 does not allow us to offer downloads which has been locally generated.
-For those cases the plugin will place an overlay on top of the chart to place an `img` or `textarea` to let the user manually save the generated output with some instructions above. These short instructions can be modified like following.
+For those cases the plugin will place an overlay on top of the chart to place an `img` or `textarea` to let the user manually save the generated output with some instructions above.
+To avoid having a bigger payload by including senseless polyfills to your site, you may need to add following metatag in your `<head>` of your HTML document.
+
+```
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+```
+
+This feature will kick in by default if you want to disable it simply pass `false` to the `fallback` parameter.
+
+```
+{
+  fallback: false
+}
+```
+
+In case you want to change our default messages you can modify it like following.
 
 ```
 {
@@ -557,14 +572,6 @@ For those cases the plugin will place an overlay on top of the chart to place an
     text: "CTRL + C to copy the data into the clipboard.",
     image: "Rightclick -> Save picture as... to save the image."
   }
-}
-```
-
-in case you don't want to offer this fallback to your users you can disable this feature by simply passing `false` to the property.
-
-```
-{
-  fallback: false
 }
 ```
 
