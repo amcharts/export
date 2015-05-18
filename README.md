@@ -630,7 +630,7 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 ## Changelog
 
-### 1.10.0
+### 1.1.0
 * Fix: Print issue on safari which captured the actual page instead of the export
 * Added: IE9 download fallback for `text/plain` and `image/*` mime types (CSS has been modified)
 * Added: `toImage` method; returns `img` element with embedded base64 imagery
