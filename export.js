@@ -939,7 +939,7 @@ AmCharts.addInitHandler( function( chart ) {
 					value = value;
 
 					// DATE FORMAT
-				} else if ( column && cfg.dateFormat && value instanceof Date && cfg.datecolumns.indexOf( column ) != -1 ) {
+				} else if (column && cfg.dateFormat && value instanceof Date && cfg.dateFields.indexOf(column) != -1) {
 					value = AmCharts.formatDate( value, cfg.dateFormat );
 				}
 
