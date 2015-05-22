@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.1.0
+Version: 1.1.1
 
 
 ## Description
@@ -629,6 +629,10 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.1.1
+* Fix: CSV export issue on date based charts
+* Fix: Enhanced migration script to obtain more settings
 
 ### 1.1.0
 * Fix: Print issue on safari which captured the actual page instead of the export
