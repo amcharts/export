@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.1.0
+Version: 1.1.1
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -26,7 +26,7 @@ not apply to any other amCharts products that are covered by different licenses.
 AmCharts.addInitHandler( function( chart ) {
 	var _this = {
 		name: "export",
-		version: "1.1.0",
+		version: "1.1.1",
 		libs: {
 			async: true,
 			autoLoad: true,
@@ -939,7 +939,7 @@ AmCharts.addInitHandler( function( chart ) {
 					value = value;
 
 					// DATE FORMAT
-				} else if ( column && cfg.dateFormat && value instanceof Date && cfg.datecolumns.indexOf( column ) != -1 ) {
+				} else if ( column && cfg.dateFormat && value instanceof Date && cfg.dateFields.indexOf( column ) != -1 ) {
 					value = AmCharts.formatDate( value, cfg.dateFormat );
 				}
 
@@ -1423,6 +1423,8 @@ AmCharts.addInitHandler( function( chart ) {
 							config.menu = value;
 						} else if ( key == "libs" ) {
 							config.libs = value;
+						} else if ( typeof key == "string" ) {
+							config[ key ] = value;
 						}
 					}
 				}
