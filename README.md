@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.1.1
+Version: 1.1.2
 
 
 ## Description
@@ -629,6 +629,11 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.1.2
+* Added: Generalized fallback; does a lookup on the Blob constructor
+* Fix: Wait for lazy images, triggers capture callback only when all images have been fully loaded
+* Discovered: [Safari 5 issue](https://github.com/kangax/fabric.js/issues/2241) please adapt fabric.js manually to solve it
 
 ### 1.1.1
 * Fix: CSV export issue on date based charts
