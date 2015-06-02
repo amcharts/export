@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.1.2
+Version: 1.1.3
 
 
 ## Description
@@ -363,6 +363,16 @@ And that's not even the end of it. You can add menu items to cancel, undo, redo.
 } ]
 ```
 
+If you need to filter the drawn elements you can pass the `reviver` method in your global configuration or pass it to the `capture` method if you export manually. To hide e.G. all free labels you can simply do so like following:
+```
+"menu": ["PNG"],
+"reviver": function(obj) {
+  if ( obj.className == "amcharts-label" ) {
+    obj.opacity = 0;
+  }
+}
+```
+
 ### A list of menu item properties
 
 Property | Description
@@ -629,6 +639,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.1.3
+* Added: Added reviver in capturing method to filter the drawn chart elements
 
 ### 1.1.2
 * Added: Generalized fallback; does a lookup on the Blob constructor
