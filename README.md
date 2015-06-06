@@ -115,15 +115,16 @@ Property | Default | Description
 -------- | ------- | -----------
 backgroundColor | #FFFFFF | RGB code of the color for the background of the exported image
 enabled | true | Enables or disables export functionality
-legend | {} | Places the legend in case it is within an external container
+divId | | ID or a reference to div object in case you want the menu in a separate container.
+fabric | {} | Overwrites the default drawing settings (fabricJS library)
+fallback | {} | Holds the messages to guide the user to copy the generated output; `false` will disable the fallback feature
 fileName | amCharts | A file name to use for generated export files (an extension will be appended to it based on the export format)
+legend | {} | Places the legend in case it is within an external container
 libs | | 3rd party required library settings (see the above section)
 menu | [] | A list of menu or submenu items (see the next chapter for details)
-fabric | {} | Overwrites the default drawing settings (fabricJS library)
 pdfMake | {} | Overwrites the default settings for PDF export (pdfMake library)
+position | top-right | A position of export icon. Possible values: "top-left", "top-right" (default), "bottom-left", "bottom-right"
 removeImages | true | If true export checks for and removes "tainted" images that area lodead from different domains
-divId | | ID or a reference to div object in case you want the menu in a separate container.
-fallback | {} | Holds the messages to guide the user to copy the generated output; `false` will disable the fallback feature
 
 
 ## Configuring export menu
