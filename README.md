@@ -26,7 +26,14 @@ bundled CSS file. I.e.:
 
 ```
 <script src="amcharts/plugins/export/export.min.js"></script>
-<link  type="text/css" href="../export.css" rel="stylesheet">
+<link  type="text/css" href="amcharts/plugins/export/export.css" rel="stylesheet">
+```
+
+Or if you'd rather use amCharts CDN:
+
+```
+<script src="//cdn.amcharts.com/lib/3/plugins/export/export.min.js"></script>
+<link  type="text/css" href="//cdn.amcharts.com/lib/3/plugins/export/export.css" rel="stylesheet">
 ```
 
 (this needs to go after all the other amCharts includes)
