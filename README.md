@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.1.3
+Version: 1.1.4
 
 
 ## Description
@@ -684,6 +684,11 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.1.4
+* Fix: Did not collect clip-path and pattern from legend
+* Fix: External legend did not respect given width when positioned on left side
+* Fix: Improved tainted image detection
 
 ### 1.1.3
 * Added: Added reviver in capturing method to filter the drawn chart elements

@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.1.3
+Version: 1.1.4
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -26,7 +26,7 @@ not apply to any other amCharts products that are covered by different licenses.
 AmCharts.addInitHandler( function( chart ) {
 	var _this = {
 		name: "export",
-		version: "1.1.3",
+		version: "1.1.4",
 		libs: {
 			async: true,
 			autoLoad: true,
@@ -46,20 +46,28 @@ AmCharts.addInitHandler( function( chart ) {
 			actions: [ "undo", "redo", "done", "cancel" ],
 			undos: [],
 			undo: function() {
-				var last = _this.drawing.undos.pop();
-
-				if ( last ) {
-					_this.drawing.redos.push( last );
-					last.path.remove();
+				var item = _this.drawing.undos.pop();
+				if ( item ) {
+					_this.drawing.redos.push( item );
+					if ( item.action == "added" ) {
+						item.target.known = true;
+						_this.setup.fabric.remove( item.target );
+					}
+					item.target.setOptions( JSON.parse( item.options ) );
+					_this.setup.fabric.renderAll();
 				}
 			},
 			redos: [],
 			redo: function() {
-				var last = _this.drawing.redos.pop();
-
-				if ( last ) {
-					_this.setup.fabric.add( last.path );
-					_this.drawing.undos.push( last );
+				var item = _this.drawing.redos.pop();
+				if ( item ) {
+					_this.drawing.undos.push( item );
+					if ( item.action == "added" ) {
+						item.target.known = true;
+						_this.setup.fabric.add( item.target );
+					}
+					item.target.setOptions( JSON.parse( item.options ) );
+					_this.setup.fabric.renderAll();
 				}
 			},
 			done: function() {
@@ -397,16 +405,93 @@ AmCharts.addInitHandler( function( chart ) {
 			if (
 				source &&
 				source.indexOf( "//" ) != -1 &&
-				source.indexOf( location.origin ) == -1
+				source.indexOf( location.origin.replace( /.*:/, "" ) ) == -1
 			) {
 				return true;
 			}
 			return false;
 		},
 
+		// RECURSIVE METHOD TO CRAWL THE ATTRIBUTE
+		gatherAttribute: function( elm, attr, lvl ) {
+			var value, lvl = lvl ? lvl : 0;
+			if ( elm ) {
+				value = elm.getAttribute( attr );
+
+				if ( !value && lvl < 3 ) {
+					return _this.gatherAttribute( elm.parentNode, attr, lvl + 1 );
+				}
+			}
+			return value
+		},
+
+		// WALKTHROUGH CHILDREN AND GATHER THE CLIPPATHS AND PATTERNS
+		gatherElements: function( group, cfg ) {
+			var i1, i2;
+			for ( i1 = 0; i1 < group.children.length; i1++ ) {
+				var childNode = group.children[ i1 ];
+
+				// CLIPPATH
+				if ( childNode.tagName == "clipPath" ) {
+					for ( i2 = 0; i2 < childNode.childNodes.length; i2++ ) {
+						childNode.childNodes[ i2 ].setAttribute( "fill", "transparent" );
+					}
+					group.clippings[ childNode.id ] = childNode;
+
+					// PATTERN
+				} else if ( childNode.tagName == "pattern" ) {
+					for ( i2 = 0; i2 < childNode.childNodes.length; i2++ ) {
+
+						var props = {
+							node: childNode,
+							source: childNode.getAttribute( "xlink:href" ),
+							width: Number( childNode.getAttribute( "width" ) ),
+							height: Number( childNode.getAttribute( "height" ) ),
+							repeat: "repeat"
+						}
+
+						// TAINTED
+						if ( cfg.removeImages && _this.isTainted( props.source ) ) {
+							group.patterns[ childNode.id ] = "transparent";
+
+						// REPLACE SOURCE
+						} else {
+							var rect = childNode.getElementsByTagName( "rect" );
+							if ( rect.length > 0 ) {
+								var IMG = new Image();
+								IMG.src = props.source;
+
+								var PSC = new fabric.StaticCanvas( undefined, {
+									width: props.width,
+									height: props.height,
+									backgroundColor: rect[ 0 ].getAttribute( "fill" )
+								} );
+
+								var RECT = new fabric.Rect( {
+									width: props.width,
+									height: props.height,
+									fill: new fabric.Pattern( {
+										source: IMG,
+										repeat: "repeat"
+									} )
+								} );
+								PSC.add( RECT );
+								props.source = PSC.toDataURL();
+							}
+
+							// BUFFER PATTERN
+							group.patterns[ childNode.id ] = new fabric.Pattern( props );
+						}
+
+					}
+				}
+			}
+			return group;
+		},
+
 		// CAPTURE EMOTIONAL MOMENT
 		capture: function( options, callback ) {
-			var i1, i2, i3;
+			var i1;
 			var cfg = _this.deepMerge( _this.deepMerge( {}, _this.config.fabric ), options || {} );
 			var groups = [];
 			var offset = {
@@ -431,64 +516,8 @@ AmCharts.addInitHandler( function( chart ) {
 					clippings: {}
 				}
 
-				for ( i2 = 0; i2 < group.children.length; i2++ ) {
-					var childNode = group.children[ i2 ];
-
-					// CLIPPATH
-					if ( childNode.tagName == "clipPath" ) {
-						for ( i3 = 0; i3 < childNode.childNodes.length; i3++ ) {
-							childNode.childNodes[ i3 ].setAttribute( "fill", "transparent" );
-						}
-						group.clippings[ childNode.id ] = childNode;
-
-						// PATTERN
-					} else if ( childNode.tagName == "pattern" ) {
-						for ( i3 = 0; i3 < childNode.childNodes.length; i3++ ) {
-
-							var props = {
-								node: childNode,
-								source: childNode.getAttribute( "xlink:href" ),
-								width: Number( childNode.getAttribute( "width" ) ),
-								height: Number( childNode.getAttribute( "height" ) ),
-								repeat: "repeat"
-							}
-
-							// TAINTED
-							if ( cfg.removeImages && _this.isTainted( props.source ) ) {
-								group.patterns[ childNode.id ] = "transparent";
-
-								// REPLACE SOURCE
-							} else {
-								var rect = childNode.getElementsByTagName( "rect" );
-								if ( rect.length > 0 ) {
-									var IMG = new Image();
-									IMG.src = props.source;
-
-									var PSC = new fabric.StaticCanvas( undefined, {
-										width: props.width,
-										height: props.height,
-										backgroundColor: rect[ 0 ].getAttribute( "fill" )
-									} );
-
-									var RECT = new fabric.Rect( {
-										width: props.width,
-										height: props.height,
-										fill: new fabric.Pattern( {
-											source: IMG,
-											repeat: "repeat"
-										} )
-									} );
-									PSC.add( RECT );
-									props.source = PSC.toDataURL();
-								}
-
-								// BUFFER PATTERN
-								group.patterns[ childNode.id ] = new fabric.Pattern( props );
-							}
-
-						}
-					}
-				}
+				// GATHER ELEMENTS
+				group = _this.gatherElements( group, cfg );
 
 				// APPEND GROUP
 				groups.push( group );
@@ -498,7 +527,8 @@ AmCharts.addInitHandler( function( chart ) {
 			if ( _this.config.legend && _this.setup.chart.legend && _this.setup.chart.legend.position == "outside" ) {
 				var group = {
 					svg: _this.setup.chart.legend.container.container,
-					parent: _this.setup.chart.legend.container.div,
+					parent: _this.setup.chart.legend.container.container.parentNode,
+					children: _this.setup.chart.legend.container.container.getElementsByTagName( "*" ),
 					offset: {
 						x: 0,
 						y: 0
@@ -508,7 +538,9 @@ AmCharts.addInitHandler( function( chart ) {
 						position: _this.config.legend.position,
 						width: _this.config.legend.width ? _this.config.legend.width : _this.setup.chart.legend.container.width,
 						height: _this.config.legend.height ? _this.config.legend.height : _this.setup.chart.legend.container.height
-					}
+					},
+					patterns: {},
+					clippings: {}
 				}
 
 				// Adapt canvas dimensions
@@ -518,6 +550,9 @@ AmCharts.addInitHandler( function( chart ) {
 				} else if ( [ "top", "bottom" ].indexOf( group.legend.position ) != -1 ) {
 					offset.height += group.legend.height;
 				}
+
+				// GATHER ELEMENTS
+				group = _this.gatherElements( group, cfg );
 
 				// PRE/APPEND SVG
 				groups[ group.legend.type ]( group );
@@ -561,9 +596,36 @@ AmCharts.addInitHandler( function( chart ) {
 
 			_this.deepMerge( _this.setup.fabric, cfg );
 
-			// OBSERVE MOUSE
-			_this.setup.fabric.on( "path:created", function( path ) {
-				_this.drawing.undos.push( path );
+			// OBSERVE OBJECT CREATION
+			_this.setup.fabric.on( "object:added", function( e ) {
+				var item = e.target;
+				var state = JSON.stringify( item.originalState );
+				if ( item.selectable && !item.known ) {
+					_this.drawing.undos.push( {
+						action: "added",
+						target: item,
+						options: state
+					} );
+					_this.drawing.undos.push( {
+						action: "modified",
+						target: item,
+						options: state
+					} );
+					_this.drawing.redos = [];
+				}
+			} );
+
+			// OBSERVE OBJECT MODIFICATIONS
+			_this.setup.fabric.on( "object:modified", function( e ) {
+				var item = e.target;
+				var state = JSON.stringify( item.saveState().originalState );
+				if ( item.selectable ) {
+					_this.drawing.undos.push( {
+						action: "modified",
+						target: item,
+						options: state
+					} );
+				}
 			} );
 
 			// DRAWING
@@ -585,7 +647,7 @@ AmCharts.addInitHandler( function( chart ) {
 					// EXTERNAL LEGEND
 					if ( group.legend ) {
 						if ( group.legend.position == "left" ) {
-							offset.x += chart.legend.container.width;
+							offset.x += group.legend.width;
 						} else if ( group.legend.position == "right" ) {
 							group.offset.x += offset.width - group.legend.width;
 						} else if ( group.legend.position == "top" ) {
@@ -615,7 +677,8 @@ AmCharts.addInitHandler( function( chart ) {
 						var g = fabric.util.groupSVGElements( objects, options );
 						var tmp = {
 							top: group.offset.y,
-							left: group.offset.x
+							left: group.offset.x,
+							selectable: false
 						};
 
 						for ( i1 = 0; i1 < g.paths.length; i1++ ) {
@@ -645,7 +708,7 @@ AmCharts.addInitHandler( function( chart ) {
 									// PATTERN; TODO: Distinguish opacity types
 								} else if ( String( g.paths[ i1 ].fill ).slice( 0, 3 ) == "url" ) {
 									var PID = g.paths[ i1 ].fill.slice( 5, -1 );
-									if ( group.patterns[ PID ] ) {
+									if ( group.patterns && group.patterns[ PID ] ) {
 										g.paths[ i1 ].set( {
 											fill: group.patterns[ PID ],
 											opacity: g.paths[ i1 ].fillOpacity
@@ -696,7 +759,8 @@ AmCharts.addInitHandler( function( chart ) {
 										fontFamily: text.style.fontFamily,
 										fill: text.style.color,
 										top: _this.pxToNumber( parent.style.top ) + group.offset.y,
-										left: _this.pxToNumber( parent.style.left ) + group.offset.x
+										left: _this.pxToNumber( parent.style.left ) + group.offset.x,
+										selectable: false
 									} );
 
 									_this.setup.fabric.add( label );
@@ -728,9 +792,9 @@ AmCharts.addInitHandler( function( chart ) {
 					// Identify elements through classnames
 				} )( group ), function( svg, obj ) {
 					var i1;
-					var className = svg.getAttribute( "class" ) || svg.parentNode.getAttribute( "class" ) || "";
-					var visibility = svg.getAttribute( "visibility" ) || svg.parentNode.getAttribute( "visibility" ) || svg.parentNode.parentNode.getAttribute( "visibility" ) || "";
-					var clipPath = svg.getAttribute( "clip-path" ) || svg.parentNode.getAttribute( "clip-path" ) || "";
+					var className = _this.gatherAttribute( svg, "class" );
+					var visibility = _this.gatherAttribute( svg, "visibility" );
+					var clipPath = _this.gatherAttribute( svg, "clip-path" );
 
 					obj.className = className;
 					obj.clipPath = clipPath;
@@ -1338,7 +1402,6 @@ AmCharts.addInitHandler( function( chart ) {
 								}
 							} )( item );
 						}
-
 						// DRAWING
 					} else if ( item.action == "draw" ) {
 						item.click = ( function( item ) {
