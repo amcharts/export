@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.1.4
+Version: 1.1.5
 
 
 ## Description
@@ -416,6 +416,19 @@ If you need to filter the drawn elements you can pass the `reviver` method in yo
 }
 ```
 
+### Delay the capturing before export
+
+In some cases you may want to delay the capturing to highlight the current value, therefore you simply need to define the 'delay' property in your menu item.
+```
+"export": {
+  "menu": [{
+    "label": "PNG",
+    "format": "PNG",
+    "delay": 3
+  }]
+}
+```
+
 ### A list of menu item properties
 
 Property | Description
@@ -439,6 +452,7 @@ content | Array of elements which represents the content ([details](#exporting-t
 freeDrawingBrush | Object which hold the settings of the brush e.G.: { color: "#FF00FF" }
 multiplier | Scale factor for the generated image
 lossless | Flag to print the actual vector graphic instead of buffered bitmap (print option only, experimental)
+delay | A numeric value to delay the capturing in seconds ([details](#delay-the-capturing-before-export))
 
 Available `format` values:
 
@@ -684,6 +698,12 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.1.5
+* Fix: Tainted check issue which failed if location.origin wasn't available
+* Fix: Capture image check, triggers callback only if all images have been loaded
+* Added: Multi language support; embedded english by default; overtakes chart language
+* Added: Delay feature, which allows to delay the capturing ([details](#delay-the-capturing-before-export))
 
 ### 1.1.4
 * Fix: Did not collect clip-path and pattern from legend
