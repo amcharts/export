@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.1.5
+Version: 1.1.6
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -44,7 +44,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 AmCharts.addInitHandler( function( chart ) {
 	var _this = {
 		name: "export",
-		version: "1.1.5",
+		version: "1.1.6",
 		libs: {
 			async: true,
 			autoLoad: true,
@@ -452,7 +452,7 @@ AmCharts.addInitHandler( function( chart ) {
 		 * Checks if given source is within the current origin
 		 */
 		isTainted: function( source ) {
-			var origin = String(window.location.origin || window.location.protocol + "//" + window.location.hostname + ( window.location.port ? ':' + window.location.port : '' ));
+			var origin = String( window.location.origin || window.location.protocol + "//" + window.location.hostname + ( window.location.port ? ':' + window.location.port : '' ) );
 
 			// CHECK IF TAINTED
 			if (
@@ -498,49 +498,51 @@ AmCharts.addInitHandler( function( chart ) {
 
 					// PATTERN
 				} else if ( childNode.tagName == "pattern" ) {
+					var props = {
+						node: childNode,
+						source: childNode.getAttribute( "xlink:href" ),
+						width: Number( childNode.getAttribute( "width" ) ),
+						height: Number( childNode.getAttribute( "height" ) ),
+						repeat: "repeat"
+					}
+
+					// GATHER BACKGROUND COLOR
 					for ( i2 = 0; i2 < childNode.childNodes.length; i2++ ) {
-
-						var props = {
-							node: childNode,
-							source: childNode.getAttribute( "xlink:href" ),
-							width: Number( childNode.getAttribute( "width" ) ),
-							height: Number( childNode.getAttribute( "height" ) ),
-							repeat: "repeat"
+						if ( childNode.childNodes[ i2 ].tagName == "rect" ) {
+							props.fill = childNode.childNodes[ i2 ].getAttribute( "fill" );
 						}
+					}
 
-						// TAINTED
-						if ( cfg.removeImages && _this.isTainted( props.source ) ) {
-							group.patterns[ childNode.id ] = "transparent";
+					// TAINTED
+					if ( cfg.removeImages && _this.isTainted( props.source ) ) {
+						group.patterns[ childNode.id ] = props.fill ? props.fill : "transparent";
+					} else {
+						images.included++;
 
-							// REPLACE SOURCE
-						} else {
-							var rect = childNode.getElementsByTagName( "rect" );
-							if ( rect.length > 0 ) {
-								var IMG = new Image();
-								IMG.src = props.source;
+						// LOAD IMAGE MANUALLY; TO RERENDER THE CANVAS
+						fabric.Image.fromURL( props.source, ( function( props ) {
+							return function( img ) {
+								images.loaded++;
 
-								var PSC = new fabric.StaticCanvas( undefined, {
-									width: props.width,
-									height: props.height,
-									backgroundColor: rect[ 0 ].getAttribute( "fill" )
+								var patternSourceCanvas = new fabric.StaticCanvas( undefined, {
+									backgroundColor: props.fill
+								} );
+								patternSourceCanvas.add( img );
+
+								var pattern = new fabric.Pattern( {
+									source: function() {
+										patternSourceCanvas.setDimensions( {
+											width: props.width,
+											height: props.height
+										} );
+										return patternSourceCanvas.getElement();
+									},
+									repeat: 'repeat'
 								} );
 
-								var RECT = new fabric.Rect( {
-									width: props.width,
-									height: props.height,
-									fill: new fabric.Pattern( {
-										source: IMG,
-										repeat: "repeat"
-									} )
-								} );
-								PSC.add( RECT );
-								props.source = PSC.toDataURL();
+								group.patterns[ props.node.id ] = pattern;
 							}
-
-							// BUFFER PATTERN
-							group.patterns[ childNode.id ] = new fabric.Pattern( props );
-						}
-
+						} )( props ) );
 					}
 
 					// IMAGES
@@ -548,7 +550,7 @@ AmCharts.addInitHandler( function( chart ) {
 					images.included++;
 
 					// LOAD IMAGE MANUALLY; TO RERENDER THE CANVAS
-					fabric.util.loadImage( childNode.getAttribute( "xlink:href" ), function( img ) {
+					fabric.Image.fromURL( childNode.getAttribute( "xlink:href" ), function( img ) {
 						images.loaded++;
 					} );
 				}
@@ -694,11 +696,6 @@ AmCharts.addInitHandler( function( chart ) {
 						target: item,
 						options: state
 					} );
-					_this.drawing.undos.push( {
-						action: "modified",
-						target: item,
-						options: state
-					} );
 					_this.drawing.redos = [];
 				}
 			} );
@@ -803,6 +800,8 @@ AmCharts.addInitHandler( function( chart ) {
 										} );
 									}
 								}
+
+								// CLIPPATH;
 								if ( String( g.paths[ i1 ].clipPath ).slice( 0, 3 ) == "url" ) {
 									var PID = g.paths[ i1 ].clipPath.slice( 5, -1 );
 
@@ -823,6 +822,20 @@ AmCharts.addInitHandler( function( chart ) {
 													ctx.rect( Number( transform[ 0 ] ) * -1 + x, Number( transform[ 1 ] ) * -1 + y, width, height );
 												}
 											} )( mask, transform )
+										} );
+									}
+								}
+
+								// TODO; WAIT FOR TSPAN SUPPORT FROM FABRICJS SIDE
+								if ( g.paths[ i1 ].originalBBox ) {
+									var bb = g.paths[ i1 ].originalBBox;
+									if ( g.paths[ i1 ].textAlign == "left" ) {
+										g.paths[ i1 ].set( {
+											left: bb.left + ( g.paths[ i1 ].width / 2 )
+										} );
+									} else {
+										g.paths[ i1 ].set( {
+											left: bb.left - ( g.paths[ i1 ].width / 2 )
 										} );
 									}
 								}
@@ -890,6 +903,30 @@ AmCharts.addInitHandler( function( chart ) {
 					obj.className = className;
 					obj.clipPath = clipPath;
 					obj.svg = svg;
+
+					// TODO; WAIT FOR TSPAN SUPPORT FROM FABRICJS SIDE
+					if ( svg.tagName == "text" && svg.childNodes.length > 1 ) {
+						var lines = [];
+						var textAnchor = svg.getAttribute( "text-anchor" ) || "left";
+						var anchorMap = {
+							"start": "left",
+							"middle": "center",
+							"end": "right"
+						}
+
+						for ( i1 = 0; i1 < svg.childNodes.length; i1++ ) {
+							lines.push( svg.childNodes[ i1 ].textContent );
+						}
+
+						if ( obj.className == _this.setup.chart.classNamePrefix + "-label" ) {
+							obj.originalBBox = obj.getBoundingRect()
+						}
+						obj.set( {
+							top: obj.top + ( ( obj.height / 2 ) * ( lines.length - 1 ) ),
+							text: lines.join( "\n" ),
+							textAlign: anchorMap[ textAnchor ]
+						} );
+					}
 
 					// HIDE HIDDEN ELEMENTS; TODO: FIND A BETTER WAY TO HANDLE THAT
 					if ( visibility == "hidden" ) {
@@ -1421,15 +1458,16 @@ AmCharts.addInitHandler( function( chart ) {
 		 * Gathers chart data according to its type
 		 */
 		getChartData: function() {
+			var i1, i2, i3;
 			var data = [];
 
 			if ( _this.setup.chart.type == "stock" ) {
 				data = _this.setup.chart.mainDataSet.dataProvider;
 			} else if ( _this.setup.chart.type == "gantt" ) {
 				var segmentsField = _this.setup.chart.segmentsField;
-				for ( var i1 = 0; i1 < _this.setup.chart.dataProvider.length; i1++ ) {
+				for ( i1 = 0; i1 < _this.setup.chart.dataProvider.length; i1++ ) {
 					if ( _this.setup.chart.dataProvider[ i1 ][ segmentsField ] ) {
-						for ( var i2 = 0; i2 < _this.setup.chart.dataProvider[ i1 ][ segmentsField ].length; i2++ ) {
+						for ( i2 = 0; i2 < _this.setup.chart.dataProvider[ i1 ][ segmentsField ].length; i2++ ) {
 							data.push( _this.setup.chart.dataProvider[ i1 ][ segmentsField ][ i2 ] )
 						}
 					}
@@ -1560,6 +1598,7 @@ AmCharts.addInitHandler( function( chart ) {
 							e.preventDefault();
 
 							// DELAYED
+							item.delay = item.delay ? item.delay : _this.config.delay;
 							if ( item.delay ) {
 								_this.delay( item, callback );
 								return;

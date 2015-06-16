@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.1.5
+Version: 1.1.6
 
 
 ## Description
@@ -126,12 +126,13 @@ divId | | ID or a reference to div object in case you want the menu in a separat
 fabric | {} | Overwrites the default drawing settings (fabricJS library)
 fallback | {} | Holds the messages to guide the user to copy the generated output; `false` will disable the fallback feature
 fileName | amCharts | A file name to use for generated export files (an extension will be appended to it based on the export format)
-legend | {} | Places the legend in case it is within an external container ([skip to chapter](https://github.com/amcharts/export#adding-external-legend))
+legend | {} | Places the legend in case it is within an external container ([skip to chapter](#adding-external-legend))
 libs | | 3rd party required library settings (see the above section)
 menu | [] | A list of menu or submenu items (see the next chapter for details)
 pdfMake | {} | Overwrites the default settings for PDF export (pdfMake library)
 position | top-right | A position of export icon. Possible values: "top-left", "top-right" (default), "bottom-left", "bottom-right"
 removeImages | true | If true export checks for and removes "tainted" images that area lodead from different domains
+delay | | General setting to delay the capturing of the chart ([skip to chapter](#delay-the-capturing-before-export))
 
 
 ## Configuring export menu
@@ -421,6 +422,10 @@ If you need to filter the drawn elements you can pass the `reviver` method in yo
 In some cases you may want to delay the capturing to highlight the current value, therefore you simply need to define the 'delay' property in your menu item.
 ```
 "export": {
+  "delay": 3,
+
+  // or specifically on individual menu items
+
   "menu": [{
     "label": "PNG",
     "format": "PNG",
@@ -698,6 +703,11 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.1.6
+* Fix: Pattern render issue in IE;
+* Added: Multiline support (workaround until fabricJS supports tspan)
+* Added: General delay property to delay the capturing of the chart ([details](#delay-the-capturing-before-export))
 
 ### 1.1.5
 * Fix: Tainted check issue which failed if location.origin wasn't available
