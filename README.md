@@ -471,9 +471,9 @@ Since version 1.1.7 the plugin has some events to celebrate with. For example th
 ### A list of the events
 
 Name | Arguments | Description
--------- | -----------
-beforeCapture | [<menu item setup>](#a-list-of-menu-item-properties) | Called before the SVG element gets converted
-afterCapture | [<menu item setup>](#a-list-of-menu-item-properties) | Called right before the passed callback of the capture method
+---- | --------- | -----------
+beforeCapture | [menu item setup](#a-list-of-menu-item-properties) | Called before the SVG element gets converted
+afterCapture | [menu item setup](#a-list-of-menu-item-properties) | Called right before the passed callback of the capture method
 
 
 ### A list of menu item properties
