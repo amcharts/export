@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.1.6
+Version: 1.1.7
 
 
 ## Description
@@ -434,6 +434,48 @@ In some cases you may want to delay the capturing to highlight the current value
 }
 ```
 
+### Events
+
+Since version 1.1.7 the plugin has some events to celebrate with. For example the `afterCapture` event allows you to add some texts or images which can't be seen on the regular chart but on the generated export - Magic! This allows you to point to your website from where the chart has been downloaded or simply add some fancy watermark.
+
+```
+"export": {
+  "afterCapture": function(menuConfig) {
+      var text = new fabric.Text("This is shown on exported image only", {
+        top: 50,
+        left: 100,
+        family: this.setup.chart.fontFamily,
+        size: this.setup.chart.fontSize * 2
+      });
+      this.setup.fabric.add(text);
+  },
+
+  // or specifically on individual menu items
+
+  "menu": [{
+    "label": "PNG",
+    "format": "PNG",  
+    "afterCapture": function(menuConfig) {
+        var text = new fabric.Text("This is shown on exported image only", {
+          top: 50,
+          left: 100,
+          family: this.setup.chart.fontFamily,
+          size: this.setup.chart.fontSize * 2
+        });
+        this.setup.fabric.add(text);
+    }
+  }]
+}
+```
+
+### A list of the events
+
+Name | Arguments | Description
+-------- | -----------
+beforeCapture | [<menu item setup>](#a-list-of-menu-item-properties) | Called before the SVG element gets converted
+afterCapture | [<menu item setup>](#a-list-of-menu-item-properties) | Called right before the passed callback of the capture method
+
+
 ### A list of menu item properties
 
 Property | Description
@@ -703,6 +745,12 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.1.7
+* Added: beforeCapture to be able to indicate the export process in some way
+* Added: afterCapture to be able to modify the fabric instance if needed
+* Added: SVG element as second argument within the "reviver" callback
+* Added: Multiple arguments supported in "handleCallback" method
 
 ### 1.1.6
 * Fix: Pattern render issue in IE;

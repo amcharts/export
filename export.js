@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.1.6
+Version: 1.1.7
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -44,7 +44,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 AmCharts.addInitHandler( function( chart ) {
 	var _this = {
 		name: "export",
-		version: "1.1.6",
+		version: "1.1.7",
 		libs: {
 			async: true,
 			autoLoad: true,
@@ -755,6 +755,9 @@ AmCharts.addInitHandler( function( chart ) {
 					}
 				}
 
+				// BEFORE CAPTURING
+				_this.handleCallback( cfg.beforeCapture, cfg );
+
 				// ADD TO CANVAS
 				fabric.parseSVGDocument( group.svg, ( function( group ) {
 					return function( objects, options ) {
@@ -886,8 +889,9 @@ AmCharts.addInitHandler( function( chart ) {
 							var timer = setInterval( function() {
 								if ( images.loaded == images.included ) {
 									clearTimeout( timer );
+									_this.handleCallback( cfg.afterCapture, cfg );
 									_this.setup.fabric.renderAll();
-									_this.handleCallback( callback );
+									_this.handleCallback( callback, cfg );
 								}
 							}, AmCharts.updateRate );
 						}
@@ -959,9 +963,7 @@ AmCharts.addInitHandler( function( chart ) {
 					}
 
 					// REVIVER
-					if ( cfg.reviver && cfg.reviver instanceof Function ) {
-						cfg.reviver.apply( _this, [ obj ] );
-					}
+					_this.handleCallback(cfg.reviver, obj, svg);
 				} );
 			}
 		},
@@ -1446,11 +1448,17 @@ AmCharts.addInitHandler( function( chart ) {
 		},
 
 		/**
-		 * Callback handler; injects given data as first argument
+		 * Callback handler; injects additional arguments to callback
 		 */
-		handleCallback: function( callback, data ) {
-			if ( callback ) {
-				callback.apply( _this, [ data ] );
+		handleCallback: function( callback ) {
+			var i1, data = Array();
+			if ( callback && callback instanceof Function ) {
+				for ( i1 = 0; i1 < arguments.length; i1++ ) {
+					if ( i1 > 0 ) {
+						data.push(arguments[i1]);
+					}
+				}
+				callback.apply( _this, data );
 			}
 		},
 
