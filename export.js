@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.1.7
+Version: 1.1.8
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -44,7 +44,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 AmCharts.addInitHandler( function( chart ) {
 	var _this = {
 		name: "export",
-		version: "1.1.7",
+		version: "1.1.8",
 		libs: {
 			async: true,
 			autoLoad: true,
@@ -1773,6 +1773,10 @@ AmCharts.addInitHandler( function( chart ) {
 				if ( _this.setup.chart.containerDiv ) {
 					clearTimeout( _this.timer );
 					_this.setup.chart.AmExport = _this;
+
+					// WORK AROUND TO BYPASS FILESAVER CHECK TRYING TO OPEN THE BLOB URL IN SAFARI BROWSER
+					window.safari = window.safari ? window.safari : {};
+
 					_this.createMenu( _this.config.menu );
 				}
 			}, AmCharts.updateRate );

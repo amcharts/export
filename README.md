@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.1.7
+Version: 1.1.8
 
 
 ## Description
@@ -745,6 +745,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.1.8
+* Fix: Issue with safari browser which prevented to open the generated export in a tab
 
 ### 1.1.7
 * Added: beforeCapture to be able to indicate the export process in some way
