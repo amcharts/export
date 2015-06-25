@@ -133,6 +133,7 @@ pdfMake | {} | Overwrites the default settings for PDF export (pdfMake library)
 position | top-right | A position of export icon. Possible values: "top-left", "top-right" (default), "bottom-left", "bottom-right"
 removeImages | true | If true export checks for and removes "tainted" images that area lodead from different domains
 delay | | General setting to delay the capturing of the chart ([skip to chapter](#delay-the-capturing-before-export))
+exportTitles | | Exchanges the data field names with it's dedicated title ( data export only )
 
 
 ## Configuring export menu
@@ -500,6 +501,7 @@ freeDrawingBrush | Object which hold the settings of the brush e.G.: { color: "#
 multiplier | Scale factor for the generated image
 lossless | Flag to print the actual vector graphic instead of buffered bitmap (print option only, experimental)
 delay | A numeric value to delay the capturing in seconds ([details](#delay-the-capturing-before-export))
+exportTitles | | Exchanges the data field names with it's dedicated title ( data export only )
 
 Available `format` values:
 
@@ -746,8 +748,12 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 ## Changelog
 
+### 1.1.9
+* Added: `exportTitles` available in general or individual setup which exchanges the data field names with it's dedicated title
+* Fix: Interpolates missing data fields across data provider
+
 ### 1.1.8
-* Fix: Issue with safari browser which prevented to open the generated export in a tab
+* Added: Temporary workaround to bypass FileSaver check; issue prevented to open blob urls in safari browser
 
 ### 1.1.7
 * Added: beforeCapture to be able to indicate the export process in some way
