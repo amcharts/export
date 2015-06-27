@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.1.9
+Version: 1.2.0
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -63,36 +63,52 @@ AmCharts.addInitHandler( function( chart ) {
 			enabled: false,
 			actions: [ "undo", "redo", "done", "cancel" ],
 			undos: [],
-			undo: function() {
+			undo: function( options, skipped ) {
 				var item = _this.drawing.undos.pop();
 				if ( item ) {
+					item.selectable = true;
 					_this.drawing.redos.push( item );
+
 					if ( item.action == "added" ) {
-						item.target.known = true;
 						_this.setup.fabric.remove( item.target );
 					}
-					item.target.setOptions( JSON.parse( item.options ) );
+
+					item.target.setOptions( JSON.parse( item.state ) );
 					_this.setup.fabric.renderAll();
+
+					// RECALL
+					if ( item.state == item.target.recentState && !skipped ) {
+						_this.drawing.undo( item, true );
+					}
 				}
 			},
 			redos: [],
-			redo: function() {
+			redo: function( options, skipped ) {
 				var item = _this.drawing.redos.pop();
 				if ( item ) {
+					item.selectable = true;
 					_this.drawing.undos.push( item );
+
 					if ( item.action == "added" ) {
-						item.target.known = true;
 						_this.setup.fabric.add( item.target );
 					}
-					item.target.setOptions( JSON.parse( item.options ) );
+
+					item.target.recentState = item.state;
+					item.target.setOptions( JSON.parse( item.state ) );
 					_this.setup.fabric.renderAll();
+
+					// RECALL
+					if ( item.action == "addified" ) {
+						_this.drawing.redo();
+					}
 				}
 			},
-			done: function() {
+			done: function( options ) {
 				_this.drawing.enabled = false;
 				_this.drawing.undos = [];
 				_this.drawing.redos = [];
 				_this.createMenu( _this.config.menu );
+				_this.setup.fabric.deactivateAll();
 				_this.setup.wrapper.setAttribute( "class", _this.setup.chart.classNamePrefix + "-export-canvas" );
 			}
 		},
@@ -137,14 +153,13 @@ AmCharts.addInitHandler( function( chart ) {
 			fabric: {
 				backgroundColor: "#FFFFFF",
 				isDrawingMode: false,
-				selection: false,
 				removeImages: true
 			},
 			pdfMake: {
 				pageSize: "A4",
 				pageOrientation: "portrait",
 				images: {},
-				content: [ {
+				content: [ "Saved from:", window.location.href, {
 					image: "reference",
 					fit: [ 523.28, 769.89 ]
 				} ]
@@ -157,13 +172,7 @@ AmCharts.addInitHandler( function( chart ) {
 				label: "Export",
 				menu: [ {
 					label: "Download as ...",
-					menu: [ "PNG", "JPG", "SVG", {
-						format: "PDF",
-						content: [ "Saved from:", window.location.href, {
-							image: "reference",
-							fit: [ 523.28, 769.89 ] // FIT IMAGE TO A4
-						} ]
-					} ]
+					menu: [ "PNG", "JPG", "SVG", "PDF" ]
 				}, {
 					label: "Save data ...",
 					menu: [ "CSV", "XLSX", "JSON" ]
@@ -207,13 +216,7 @@ AmCharts.addInitHandler( function( chart ) {
 							} ]
 						}, "UNDO", "REDO", {
 							label: "Save as ...",
-							menu: [ "PNG", "JPG", "SVG", {
-								format: "PDF",
-								content: [ "Saved from:", window.location.href, {
-									image: "reference",
-									fit: [ 523.28, 769.89 ] // FIT IMAGE TO A4
-								} ]
-							} ]
+							menu: [ "PNG", "JPG", "SVG", "PDF" ]
 						}, {
 							format: "PRINT",
 							label: "Print"
@@ -428,7 +431,7 @@ AmCharts.addInitHandler( function( chart ) {
 					}
 				}
 
-				if ( !( v instanceof Function || v instanceof Date || _this.isElement( v ) ) && ( v instanceof Object || v instanceof Array ) ) {
+				if ( ( a instanceof Object || a instanceof Array ) && ( v instanceof Object || v instanceof Array ) && !( v instanceof Function || v instanceof Date || _this.isElement( v ) ) ) {
 					_this.deepMerge( a[ i1 ], v, overwrite );
 				} else {
 					if ( a instanceof Array && !overwrite ) {
@@ -686,31 +689,46 @@ AmCharts.addInitHandler( function( chart ) {
 			// REAPPLY FOR SOME REASON
 			_this.deepMerge( _this.setup.fabric, cfg );
 
+			// OBSERVE MOUSE; TOGGLE DRAWING MODE
+			_this.setup.fabric.on( "mouse:over", function( e ) {
+				_this.setup.fabric.isDrawingMode = !e.target.selectable;
+			} );
+
 			// OBSERVE OBJECT CREATION
 			_this.setup.fabric.on( "object:added", function( e ) {
 				var item = e.target;
 				var state = JSON.stringify( item.originalState );
+
 				if ( item.selectable && !item.known ) {
 					_this.drawing.undos.push( {
 						action: "added",
 						target: item,
-						options: state
+						state: state
+					} );
+					_this.drawing.undos.push( {
+						action: "addified",
+						target: item,
+						state: state
 					} );
 					_this.drawing.redos = [];
 				}
+				item.recentState = state;
+				item.known = true;
 			} );
 
 			// OBSERVE OBJECT MODIFICATIONS
 			_this.setup.fabric.on( "object:modified", function( e ) {
 				var item = e.target;
 				var state = JSON.stringify( item.saveState().originalState );
-				if ( item.selectable ) {
-					_this.drawing.undos.push( {
-						action: "modified",
-						target: item,
-						options: state
-					} );
-				}
+
+				item.recentState = state;
+
+				_this.drawing.redos = [];
+				_this.drawing.undos.push( {
+					action: "modified",
+					target: item,
+					state: state
+				} );
 			} );
 
 			// DRAWING
@@ -1693,7 +1711,7 @@ AmCharts.addInitHandler( function( chart ) {
 							item.action = action;
 							item.click = ( function( item ) {
 								return function() {
-									this.drawing[ item.action ]();
+									this.drawing[ item.action ]( item );
 								}
 							} )( item );
 
@@ -1701,8 +1719,8 @@ AmCharts.addInitHandler( function( chart ) {
 						} else if ( _this.drawing.enabled ) {
 							item.click = ( function( item ) {
 								return function() {
+									this.drawing.done();
 									this[ "to" + item.format ]( item, function( data ) {
-										this.drawing.done();
 										if ( item.action != "print" && item.format != "PRINT" ) {
 											this.download( data, item.mimeType, [ item.fileName, item.extension ].join( "." ) );
 										}
@@ -1946,8 +1964,8 @@ AmCharts.addInitHandler( function( chart ) {
 
 	// MERGE SETTINGS
 	_this.deepMerge( _this.libs, _this.setup.chart[ "export" ].libs || {}, true );
-	_this.deepMerge( _this.defaults.pdfMake, _this.setup.chart[ "export" ] );
-	_this.deepMerge( _this.defaults.fabric, _this.setup.chart[ "export" ] );
+	_this.deepMerge( _this.defaults.pdfMake, _this.setup.chart[ "export" ], true );
+	_this.deepMerge( _this.defaults.fabric, _this.setup.chart[ "export" ], true );
 	_this.config = _this.deepMerge( _this.defaults, _this.setup.chart[ "export" ], true );
 
 	// SUPPORT IE ONLY IF WE'VE ACCESS TO THE HEAD

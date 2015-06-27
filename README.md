@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.1.8
+Version: 1.2.0
 
 
 ## Description
@@ -747,6 +747,12 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.2.0
+* Fixed: Issue with deepMerge which did not allow to modfiy the pdfMake default settings
+* Fixed: Menu issue which did not allow to modify the pdfMake settings
+* Fixed: Undo issue which needed double attempts in the beginning
+* Added: Drag/Scale feature in annotation mode; toggles automatically between drawing/dragging while hovering over the elements
 
 ### 1.1.9
 * Added: `exportTitles` available in general or individual setup which exchanges the data field names with it's dedicated title
