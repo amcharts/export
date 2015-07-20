@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.2.1
+Version: 1.2.2
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -68,7 +68,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts.export = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.2.1",
+			version: "1.2.2",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -113,11 +113,10 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 							if ( item.target instanceof fabric.Group ) {
 								_this.drawing.handler.change( {
-									target: item.target,
 									color: state.cfg.color,
 									width: state.cfg.width,
 									opacity: state.cfg.opacity
-								}, true );
+								}, true, item.target );
 							}
 
 							_this.setup.fabric.renderAll();
@@ -144,11 +143,10 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 							if ( item.target instanceof fabric.Group ) {
 								_this.drawing.handler.change( {
-									target: item.target,
 									color: state.cfg.color,
 									width: state.cfg.width,
 									opacity: state.cfg.opacity
-								}, true );
+								}, true, item.target );
 							}
 
 							_this.setup.fabric.renderAll();
@@ -203,27 +201,28 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							_this.setup.fabric.add( group );
 						} );
 					},
-					change: function( options, skipped ) {
+					change: function( options, skipped, target ) {
+						var cfg = _this.deepMerge( {}, options || {} );
 						var state, i1, rgba;
-						var current = options.target || _this.drawing.buffer.target;
+						var current = target || _this.drawing.buffer.target;
 						var objects = current ? current._objects ? current._objects : [ current ] : null;
 
 						// UPDATE DRAWING OBJECT
-						if ( options.mode ) {
-							_this.drawing.mode = options.mode;
+						if ( cfg.mode ) {
+							_this.drawing.mode = cfg.mode;
 						}
-						if ( options.width ) {
-							_this.drawing.width = options.width;
-							_this.drawing.fontSize = options.width * 3;
-							if ( _this.drawing.buffer.target === undefined ) {
-								_this.drawing.fontSize = _this.setup.chart.fontSize || 11;
-							}
+						if ( cfg.width ) {
+							_this.drawing.width = cfg.width;
+							_this.drawing.fontSize = cfg.width * 3;
 						}
-						if ( options.color ) {
-							_this.drawing.color = options.color;
+						if ( cfg.fontSize ) {
+							_this.drawing.fontSize = cfg.fontSize;
 						}
-						if ( options.opacity ) {
-							_this.drawing.opacity = options.opacity;
+						if ( cfg.color ) {
+							_this.drawing.color = cfg.color;
+						}
+						if ( cfg.opacity ) {
+							_this.drawing.opacity = cfg.opacity;
 						}
 
 						// APPLY OPACITY ON CURRENT COLOR
@@ -236,6 +235,21 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 						// UPDATE CURRENT SELECTION
 						if ( current ) {
+							state = JSON.parse( current.recentState ).cfg;
+
+							// UPDATE GIVE OPTIONS ONLY
+							if ( state ) {
+								cfg.color   = cfg.color || state.color;
+								cfg.width   = cfg.width || state.width;
+								cfg.opacity = cfg.opacity || state.opacity;
+								cfg.fontSize = cfg.fontSize || cfg.width * 3;
+
+								rgba = new fabric.Color( cfg.color ).getSource();
+								rgba.pop();
+								rgba.push( cfg.opacity );
+								cfg.color = "rgba(" + rgba.join() + ")";
+							}
+
 							// UPDATE OBJECTS
 							for ( i1 = 0; i1 < objects.length; i1++ ) {
 								if (
@@ -243,23 +257,37 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 									objects[ i1 ] instanceof fabric.PathGroup ||
 									objects[ i1 ] instanceof fabric.Triangle
 								) {
-									objects[ i1 ].set( {
-										fill: _this.drawing.color,
-										fontSize: _this.drawing.fontSize
-									} );
+									if ( cfg.color || cfg.opacity ) {
+										objects[ i1 ].set( {
+											fill: cfg.color
+										} );
+									}
+									if ( cfg.fontSize ) {
+										objects[ i1 ].set( {
+											fontSize: cfg.fontSize
+										} );
+									}
 								} else if (
 									objects[ i1 ] instanceof fabric.Path ||
 									objects[ i1 ] instanceof fabric.Line
 								) {
 									if ( current instanceof fabric.Group ) {
-										objects[ i1 ].set( {
-											stroke: _this.drawing.color
-										} );
+										if ( cfg.color || cfg.opacity ) {
+											objects[ i1 ].set( {
+												stroke: cfg.color
+											} );
+										}
 									} else {
-										objects[ i1 ].set( {
-											stroke: _this.drawing.color,
-											strokeWidth: _this.drawing.width
-										} );
+										if ( cfg.color || cfg.opacity ) {
+											objects[ i1 ].set( {
+												stroke: cfg.color
+											} );
+										}
+										if ( cfg.width ) {
+											objects[ i1 ].set( {
+												strokeWidth: cfg.width
+											} );
+										}
 									}
 								}
 							}
@@ -268,9 +296,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							if ( !skipped ) {
 								state = JSON.stringify( _this.deepMerge( current.saveState().originalState, {
 									cfg: {
-										color: _this.drawing.color,
-										width: _this.drawing.width,
-										opacity: _this.drawing.opacity
+										color: cfg.color,
+										width: cfg.width,
+										opacity: cfg.opacity
 									}
 								} ) );
 								current.recentState = state;
@@ -290,7 +318,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							text: _this.i18l( "menu.label.draw.text" ),
 							top: _this.setup.fabric.height / 2,
 							left: _this.setup.fabric.width / 2,
-							fontSize: _this.drawing.fontSize || _this.setup.chart.fontSize || 11,
+							fontSize: _this.drawing.fontSize,
 							fontFamily: _this.setup.chart.fontFamily || "Verdana",
 							fill: _this.drawing.color
 						}, options || {} );
@@ -1188,7 +1216,8 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						cfg: {
 							color: _this.drawing.color,
 							width: _this.drawing.width,
-							opacity: _this.drawing.opacity
+							opacity: _this.drawing.opacity,
+							fontSize: _this.drawing.fontSize
 						}
 					} );
 
@@ -1220,12 +1249,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				} );
 				_this.setup.fabric.on( "object:modified", function( e ) {
 					var item = e.target;
+					var recentState = JSON.parse( item.recentState );
 					var state = _this.deepMerge( item.saveState().originalState, {
-						cfg: {
-							color: _this.drawing.color,
-							width: _this.drawing.width,
-							opacity: _this.drawing.opacity
-						}
+						cfg: recentState.cfg
 					} );
 
 					state = JSON.stringify( state );
@@ -2745,6 +2771,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 				// WORK AROUND TO BYPASS FILESAVER CHECK TRYING TO OPEN THE BLOB URL IN SAFARI BROWSER
 				window.safari = window.safari ? window.safari : {};
+
+				// OVERTAKE CHART FONTSIZE IF GIVEN
+				_this.defaults.fabric.drawing.fontSize = _this.setup.chart.fontSize || 11;
 
 				// MERGE SETTINGS
 				_this.config.drawing = _this.deepMerge( _this.defaults.fabric.drawing, _this.config.drawing || {}, true );
