@@ -1132,7 +1132,6 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						var target = _this.setup.fabric.findTarget( e.e );
 						if ( target && target.selectable ) {
 							_this.setup.fabric.setActiveObject( target );
-							_this.setup.fabric.sendBackwards( target );
 						}
 					}
 
