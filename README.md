@@ -89,8 +89,10 @@ There are two ways to load them. Choose the one that is right:
 All libraries required for plugin operation are included withing plugins */libs* 
 subdirectory.
 
-If you want the plugin to load them on-demand (when it's needed for a certain 
-operation), make sure you've set the [`path`](http://docs.amcharts.com/3/javascriptcharts/AmSerialChart#path) property in your chart setup.
+The plugin will automatically try to look in chart's [`path`](http://docs.amcharts.com/3/javascriptcharts/AmSerialChart#path) 
+property. If your plugin files are located within plugins folder under amcharts 
+(as is the case with the default distributions), you don't need to do anything -
+the libraries will load on-demand.
 
 If you are using relative url, note that it is relative to the web page you are 
 displaying your chart on, not the export.js library.
@@ -274,9 +276,9 @@ By default it obtains the dimensions from the container but you can optionally o
 
 ### Menu item reviver
 
-By passing the `menuReviver` callback you are to adapt or completely replace the
-generated menu item before it gets appended to the list (`ul`).
-It retrieves two arguments and it needs to return a valid DOM element.
+By passing the `menuReviver` callback function you can modify the resulting menu 
+item or relative container, before it gets appended to the list (`ul`). The 
+function takes two arguments and it needs to return a valid DOM element.
 
 ```
 "export": {
@@ -289,8 +291,8 @@ It retrieves two arguments and it needs to return a valid DOM element.
 
 ### Menu walker
 
-In case you don't like our structure, go ahead and write your own recursive function
-to create the menu by the given list configured through `menu`.
+In case you don't like our structure, go ahead and write your own recursive 
+function to create the menu by the given list configured through `menu`.
 
 ```
 "export": {
@@ -353,9 +355,10 @@ By default each menu item triggers some kind of export. You can trigger an
 ```
 
 Now, when you click on the "Annotate" item in the menu, the chart will turn into 
-an image editor which you can actual draw on and the menu gets replaced by the default annotation menu.
+an image editor which you can actual draw on and the menu gets replaced by the 
+default annotation menu.
 
-In case you want your own annotation menu you simply need to define a submenu like following to replace the default:
+If you don't like the detault annotation menu, you can define your own:
 
 ```
 "export": {
@@ -376,10 +379,12 @@ In case you want your own annotation menu you simply need to define a submenu li
 }
 ```
 
-Now, when you turn on the annotation mode, your individual submenu will display, allowing to 
-export the image into either PNG,JPG,SVG or PDF.
+Now, when you turn on the annotation mode, your own submenu will display, 
+allowing to export the image into either PNG, JPG, SVG or PDF.
 
-And that's not even the end of it. You can add menu items to cancel, undo, redo and still be able to resuse the choices by using the actions `draw.modes`, `draw.widths`, `draw.colors` or `draw.shapes`.
+And that's not even the end of it. You can add menu items to cancel, undo, redo 
+and still be able to reuse the choices by using the actions `draw.modes`, 
+`draw.widths`, `draw.colors` or `draw.shapes`.
 
 ```
 "export": {
@@ -412,10 +417,13 @@ And that's not even the end of it. You can add menu items to cancel, undo, redo 
 
 ### Annotation settings
 
-Since 1.2.1 it's possible to easily adapt the drawing features and the offered choice within the annotation menu.
-You can easily adjust the choice of modes, colors, widths or shapes and set the defaults when entering the annotation mode.
+Since 1.2.1 it's also possible to set some of the annotation options without the 
+need to re-define the whole menu structure. You can easily adjust the choice of 
+modes, colors, widths or shapes, and set the defaults when entering the 
+annotation mode.
 
-Following setup shows you all available settings, if don't define the `drawing` property at all it falls back to the defaults.
+Following setup shows you all available settings. If you don't have the 
+`drawing` property at all, it will falls back to the defaults.
 
 ```
 "export": {
@@ -441,7 +449,11 @@ Following setup shows you all available settings, if don't define the `drawing` 
 }
 ```
 
-If you need to filter the drawn elements you can pass the `reviver` method in your global configuration or pass it to the `capture` method if you export manually. To hide e.G. all free labels you can simply do so like following:
+If you need to filter the drawn elements, you can pass the `reviver` method in 
+your global configuration, or pass it to the `capture` method if you export 
+manually. For example, to hide all free labels you can simply do something like 
+the following:
+
 ```
 "export": {
   "menu": ["PNG"],
@@ -455,7 +467,10 @@ If you need to filter the drawn elements you can pass the `reviver` method in yo
 
 ### Delay the capturing before export
 
-In some cases you may want to delay the capturing to highlight the current value, therefore you simply need to define the 'delay' property in your menu item.
+In some cases you may want to delay the capturing of the current chart snapshot 
+to highlight the current value. For this you can simply define the 'delay' 
+property in your menu item:
+
 ```
 "export": {
   "delay": 3,
@@ -472,7 +487,10 @@ In some cases you may want to delay the capturing to highlight the current value
 
 ### Events
 
-Since version 1.1.7 the plugin has some events to celebrate with. For example the `afterCapture` event allows you to add some texts or images which can't be seen on the regular chart but on the generated export - Magic! This allows you to point to your website from where the chart has been downloaded or simply add some fancy watermark.
+Since version 1.1.7 the plugin introduces some events you can use. For example 
+the `afterCapture` event allows you to add some texts or images which can't be 
+seen on the regular chart but only the generated export. Use it to watermark 
+your exported images.
 
 ```
 "export": {
@@ -536,8 +554,6 @@ multiplier | Scale factor for the generated image
 lossless | Flag to print the actual vector graphic instead of buffered bitmap (print option only, experimental)
 delay | A numeric value to delay the capturing in seconds ([details](#delay-the-capturing-before-export))
 exportTitles | Exchanges the data field names with it's dedicated title ( data export only )
-
-drawing
 
 Available `format` values:
 
@@ -677,8 +693,8 @@ Here's an example:
 }
 ```
 
-The above will use plugin's internal `capture` method to capture it's current state and `toJPG()`
-method to export the chart to JPEG format.
+The above will use plugin's internal `capture` method to capture it's current 
+state and `toJPG()` method to export the chart to JPEG format.
 
 Yes, you're right, it's the exact equivalent of just including "JPG" string. The 
 code is here for the explanatory purposes.
@@ -701,15 +717,19 @@ toImage | (object) options, (function) callback | Generates an image element whi
 
 ## Fallback for IE9
 
-Unfortunately our lovely Internet Explorer 9 does not allow us to offer downloads which has been locally generated.
-For those cases the plugin will place an overlay on top of the chart to place an `img` or `textarea` to let the user manually save the generated output with some instructions above.
-To avoid having a bigger payload by including senseless polyfills to your site, you may need to add following metatag in your `<head>` of your HTML document.
+Unfortunately, Internet Explorer 9 has restrictions in place that prevent the 
+download of locally-generated files. In this case the plugin will place the 
+generated image along download instructions directly over the chart area.
+
+To avoid having a bigger payload by including senseless polyfills to your site, 
+you may need to add following metatag in your `<head>` of your HTML document.
 
 ```
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 ```
 
-This feature will kick in by default if you want to disable it simply pass `false` to the `fallback` parameter.
+This feature will kick in by default. If you want to disable it simply pass 
+`false` to the `fallback` parameter.
 
 ```
 "export": {
@@ -717,7 +737,8 @@ This feature will kick in by default if you want to disable it simply pass `fals
 }
 ```
 
-In case you want to change our default messages you can modify it like following.
+In case you want to change our default messages you can modify it like 
+following.
 
 ```
 "export": {
