@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.2.0
+Version: 1.2.1
 
 
 ## Description
@@ -134,6 +134,9 @@ position | top-right | A position of export icon. Possible values: "top-left", "
 removeImages | true | If true export checks for and removes "tainted" images that area lodead from different domains
 delay | | General setting to delay the capturing of the chart ([skip to chapter](#delay-the-capturing-before-export))
 exportTitles | | Exchanges the data field names with it's dedicated title ( data export only )
+keyListener | false | If true it observes the pressed keys to undo/redo the annotations
+fileListener | false | If true it observes the drag and drop feature and loads the dropped image file into the annotation
+drawing | {} | Object which holds all possible settings for the annotation mode ([skip to chaper](#annotation-settings))
 
 
 ## Configuring export menu
@@ -350,12 +353,9 @@ By default each menu item triggers some kind of export. You can trigger an
 ```
 
 Now, when you click on the "Annotate" item in the menu, the chart will turn into 
-an image editor which you can actual draw on.
+an image editor which you can actual draw on and the menu gets replaced by the default annotation menu.
 
-As cool as it may sound, there's little we can do if the annotated chart if we 
-can't save the result image.
-
-That's where sub-menus come for the rescue again:
+In case you want your own annotation menu you simply need to define a submenu like following to replace the default:
 
 ```
 "export": {
@@ -369,17 +369,17 @@ That's where sub-menus come for the rescue again:
       "action": "draw",
       "menu": [ {
         "class": "export-drawing",
-        "menu": [ "JPG", "PNG", "SVG", PDF" ]
+        "menu": [ "JPG", "PNG", "SVG", "PDF" ]
       } ]
     } ]
   } ]
 }
 ```
 
-Now, when you turn on the annotation mode, a submenu will display, allowing to 
+Now, when you turn on the annotation mode, your individual submenu will display, allowing to 
 export the image into either PNG,JPG,SVG or PDF.
 
-And that's not even the end of it. You can add menu items to cancel, undo, redo.
+And that's not even the end of it. You can add menu items to cancel, undo, redo and still be able to resuse the choices by using the actions `draw.modes`, `draw.widths`, `draw.colors` or `draw.shapes`.
 
 ```
 "export": {
@@ -394,6 +394,10 @@ And that's not even the end of it. You can add menu items to cancel, undo, redo.
       "menu": [ {
         "class": "export-drawing",
         "menu": [ {
+            label: "Size ...",
+            action: "draw.widths",
+            widths: [ 5, 20, 30 ] // replaces the default choice
+        }, {
           "label": "Edit",
           "menu": [ "UNDO", "REDO", "CANCEL" ]
         }, {
@@ -403,6 +407,37 @@ And that's not even the end of it. You can add menu items to cancel, undo, redo.
       } ]
     } ]
   } ]
+}
+```
+
+### Annotation settings
+
+Since 1.2.1 it's possible to easily adapt the drawing features and the offered choice within the annotation menu.
+You can easily adjust the choice of modes, colors, widths or shapes and set the defaults when entering the annotation mode.
+
+Following setup shows you all available settings, if don't define the `drawing` property at all it falls back to the defaults.
+
+```
+"export": {
+  "drawing": {
+    "enabled": true, // Flag for `action: "draw"` menu items to toggle it's visibility
+    "shapes": [ "test.svg" ], // Choice of shapes offered in the menu (shapes are being loaded from the shapes folder)
+
+    "width": 2, // Width of the pencil and line when entering the annotation mode
+    "widths": [ 2, 10, 20 ], // Choice of widths offered in the menu
+
+    "color": "#000000", // Color of the pencil, line, text and shapes when entering the annotation mode
+    "colors": [ "#000000", "#FF0000" ] // Choice of colors offered in the menu
+
+    "opacity": 1, // Opacity of the pencil, line, text and shapes when entering the annotation mode
+    "opacities": [ 1, 0.8, 0.6, 0.4, 0.2 ] // Choice of opacity offered in the menu
+
+    "menu": [ ... ], // Shown menu when entering the annotation mode
+
+    "mode": "pencil", // Drawing mode when entering the annotation mode "pencil", "line" and "arrow" are available
+    "modes": [ "pencil" , "line", "arrow" ], // Choice of modes offered in the menu
+    "arrow": "end", // position of the arrow on drawn lines; "start","middle" and "end" are available
+  }
 }
 ```
 
@@ -497,11 +532,12 @@ pageSize | A string or { width: number, height: number } ([details](#exporting-t
 pageOrientation | By default we use portrait, you can change it to landscape if you wish ([details](#exporting-to-pdf))
 pageMargins | [left, top, right, bottom] or [horizontal, vertical] or just a number for equal margins ([details](#exporting-to-pdf))
 content | Array of elements which represents the content ([details](#exporting-to-pdf))
-freeDrawingBrush | Object which hold the settings of the brush e.G.: { color: "#FF00FF" }
 multiplier | Scale factor for the generated image
 lossless | Flag to print the actual vector graphic instead of buffered bitmap (print option only, experimental)
 delay | A numeric value to delay the capturing in seconds ([details](#delay-the-capturing-before-export))
-exportTitles | | Exchanges the data field names with it's dedicated title ( data export only )
+exportTitles | Exchanges the data field names with it's dedicated title ( data export only )
+
+drawing
 
 Available `format` values:
 
@@ -663,7 +699,6 @@ toCanvas | (object) options, (function) callback | Prepares a Canvas and passes 
 toArray | (object) options, (function) callback | Prepares an Array and passes the data to the callback function
 toImage | (object) options, (function) callback | Generates an image element which holds the output in an embedded base64 data url
 
-
 ## Fallback for IE9
 
 Unfortunately our lovely Internet Explorer 9 does not allow us to offer downloads which has been locally generated.
@@ -747,6 +782,16 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.2.1
+* Added: Possibility to add text, lines, shapes ([details](#annotation-settings))
+* Added: Possibility to change drawing mode, color, opacity and size
+* Added: Possibility to select,move,scale drawn items
+* Added: Possibility to define dedicated drawing menu `drawing.menu` individual menu items get prioritised
+* Added: Dropbox feature which allows to drag images into the chart `fileListener: true`
+* Added: Keylistener which allows to undo/redo/remove the drawn steps `keyListener: true`
+* Added: Isolated plugin to be able to initiate manually regardless of the chart setup
+* Fixed: Conflict with prototypeJS which caused tainted return value from `toArray`
 
 ### 1.2.0
 * Fixed: Issue with deepMerge which did not allow to modfiy the pdfMake default settings
