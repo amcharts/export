@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.2.1
+Version: 1.2.2
 
 
 ## Description
@@ -803,6 +803,10 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.2.2
+* Fixed: Issue with object changes which overwrite undo/redo object states
+* Fixed: Issue with default fontSize
 
 ### 1.2.1
 * Added: Possibility to add text, lines, shapes ([details](#annotation-settings))
