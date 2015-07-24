@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.2.2
+Version: 1.2.3
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -68,7 +68,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts.export = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.2.2",
+			version: "1.2.3",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -1546,9 +1546,10 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 								lines.push( svg.childNodes[ i1 ].textContent );
 							}
 
-							if ( obj.classList.indexOf( _this.setup.chart.classNamePrefix + "-label" ) != -1 ) {
-								obj.originalBBox = obj.getBoundingRect()
+							if ( textAnchor != "middle" ) {
+								obj.originalBBox = obj.getBoundingRect();
 							}
+
 							obj.set( {
 								top: obj.top + ( ( obj.height / 2 ) * ( lines.length - 1 ) ),
 								text: lines.join( "\n" ),

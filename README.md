@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.2.2
+Version: 1.2.3
 
 
 ## Description
@@ -803,6 +803,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.2.3
+* Fixed: Positioning issue on multiline labels
 
 ### 1.2.2
 * Fixed: Issue with object changes which overwrite undo/redo object states
