@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.2.3
+Version: 1.2.4
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -68,7 +68,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts.export = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.2.3",
+			version: "1.2.4",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -1802,27 +1802,17 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					data: _this.getChartData( options ),
 					delimiter: ",",
 					quotes: true,
-					escape: true,
-					dateFields: [],
-					dateFormat: _this.setup.chart.dataDateFormat || "YYYY-MM-DD"
+					escape: true
 				}, options || {}, true );
 				var data = "";
 				var cols = [];
 				var buffer = [];
-
-				if ( _this.setup.chart.categoryAxis && _this.setup.chart.categoryAxis.parseDates && _this.setup.chart.categoryField ) {
-					cfg.dateFields.push( _this.setup.chart.categoryField );
-				}
 
 				function enchant( value, column ) {
 
 					// STRING
 					if ( typeof value === "string" ) {
 						value = value;
-
-						// DATE FORMAT
-					} else if ( column && cfg.dateFormat && value instanceof Date && cfg.dateFields.indexOf( column ) != -1 ) {
-						value = AmCharts.formatDate( value, cfg.dateFormat );
 					}
 
 					// WRAP IN QUOTES				
@@ -1952,8 +1942,6 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				var row, col;
 				var cfg = _this.deepMerge( {
 					data: _this.getChartData( options ),
-					dateFields: [],
-					dateFormat: false,
 					withHeader: false
 				}, options || {}, true );
 				var data = [];
@@ -1976,12 +1964,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 								var col = cols[ col ];
 								var value = cfg.data[ row ][ col ] || "";
 
-								if ( cfg.dateFormat && value instanceof Date && cfg.dateFields.indexOf( col ) != -1 ) {
-									value = AmCharts.formatDate( value, cfg.dateFormat );
-								} else {
-									value = String( value )
-								}
-
+								value = String( value )
 								buffer.push( value );
 							}
 						}
@@ -2136,20 +2119,22 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			 */
 			getChartData: function( options ) {
 				var cfg = _this.deepMerge( {
-					exportTitles: _this.config.exportTitles
+					data: [],
+					titles: {},
+					dateFields: [],
+					dataFields: [],
+					dataFieldsMap: {},
+					exportTitles: _this.config.exportTitles,
+					exportSelection: _this.config.exportSelection
 				}, options || {}, true );
 				var uid, i1, i2, i3;
-				var data = [];
-				var dataFields = [];
 				var lookupFields = [ "valueField", "openField", "closeField", "highField", "lowField", "xField", "yField" ];
-				var titles = {};
-				var dataFieldsMap = {};
 
 				// HANDLE FIELDS
 				function addField( field, title, type ) {
 
 					function checkExistance( field, type ) {
-						if ( dataFields.indexOf( field ) != -1 ) {
+						if ( cfg.dataFields.indexOf( field ) != -1 ) {
 							return checkExistance( [ field, ".", type ].join( "" ) );
 						}
 						return field;
@@ -2157,18 +2142,19 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 					if ( field && cfg.exportTitles && _this.setup.chart.type != "gantt" ) {
 						uid = checkExistance( field, type );
-						dataFieldsMap[ uid ] = field;
-						dataFields.push( uid );
-						titles[ uid ] = title || uid;
+						cfg.dataFieldsMap[ uid ] = field;
+						cfg.dataFields.push( uid );
+						cfg.titles[ uid ] = title || uid;
 					}
 				}
 
 				// STOCK DATA; GATHER COMPARED GRAPHS
 				if ( _this.setup.chart.type == "stock" ) {
-					data = _this.setup.chart.mainDataSet.dataProvider;
+					cfg.data = _this.setup.chart.mainDataSet.dataProvider;
 
 					// CATEGORY AXIS
 					addField( _this.setup.chart.mainDataSet.categoryField );
+					cfg.dateFields.push( _this.setup.chart.mainDataSet.categoryField );
 
 					// WALKTHROUGH GRAPHS
 					for ( i1 = 0; i1 < _this.setup.chart.mainDataSet.fieldMappings.length; i1++ ) {
@@ -2195,9 +2181,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 								var fieldMap = graph.dataSet.fieldMappings[ i3 ];
 								var uid = graph.dataSet.id + "_" + fieldMap.toField;
 
-								data[ i2 ][ uid ] = graph.dataSet.dataProvider[ i2 ][ fieldMap.fromField ];
+								cfg.data[ i2 ][ uid ] = graph.dataSet.dataProvider[ i2 ][ fieldMap.fromField ];
 
-								if ( !titles[ uid ] ) {
+								if ( !cfg.titles[ uid ] ) {
 									addField( uid, graph.dataSet.title )
 								}
 							}
@@ -2208,6 +2194,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				} else if ( _this.setup.chart.type == "gantt" ) {
 					// CATEGORY AXIS
 					addField( _this.setup.chart.categoryField );
+					cfg.dateFields.push( _this.setup.chart.categoryField );
 
 					var field = _this.setup.chart.segmentsField;
 					for ( i1 = 0; i1 < _this.setup.chart.dataProvider.length; i1++ ) {
@@ -2215,7 +2202,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						if ( dataItem[ field ] ) {
 							for ( i2 = 0; i2 < dataItem[ field ].length; i2++ ) {
 								dataItem[ field ][ i2 ][ _this.setup.chart.categoryField ] = dataItem[ _this.setup.chart.categoryField ];
-								data.push( dataItem[ field ][ i2 ] );
+								cfg.data.push( dataItem[ field ][ i2 ] );
 							}
 						}
 					}
@@ -2235,21 +2222,23 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 					// PIE/FUNNEL DATA;
 				} else if ( [ "pie", "funnel" ].indexOf( _this.setup.chart.type ) != -1 ) {
-					data = _this.setup.chart.dataProvider;
+					cfg.data = _this.setup.chart.dataProvider;
 
 					// CATEGORY AXIS
 					addField( _this.setup.chart.titleField );
+					cfg.dateFields.push( _this.setup.chart.titleField );
 
 					// VALUE
 					addField( _this.setup.chart.valueField );
 
 					// DEFAULT DATA;
 				} else if ( _this.setup.chart.type != "map" ) {
-					data = _this.setup.chart.dataProvider;
+					cfg.data = _this.setup.chart.dataProvider;
 
 					// CATEGORY AXIS
 					if ( _this.setup.chart.categoryAxis ) {
 						addField( _this.setup.chart.categoryField, _this.setup.chart.categoryAxis.title );
+						cfg.dateFields.push( _this.setup.chart.categoryField );
 					}
 
 					// GRAPHS
@@ -2264,27 +2253,47 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						}
 					}
 				}
+				return _this.processData(cfg);
+			},
 
-				if ( data.length ) {
+			/**
+			 * Walkthrough data to format dates and titles
+			 */
+			processData: function( options ) {
+				var cfg = _this.deepMerge( {
+					data: [],
+					titles: {},
+					dateFields: [],
+					dataFields: [],
+					dataFieldsMap: {},
+					dataDateFormat: _this.setup.chart.dataDateFormat,
+					dateFormat: _this.config.dateFormat || _this.setup.chart.dataDateFormat || "YYYY-MM-DD",
+					exportTitles: _this.config.exportTitles,
+					exportSelection: _this.config.exportSelection
+				}, options || {}, true );
+				var i1, i2;
+
+				if ( cfg.data.length ) {
 					// GATHER MISSING FIELDS
-					for ( i1 = 0; i1 < data.length; i1++ ) {
-						for ( i2 in data[ i1 ] ) {
-							if ( dataFields.indexOf( i2 ) == -1 ) {
-								dataFields.push( i2 );
-								dataFieldsMap[ i2 ] = i2;
+					for ( i1 = 0; i1 < cfg.data.length; i1++ ) {
+						for ( i2 in cfg.data[ i1 ] ) {
+							if ( cfg.dataFields.indexOf( i2 ) == -1 ) {
+								cfg.dataFields.push( i2 );
+								cfg.dataFieldsMap[ i2 ] = i2;
 							}
 						}
 					}
 
 					// REBUILD DATA
 					var buffer = [];
-					for ( i1 = 0; i1 < data.length; i1++ ) {
+					for ( i1 = 0; i1 < cfg.data.length; i1++ ) {
 						var tmp = {};
-						for ( i2 = 0; i2 < dataFields.length; i2++ ) {
-							var uniqueField = dataFields[ i2 ];
-							var dataField = dataFieldsMap[ uniqueField ];
-							var title = titles[ uniqueField ] || uniqueField;
-							var value = data[ i1 ][ dataField ] || undefined;
+						var skip = false;
+						for ( i2 = 0; i2 < cfg.dataFields.length; i2++ ) {
+							var uniqueField = cfg.dataFields[ i2 ];
+							var dataField = cfg.dataFieldsMap[ uniqueField ];
+							var title = cfg.titles[ uniqueField ] || uniqueField;
+							var value = cfg.data[ i1 ][ dataField ] || undefined;
 
 							// TITLEFY
 							if ( cfg.exportTitles && _this.setup.chart.type != "gantt" ) {
@@ -2293,14 +2302,41 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 								}
 							}
 
+							// PROCESS CATEGORY
+							if ( cfg.dateFields.indexOf(dataField) != -1 ) {
+
+								// CONVERT DATESTRING WITH GIVEN DATADATEFORMAT
+								if ( cfg.dataDateFormat && ( value instanceof String || typeof value == "string" ) ) {
+									value = AmCharts.stringToDate( value, cfg.dataDateFormat );
+								}
+
+								// CATEGORY RANGE
+								if ( cfg.exportSelection ) {
+									if ( value instanceof Date ) {
+										if ( value < chart.startDate || value > chart.endDate ) {
+											skip = true;
+										}
+
+									} else if ( i1 < chart.startIndex || i1 > chart.endIndex ) {
+										skip = true;
+									}
+								}
+
+								// CATEGORY FORMAT
+								if ( cfg.dateFormat && value instanceof Date ) {
+									value = AmCharts.formatDate( value, cfg.dateFormat );
+								}
+							}
+
 							tmp[ title ] = value;
 						}
-						buffer.push( tmp );
+						if ( !skip ) {
+							buffer.push( tmp );
+						}
 					}
-					data = buffer;
+					cfg.data = buffer;
 				}
-
-				return data;
+				return cfg.data;
 			},
 
 			/**
