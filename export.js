@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.2.4
+Version: 1.2.5
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -68,7 +68,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts.export = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.2.4",
+			version: "1.2.5",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -239,8 +239,8 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 							// UPDATE GIVE OPTIONS ONLY
 							if ( state ) {
-								cfg.color   = cfg.color || state.color;
-								cfg.width   = cfg.width || state.width;
+								cfg.color = cfg.color || state.color;
+								cfg.width = cfg.width || state.width;
 								cfg.opacity = cfg.opacity || state.opacity;
 								cfg.fontSize = cfg.fontSize || cfg.width * 3;
 
@@ -1549,9 +1549,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							if ( textAnchor != "middle" ) {
 								obj.originalBBox = obj.getBoundingRect();
 							}
-
 							obj.set( {
-								top: obj.top + ( ( obj.height / 2 ) * ( lines.length - 1 ) ),
+								lineHeight: 1.05,
+								top: obj.top + obj.height - ( obj.fontSize * ( 0.18 + obj._fontSizeFraction ) / 2 ),
 								text: lines.join( "\n" ),
 								textAlign: anchorMap[ textAnchor ],
 								selectable: false
@@ -1583,7 +1583,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 									attrRGBA.pop();
 									attrRGBA.push( attrOpacity )
 									obj[ attr ] = "rgba(" + attrRGBA.join() + ")";
-									obj[ _this.capitalize( attr + "-opacity" ) ] = attrOpacity;
+									obj[ attr + _this.capitalize( "opacity" ) ] = attrOpacity;
 								}
 							}
 						}
@@ -1707,9 +1707,39 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			 */
 			toSVG: function( options, callback ) {
 				var cfg = _this.deepMerge( {
-					// NOTHING IN HERE
+					reviver: function( string ) {
+						var matcher = new RegExp( /\bstyle=(['"])(.*?)\1/ );
+						var match = matcher.exec( string )[ 0 ].slice( 7, -1 );
+						var styles = match.split( ";" );
+						var replacement = [];
+
+						for ( i1 = 0; i1 < styles.length; i1++ ) {
+							if ( styles[ i1 ] ) {
+								var pair = styles[ i1 ].replace( /\s/g, "" ).split( ":" );
+								var key = pair[ 0 ];
+								var value = pair[ 1 ];
+
+								if ( [ "fill", "stroke" ].indexOf( key ) != -1 ) {
+									value = fabric.Color.fromRgba( value );
+									if ( value && value._source ) {
+										var color = "#" + value.toHex();
+										var opacity = value._source[ 3 ];
+
+										replacement.push( [ key, color ].join( ":" ) );
+										replacement.push( [ key + "-opacity", opacity ].join( ":" ) );
+									} else {
+										replacement.push( styles[ i1 ] );
+									}
+								} else if ( key != "opactiy" ) {
+									replacement.push( styles[ i1 ] );
+								}
+							}
+						}
+
+						return string.replace( match, replacement.join( ";" ) );
+					}
 				}, options || {} );
-				var data = _this.setup.fabric.toSVG( cfg );
+				var data = _this.setup.fabric.toSVG( cfg, cfg.reviver );
 
 				if ( cfg.getBase64 ) {
 					data = "data:image/svg+xml;base64," + btoa( data );
@@ -2253,7 +2283,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						}
 					}
 				}
-				return _this.processData(cfg);
+				return _this.processData( cfg );
 			},
 
 			/**
@@ -2303,7 +2333,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							}
 
 							// PROCESS CATEGORY
-							if ( cfg.dateFields.indexOf(dataField) != -1 ) {
+							if ( cfg.dateFields.indexOf( dataField ) != -1 ) {
 
 								// CONVERT DATESTRING WITH GIVEN DATADATEFORMAT
 								if ( cfg.dataDateFormat && ( value instanceof String || typeof value == "string" ) ) {

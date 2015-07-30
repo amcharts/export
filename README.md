@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.2.4
+Version: 1.2.5
 
 
 ## Description
@@ -809,6 +809,10 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.2.5
+* Added: Illustrator support; `reviver` method to `toSVG`; converts by default RGBA to HEX colors codes and places it's dedicated opacity property
+* Fixed: Multiline text positioning / line heights
 
 ### 1.2.4
 * Added: `exportSelection` exports the current data selection
