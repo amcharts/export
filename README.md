@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.2.5
+Version: 1.2.6
 
 
 ## Description
@@ -809,6 +809,10 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.2.6
+* Added: Native EXCEL date cell type for date fields, forced by default
+* Fixed: Issue in `getChartData` which ignored given data array ( affected API usage only )
 
 ### 1.2.5
 * Added: Illustrator support; `reviver` method to `toSVG`; converts by default RGBA to HEX colors codes and places it's dedicated opacity property
