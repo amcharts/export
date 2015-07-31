@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.2.6
+Version: 1.2.7
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -68,7 +68,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts.export = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.2.6",
+			version: "1.2.7",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -1679,6 +1679,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					quality: 1,
 					multiplier: 1
 				}, options || {} );
+				cfg.format = cfg.format.toLowerCase();
 				var data = _this.setup.fabric.toDataURL( cfg );
 
 				_this.handleCallback( callback, data );
@@ -2116,37 +2117,32 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			 * Handles drag/drop events; loads given imagery
 			 */
 			handleDropbox: function( e ) {
-				e.preventDefault();
-				e.stopPropagation();
-
-				// AUTOMATICALLY CAPTURE
-				if ( !_this.setup.wrapper && !_this.drawing.buffer.enabled ) {
-					_this.drawing.buffer.enabled = true;
-					_this.capture( {}, function() {
-						this.createMenu( _this.config.fabric.drawing.menu );
-					} );
+				if ( _this.drawing.buffer.enabled ) {
+					e.preventDefault();
+					e.stopPropagation();
 
 					// DRAG OVER
-				} else if ( e.type == "dragover" ) {
-					_this.setup.wrapper.setAttribute( "class", _this.setup.chart.classNamePrefix + "-export-canvas active dropbox" );
+					if ( e.type == "dragover" ) {
+						_this.setup.wrapper.setAttribute( "class", _this.setup.chart.classNamePrefix + "-export-canvas active dropbox" );
 
-					// DRAGLEAVE; DROP
-				} else {
-					_this.setup.wrapper.setAttribute( "class", _this.setup.chart.classNamePrefix + "-export-canvas active" );
+						// DRAGLEAVE; DROP
+					} else {
+						_this.setup.wrapper.setAttribute( "class", _this.setup.chart.classNamePrefix + "-export-canvas active" );
 
-					if ( e.type == "drop" && e.dataTransfer.files.length ) {
-						for ( var i1 = 0; i1 < e.dataTransfer.files.length; i1++ ) {
-							var reader = new FileReader();
-							reader.onloadend = ( function( index ) {
-								return function() {
-									_this.drawing.handler.add( {
-										url: reader.result,
-										top: e.layerY - ( index * 10 ),
-										left: e.layerX - ( index * 10 )
-									} );
-								}
-							} )( i1 );
-							reader.readAsDataURL( e.dataTransfer.files[ i1 ] );
+						if ( e.type == "drop" && e.dataTransfer.files.length ) {
+							for ( var i1 = 0; i1 < e.dataTransfer.files.length; i1++ ) {
+								var reader = new FileReader();
+								reader.onloadend = ( function( index ) {
+									return function() {
+										_this.drawing.handler.add( {
+											url: reader.result,
+											top: e.layerY - ( index * 10 ),
+											left: e.layerX - ( index * 10 )
+										} );
+									}
+								} )( i1 );
+								reader.readAsDataURL( e.dataTransfer.files[ i1 ] );
+							}
 						}
 					}
 				}

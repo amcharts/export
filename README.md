@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.2.6
+Version: 1.2.7
 
 
 ## Description
@@ -809,6 +809,10 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.2.7
+* Fixed: Generates true JPG file instead PNG with JPG extension
+* Fixed: Drag&Drop feature does not activate automatically the annotation mode
 
 ### 1.2.6
 * Added: Native EXCEL date cell type for date fields, forced by default
