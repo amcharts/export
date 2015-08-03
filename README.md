@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.2.7
+Version: 1.2.8
 
 
 ## Description
@@ -809,6 +809,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.2.8
+* Fixed: Issue in `gatherClassName` checking element type
 
 ### 1.2.7
 * Fixed: Generates true JPG file instead PNG with JPG extension
