@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.2.8
+Version: 1.2.9
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -68,7 +68,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts.export = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.2.8",
+			version: "1.2.9",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -1286,8 +1286,11 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				if ( _this.drawing.buffer.enabled ) {
 					_this.setup.wrapper.setAttribute( "class", _this.setup.chart.classNamePrefix + "-export-canvas active" );
 					_this.setup.wrapper.style.backgroundColor = cfg.backgroundColor;
+					_this.setup.wrapper.style.display = "block";
+
 				} else {
 					_this.setup.wrapper.setAttribute( "class", _this.setup.chart.classNamePrefix + "-export-canvas" );
+					_this.setup.wrapper.style.display = "none";
 				}
 
 				for ( i1 = 0; i1 < groups.length; i1++ ) {
@@ -1525,7 +1528,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						var i1;
 						var className = _this.gatherAttribute( svg, "class" );
 						var visibility = _this.gatherAttribute( svg, "visibility" );
-						var clipPath = _this.gatherAttribute( svg, "clip-path" );
+						var clipPath = _this.gatherAttribute( svg, "clip-path", 1 );
 
 						obj.className = String( className );
 						obj.classList = String( className ).split( " " );
@@ -2628,7 +2631,11 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					}
 
 					// JUST ADD THOSE WITH ENTRIES
-					return container.appendChild( ul );
+					if ( ul.childNodes.length ) {
+						container.appendChild( ul );
+					}
+
+					return ul;
 				}
 
 				// DETERMINE CONTAINER
@@ -2656,7 +2663,10 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				}
 				buildList.apply( this, [ list, _this.setup.menu ] );
 
-				container.appendChild( _this.setup.menu );
+				// JUST ADD THOSE WITH ENTRIES
+				if ( _this.setup.menu.childNodes.length ) {
+					container.appendChild( _this.setup.menu );
+				}
 
 				return _this.setup.menu;
 			},

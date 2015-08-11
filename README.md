@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.2.8
+Version: 1.2.9
 
 
 ## Description
@@ -809,6 +809,12 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.2.9
+* Fixed: Issue with missing `export.css` which showed the canvas
+* Fixed: Issue with empty menu items; adds list only with childNodes > 1
+* Fixed: Issue with hidden bullets; caused by wrong clip-paths
+* Added: Polish language file ( thanks to piernik )
 
 ### 1.2.8
 * Fixed: Issue in `gatherClassName` checking element type
