@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.2.9
+Version: 1.3.0
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -68,7 +68,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts.export = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.2.9",
+			version: "1.3.0",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -164,6 +164,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						_this.createMenu( _this.config.menu );
 						_this.setup.fabric.deactivateAll();
 						_this.setup.wrapper.setAttribute( "class", _this.setup.chart.classNamePrefix + "-export-canvas" );
+						_this.setup.wrapper.style.display = "none";
 					},
 					add: function( options ) {
 						var cfg = _this.deepMerge( {
@@ -1297,7 +1298,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					var group = groups[ i1 ];
 					var isLegend = _this.gatherClassName( group.parent, _this.setup.chart.classNamePrefix + "-legend-div", 1 );
 					var isPanel = _this.gatherClassName( group.parent, _this.setup.chart.classNamePrefix + "-stock-panel-div" );
-					var isScrollbar = _this.gatherClassName( group.parent, _this.setup.chart.classNamePrefix + "-scrollbar-chart-div" )
+					var isScrollbar = _this.gatherClassName( group.parent, _this.setup.chart.classNamePrefix + "-scrollbar-chart-div" );
 
 					// STOCK CHART; SVG OFFSET;; SVG OFFSET
 					if ( _this.setup.chart.type == "stock" && _this.setup.chart.legendSettings.position ) {
@@ -1306,7 +1307,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						if ( [ "top", "bottom" ].indexOf( _this.setup.chart.legendSettings.position ) != -1 ) {
 
 							// POSITION; ABSOLUTE
-							if ( group.parent.style.top || group.parent.style.left ) {
+							if ( group.parent.style.top && group.parent.style.left ) {
 								group.offset.y = _this.pxToNumber( group.parent.style.top );
 								group.offset.x = _this.pxToNumber( group.parent.style.left );
 
@@ -1346,7 +1347,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					} else {
 
 						// POSITION; ABSOLUTE
-						if ( group.parent.style.top || group.parent.style.left ) {
+						if ( group.parent.style.top && group.parent.style.left ) {
 							group.offset.y = _this.pxToNumber( group.parent.style.top );
 							group.offset.x = _this.pxToNumber( group.parent.style.left );
 

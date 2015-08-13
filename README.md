@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.2.9
+Version: 1.3.0
 
 
 ## Description
@@ -809,6 +809,10 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.3.0
+* Fixed: Issue hiding drawing container on "drawing.done"
+* Fixed: Legend positioning issue with charts created in a hidden container
 
 ### 1.2.9
 * Fixed: Issue with missing `export.css` which showed the canvas
