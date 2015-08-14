@@ -65,7 +65,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
  ** Polyfill export class
  */
 ( function() {
-	AmCharts.export = function( chart, config ) {
+	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
 			version: "1.3.0",
