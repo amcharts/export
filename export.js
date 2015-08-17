@@ -2984,6 +2984,6 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
  * Set init handler
  */
 AmCharts.addInitHandler( function( chart ) {
-	new AmCharts.export( chart );
+	new AmCharts["export"]( chart );
 
 }, [ "pie", "serial", "xy", "funnel", "radar", "gauge", "stock", "map", "gantt" ] );
