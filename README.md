@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.3.0
+Version: 1.3.1
 
 
 ## Description
@@ -871,6 +871,11 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.3.1
+* Added: Timestamp date fields get converted as dates
+* Fixed: XLSX respects given dateFormat
+* Changed: JSON exports date fields as date objects by default
 
 ### 1.3.0
 * Fixed: Issue hiding drawing container on "drawing.done"

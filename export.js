@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.3.0
+Version: 1.3.1
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -68,7 +68,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.3.0",
+			version: "1.3.1-rc1",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -1819,8 +1819,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			 */
 			toJSON: function( options, callback ) {
 				var cfg = _this.deepMerge( {
-					data: _this.getChartData( options )
+					dateFormat: _this.config.dateFormat || "dateObject",
 				}, options || {}, true );
+				cfg.data = cfg.data ? cfg.data : _this.getChartData( cfg );
 				var data = JSON.stringify( cfg.data, undefined, "\t" );
 
 				_this.handleCallback( callback, data );
@@ -1897,7 +1898,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			toXLSX: function( options, callback ) {
 				var cfg = _this.deepMerge( {
 					name: "amCharts",
-					dateFormat: "dateObject",
+					dateFormat: _this.config.dateFormat || "dateObject",
 					withHeader: true,
 					stringify: false
 				}, options || {}, true );
@@ -2220,10 +2221,12 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 									var fieldMap = graph.dataSet.fieldMappings[ i3 ];
 									var uid = graph.dataSet.id + "_" + fieldMap.toField;
 
-									cfg.data[ i2 ][ uid ] = graph.dataSet.dataProvider[ i2 ][ fieldMap.fromField ];
+									if ( i2 < cfg.data.length ) {
+										cfg.data[ i2 ][ uid ] = graph.dataSet.dataProvider[ i2 ][ fieldMap.fromField ];
 
-									if ( !cfg.titles[ uid ] ) {
-										addField( uid, graph.dataSet.title )
+										if ( !cfg.titles[ uid ] ) {
+											addField( uid, graph.dataSet.title )
+										}
 									}
 								}
 							}
@@ -2345,9 +2348,13 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							// PROCESS CATEGORY
 							if ( cfg.dateFields.indexOf( dataField ) != -1 ) {
 
-								// CONVERT DATESTRING WITH GIVEN DATADATEFORMAT
+								// CONVERT DATESTRING TO DATE OBJECT
 								if ( cfg.dataDateFormat && ( value instanceof String || typeof value == "string" ) ) {
 									value = AmCharts.stringToDate( value, cfg.dataDateFormat );
+
+								// CONVERT TIMESTAMP TO DATE OBJECT
+								} else if ( cfg.dateFormat && ( value instanceof Number || typeof value == "number" ) ) {
+									value = new Date(value);
 								}
 
 								// CATEGORY RANGE
