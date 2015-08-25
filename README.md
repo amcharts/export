@@ -292,6 +292,63 @@ function takes two arguments and it needs to return a valid DOM element.
 }
 ```
 
+#### Format specific options that you can override using Menu item reviver
+
+Some formats, such as CSV, have specific parameters that are used when exporting to this format. For example, default column separator for CSV is a comma. But what if you would like to be that a tab? You could use `menuReviver` for that like this:
+
+```
+"export": {
+  "enabled": true,
+  "menuReviver": function(cfg,li) {
+    if ( cfg.format == "CSV" ) {
+      cfg.delimiter = "\t";
+    }
+    return li;
+  }
+}
+```
+
+Below you will find a list of parameters that you can override for each format:
+
+**JPG**
+|Parameter|Default|Available values|Description|
+|---------|-------|----------------|-----------|
+|quality|1|0-1|A quality of the resulting JPG image|
+|multiplier|1|number|Set this to non-1 number to resize the resulting image by|
+
+**PNG**
+|Parameter|Default|Available values|Description|
+|---------|-------|----------------|-----------|
+|quality|1|0-1|A quality of the resulting JPG image|
+|multiplier|1|number|Set this to non-1 number to resize the resulting image by|
+
+**PDF**
+|Parameter|Default|Available values|Description|
+|---------|-------|----------------|-----------|
+|multiplier|2|number|Set this to non-1 number to resize the resulting image by|
+
+**PRINT**
+|Parameter|Default|Available values|Description|
+|---------|-------|----------------|-----------|
+|delay|1|number|Delay by number of seconds before triggering print|
+|lossless|false|true/false|Enable or disable image optimization when printing|
+
+**CSV**
+|Parameter|Default|Available values|Description|
+|---------|-------|----------------|-----------|
+|delimiter|","|string|A string to use as a column delimiter|
+|quotes|true|true/false|Set whether to enclose strings in doublequotes|
+|escape|true|true/false|Set whether to escape strings|
+
+**XLSX**
+|Parameter|Default|Available values|Description|
+|---------|-------|----------------|-----------|
+|dateFormat|"dateObject"|"dateObject"\|"string"|Whether to export dates as dates recognisable by Excel or formatted as strings|
+|withHeader|true|true/false|Add header row with column names|
+|stringify|false|true/false|Convert all cell content to strings|
+
+
+
 ### Menu walker
 
 In case you don't like our structure, go ahead and write your own recursive 
