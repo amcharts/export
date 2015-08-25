@@ -311,42 +311,41 @@ Some formats, such as CSV, have specific parameters that are used when exporting
 Below you will find a list of parameters that you can override for each format:
 
 **JPG**
-Parameter|Default|Available values|Description
----------|-------|----------------|-----------
-quality|1|0-1|A quality of the resulting JPG image
-multiplier|1|number|Set this to non-1 number to resize the resulting image by
+Parameter | Default | Available values | Description
+--------- | ------- | ---------------- | -----------
+quality |1 | 0-1 | A quality of the resulting JPG image
+multiplier | 1 | number | Set this to non-1 number to resize the resulting image by
 
 **PNG**
-Parameter|Default|Available values|Description
----------|-------|----------------|-----------
-quality|1|0-1|A quality of the resulting JPG image
-multiplier|1|number|Set this to non-1 number to resize the resulting image by
+Parameter | Default | Available values | Description
+--------- | ------- | ---------------- | -----------
+quality | 1 | 0-1 | A quality of the resulting JPG image
+multiplier | 1 | number | Set this to non-1 number to resize the resulting image by
 
 **PDF**
-Parameter|Default|Available values|Description
----------|-------|----------------|-----------
-multiplier|2|number|Set this to non-1 number to resize the resulting image by
+Parameter | Default | Available values | Description
+--------- | ------- | ---------------- | -----------
+multiplier | 2 | number | Set this to non-1 number to resize the resulting image by
 
 **PRINT**
-Parameter|Default|Available values|Description
----------|-------|----------------|-----------
-delay|1|number|Delay by number of seconds before triggering print
-lossless|false|true/false|Enable or disable image optimization when printing
+Parameter | Default | Available values | Description
+--------- | ------- | ---------------- | -----------
+delay | 1 | number | Delay by number of seconds before triggering print
+lossless | false | true/false | Enable or disable image optimization when printing
 
 **CSV**
-Parameter|Default|Available values|Description
----------|-------|----------------|-----------
-delimiter|","|string|A string to use as a column delimiter
-quotes|true|true/false|Set whether to enclose strings in doublequotes
-escape|true|true/false|Set whether to escape strings
+Parameter | Default | Available values | Description
+--------- | ------- | ---------------- | -----------
+delimiter | "," | string | A string to use as a column delimiter
+quotes | true | true/false | Set whether to enclose strings in doublequotes
+escape | true | true/false | Set whether to escape strings
 
 **XLSX**
-Parameter|Default|Available values|Description
----------|-------|----------------|-----------
-dateFormat|"dateObject"|"dateObject"\|"string"|Whether to export dates as dates recognisable by Excel or formatted as strings
-withHeader|true|true/false|Add header row with column names
-stringify|false|true/false|Convert all cell content to strings
-
+Parameter | Default | Available values | Description
+--------- | ------- | ---------------- | -----------
+dateFormat | "dateObject" | "dateObject"\|"string" | Whether to export dates as dates recognisable by Excel or formatted as strings
+withHeader | true | true/false | Add header row with column names
+stringify | false | true/false | Convert all cell content to strings
 
 
 ### Menu walker
