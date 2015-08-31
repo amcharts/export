@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.3.1
+Version: 1.3.2
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -68,7 +68,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.3.1-rc1",
+			version: "1.3.2",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -471,7 +471,8 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						widths: [ 1, 5, 10, 15 ],
 						opacity: 1,
 						opacities: [ 1, 0.8, 0.6, 0.4, 0.2 ],
-						menu: undefined
+						menu: undefined,
+						autoClose: true
 					}
 				},
 				pdfMake: {
@@ -2525,7 +2526,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							} else if ( _this.drawing.buffer.enabled ) {
 								item.click = ( function( item ) {
 									return function() {
-										this.drawing.handler.done();
+										if ( this.config.drawing.autoClose ) {
+											this.drawing.handler.done();
+										}
 										this[ "to" + item.format ]( item, function( data ) {
 											if ( item.action == "download" ) {
 												this.download( data, item.mimeType, [ item.fileName, item.extension ].join( "." ) );
@@ -2540,7 +2543,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 									return function() {
 										if ( item.capture || item.action == "print" || item.format == "PRINT" ) {
 											this.capture( item, function() {
-												this.drawing.handler.done();
+												if ( this.config.drawing.autoClose ) {
+													this.drawing.handler.done();
+												}
 												this[ "to" + item.format ]( item, function( data ) {
 													if ( item.action == "download" ) {
 														this.download( data, item.mimeType, [ item.fileName, item.extension ].join( "." ) );

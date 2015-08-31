@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.3.1
+Version: 1.3.2
 
 
 ## Description
@@ -510,6 +510,8 @@ Following setup shows you all available settings. If you don't have the
     "mode": "pencil", // Drawing mode when entering the annotation mode "pencil", "line" and "arrow" are available
     "modes": [ "pencil" , "line", "arrow" ], // Choice of modes offered in the menu
     "arrow": "end", // position of the arrow on drawn lines; "start","middle" and "end" are available
+
+    "autoClose": true // Flag to automatically close the annotation mode after download
   }
 }
 ```
@@ -871,6 +873,10 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.3.2
+* Added: ([drawing.autoClose](#annotation-settings)) new flag to automatically close the annotation mode after download
+* Fixed: Internal pdfMake issue which prevented to generate PDFs in IE10, uses custom build until officially fixed
 
 ### 1.3.1
 * Added: Timestamp date fields get converted as dates
