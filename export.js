@@ -2210,15 +2210,10 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					}
 
 					if ( field && cfg.exportTitles && _this.setup.chart.type != "gantt" ) {
-						if ( cfg.columnNames[ field ] !== undefined ) {
-							cfg.titles[ field ] = cfg.columnNames[ field ];
-						}
-						else {
-							uid = checkExistance( field, type );
-							cfg.dataFieldsMap[ uid ] = field;
-							cfg.dataFields.push( uid );
-							cfg.titles[ uid ] = title || uid;
-						}
+						uid = checkExistance( field, type );
+						cfg.dataFieldsMap[ uid ] = field;
+						cfg.dataFields.push( uid );
+						cfg.titles[ uid ] = title || uid;
 					}
 				}
 
@@ -2349,7 +2344,8 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					dataDateFormat: _this.setup.chart.dataDateFormat,
 					dateFormat: _this.config.dateFormat || _this.setup.chart.dataDateFormat || "YYYY-MM-DD",
 					exportTitles: _this.config.exportTitles,
-					exportSelection: _this.config.exportSelection
+					exportSelection: _this.config.exportSelection,
+					columnNames: _this.config.columnNames
 				}, options || {}, true );
 				var i1, i2;
 
@@ -2372,7 +2368,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						for ( i2 = 0; i2 < cfg.dataFields.length; i2++ ) {
 							var uniqueField = cfg.dataFields[ i2 ];
 							var dataField = cfg.dataFieldsMap[ uniqueField ];
-							var title = cfg.titles[ uniqueField ] || uniqueField;
+							var title = cfg.columnNames[ uniqueField ] || cfg.titles[ uniqueField ] || uniqueField;
 							var value = cfg.data[ i1 ][ dataField ] || undefined;
 
 							// TITLEFY
