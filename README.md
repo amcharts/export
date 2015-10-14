@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.3.5
+Version: 1.3.6
 
 
 ## Description
@@ -873,6 +873,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.3.6
+* Fixed: Checking parseDates for category values for date interpretation
 
 ### 1.3.5
 * Fixed: Scrollbar issue hiding the unselected scrollbar background area
