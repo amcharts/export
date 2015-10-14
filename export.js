@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.3.6
+Version: 1.3.7
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -68,7 +68,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.3.6",
+			version: "1.3.7",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -2193,7 +2193,8 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					dataFields: [],
 					dataFieldsMap: {},
 					exportTitles: _this.config.exportTitles,
-					exportSelection: _this.config.exportSelection
+					exportSelection: _this.config.exportSelection,
+					columnNames: _this.config.columnNames
 				}, options || {}, true );
 				var uid, i1, i2, i3;
 				var lookupFields = [ "valueField", "openField", "closeField", "highField", "lowField", "xField", "yField" ];
@@ -2210,9 +2211,14 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 					if ( field && cfg.exportTitles && _this.setup.chart.type != "gantt" ) {
 						uid = checkExistance( field, type );
-						cfg.dataFieldsMap[ uid ] = field;
-						cfg.dataFields.push( uid );
-						cfg.titles[ uid ] = title || uid;
+						if ( cfg.columnNames[ uid ] !== undefined ) {
+							cfg.titles[ uid ] = cfg.columnNames[ field ];
+						}
+						else {
+							cfg.dataFieldsMap[ uid ] = field;
+							cfg.dataFields.push( uid );
+							cfg.titles[ uid ] = title || uid;
+						}
 					}
 				}
 
