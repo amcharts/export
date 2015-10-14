@@ -2210,11 +2210,11 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					}
 
 					if ( field && cfg.exportTitles && _this.setup.chart.type != "gantt" ) {
-						uid = checkExistance( field, type );
-						if ( cfg.columnNames[ uid ] !== undefined ) {
-							cfg.titles[ uid ] = cfg.columnNames[ field ];
+						if ( cfg.columnNames[ field ] !== undefined ) {
+							cfg.titles[ field ] = cfg.columnNames[ field ];
 						}
 						else {
+							uid = checkExistance( field, type );
 							cfg.dataFieldsMap[ uid ] = field;
 							cfg.dataFields.push( uid );
 							cfg.titles[ uid ] = title || uid;
