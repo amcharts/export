@@ -2368,7 +2368,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						for ( i2 = 0; i2 < cfg.dataFields.length; i2++ ) {
 							var uniqueField = cfg.dataFields[ i2 ];
 							var dataField = cfg.dataFieldsMap[ uniqueField ];
-							var title = cfg.columnNames[ uniqueField ] || cfg.titles[ uniqueField ] || uniqueField;
+							var title = ( cfg.columnNames && cfg.columnNames[ uniqueField ] ) || cfg.titles[ uniqueField ] || uniqueField;
 							var value = cfg.data[ i1 ][ dataField ] || undefined;
 
 							// TITLEFY
