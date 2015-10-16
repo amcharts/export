@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.3.7
+Version: 1.3.8
 
 
 ## Description
@@ -875,6 +875,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.3.8
+* Fixed: Base tag clip path issue which draw the lines outside the plotarea
 
 ### 1.3.7
 * Added: `columnNames` property, which allows overriding column names when expoerting chart data

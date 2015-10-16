@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.3.7
+Version: 1.3.8
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -68,7 +68,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.3.7",
+			version: "1.3.8",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -1450,7 +1450,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 										// PATTERN; TODO: DISTINGUISH OPACITY TYPES
 									} else if ( String( g.paths[ i1 ].fill ).slice( 0, 3 ) == "url" ) {
+										var hashBang = g.paths[ i1 ].fill.indexOf("#");
 										var PID = g.paths[ i1 ].fill.slice( 5, -1 );
+
 										if ( group.patterns && group.patterns[ PID ] ) {
 											g.paths[ i1 ].set( {
 												fill: group.patterns[ PID ],
@@ -1461,7 +1463,8 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 									// CLIPPATH;
 									if ( String( g.paths[ i1 ].clipPath ).slice( 0, 3 ) == "url" ) {
-										var PID = g.paths[ i1 ].clipPath.slice( 5, -1 );
+										var hashBang = g.paths[ i1 ].clipPath.indexOf("#");
+										var PID = g.paths[ i1 ].clipPath.slice( hashBang + 1, - 1 );
 
 										if ( group.clippings[ PID ] ) {
 											var mask = group.clippings[ PID ].childNodes[ 0 ];
