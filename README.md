@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.3.8
+Version: 1.3.9
 
 
 ## Description
@@ -875,6 +875,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.3.9
+* Fixed: Base tag gradient drawing issue (includes embedded hotfix for fabricjs commit #c9745ff)
 
 ### 1.3.8
 * Fixed: Base tag clip path issue which draw the lines outside the plotarea

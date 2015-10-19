@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.3.8
+Version: 1.3.9
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -68,7 +68,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.3.8",
+			version: "1.3.9",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -725,6 +725,15 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			},
 
 			/**
+			 * Checks if given argument contains a hashbang and returns it
+			 */
+			isHashbanged: function( thingy ) {
+				var str = String( thingy );
+
+				return str.slice(0,3) == "url" ? str.slice( str.indexOf("#") + 1, str.length - 1 ) : false;
+			},
+
+			/**
 			 * Checks if given event has been thrown with pressed click / touch
 			 */
 			isPressed: function( event ) {
@@ -855,7 +864,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				for ( i1 = 0; i1 < group.children.length; i1++ ) {
 					var childNode = group.children[ i1 ];
 
-					// CLIPPATH
+						// CLIPPATH
 					if ( childNode.tagName == "clipPath" ) {
 						for ( i2 = 0; i2 < childNode.childNodes.length; i2++ ) {
 							childNode.childNodes[ i2 ].setAttribute( "fill", "transparent" );
@@ -974,6 +983,19 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					loaded: 0,
 					included: 0
 				}
+
+				fabric.ElementsParser.prototype.resolveGradient = function(obj, property) {
+
+					var instanceFillValue = obj.get(property);
+					if (!(/^url\(/).test(instanceFillValue)) {
+						return;
+					}
+					var gradientId = instanceFillValue.slice(instanceFillValue.indexOf("#") + 1, instanceFillValue.length - 1);
+					if (fabric.gradientDefs[this.svgUid][gradientId]) {
+						obj.set(property,
+						fabric.Gradient.fromElement(fabric.gradientDefs[this.svgUid][gradientId], obj));
+					}
+				};
 
 				// GATHER SVGS
 				var svgs = _this.setup.chart.containerDiv.getElementsByTagName( "svg" );
@@ -1425,6 +1447,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							}
 
 							for ( i1 = 0; i1 < g.paths.length; i1++ ) {
+								var PID = null;
 
 								// OPACITY; TODO: DISTINGUISH OPACITY TYPES
 								if ( g.paths[ i1 ] ) {
@@ -1448,11 +1471,10 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 											opacity: g.paths[ i1 ].fillOpacity
 										} );
 
-										// PATTERN; TODO: DISTINGUISH OPACITY TYPES
-									} else if ( String( g.paths[ i1 ].fill ).slice( 0, 3 ) == "url" ) {
-										var hashBang = g.paths[ i1 ].fill.indexOf("#");
-										var PID = g.paths[ i1 ].fill.slice( 5, -1 );
+										// FILLING; TODO: DISTINGUISH OPACITY TYPES
+									} else if ( PID = _this.isHashbanged(g.paths[ i1 ].fill) ) {
 
+										// PATTERN
 										if ( group.patterns && group.patterns[ PID ] ) {
 											g.paths[ i1 ].set( {
 												fill: group.patterns[ PID ],
@@ -1462,9 +1484,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 									}
 
 									// CLIPPATH;
-									if ( String( g.paths[ i1 ].clipPath ).slice( 0, 3 ) == "url" ) {
-										var hashBang = g.paths[ i1 ].clipPath.indexOf("#");
-										var PID = g.paths[ i1 ].clipPath.slice( hashBang + 1, - 1 );
+									if ( PID = _this.isHashbanged(g.paths[ i1 ].clipPath ) ) {
 
 										if ( group.clippings[ PID ] ) {
 											var mask = group.clippings[ PID ].childNodes[ 0 ];
