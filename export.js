@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.3.9
+Version: 1.4.0
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -68,7 +68,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.3.9",
+			version: "1.4.0",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -76,7 +76,14 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				resources: [ {
 					"pdfmake/pdfmake.js": [ "pdfmake/vfs_fonts.js" ],
 					"jszip/jszip.js": [ "xlsx/xlsx.js" ]
-				}, "fabric.js/fabric.js", "FileSaver.js/FileSaver.js" ]
+				}, "fabric.js/fabric.js", "FileSaver.js/FileSaver.js" ],
+				namespaces: {
+					"pdfmake.js": "pdfMake",
+					"jszip.js": "JSZip",
+					"xlsx.js": "XLSX",
+					"fabric.js": "fabric",
+					"FileSaver.js": "saveAs"
+				}
 			},
 			config: {},
 			setup: {
@@ -611,6 +618,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					node.setAttribute( "href", url );
 				}
 
+				// NODE CHECK
 				for ( i1 = 0; i1 < document.head.childNodes.length; i1++ ) {
 					item = document.head.childNodes[ i1 ];
 					check = item ? ( item.src || item.href ) : false;
@@ -620,6 +628,17 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						if ( _this.libs.reload ) {
 							document.head.removeChild( item );
 						}
+						exist = true;
+						break;
+					}
+				}
+
+				// NAMESPACE CHECK
+				for ( i1 in _this.libs.namespaces ) {
+					var namespace = _this.libs.namespaces[i1];
+					var check = src.toLowerCase();
+					var item = i1.toLowerCase();
+					if ( check.indexOf(item) != -1 && window[namespace] !== undefined ) {
 						exist = true;
 						break;
 					}
@@ -996,6 +1015,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						fabric.Gradient.fromElement(fabric.gradientDefs[this.svgUid][gradientId], obj));
 					}
 				};
+
+				// BEFORE CAPTURING
+				_this.handleCallback( cfg.beforeCapture, cfg );
 
 				// GATHER SVGS
 				var svgs = _this.setup.chart.containerDiv.getElementsByTagName( "svg" );
@@ -1415,9 +1437,6 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							group.offset.y += _this.pxToNumber( isPanel.style.marginTop );
 						}
 					}
-
-					// BEFORE CAPTURING
-					_this.handleCallback( cfg.beforeCapture, cfg );
 
 					// ADD TO CANVAS
 					fabric.parseSVGDocument( group.svg, ( function( group ) {

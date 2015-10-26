@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.3.9
+Version: 1.4.0
 
 
 ## Description
@@ -875,6 +875,10 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.0
+* Fixed: beforeCapture issue on SVG document changes
+* Added: Namespace check within globals for required third party software
 
 ### 1.3.9
 * Fixed: Base tag gradient drawing issue (includes embedded hotfix for fabricjs commit #c9745ff)
