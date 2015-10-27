@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.0
+Version: 1.4.1
 
 
 ## Description
@@ -875,6 +875,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.1
+* Fixed: cropped bullets on XY charts
 
 ### 1.4.0
 * Fixed: beforeCapture issue on SVG document changes

@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.0
+Version: 1.4.1
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -68,7 +68,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.4.0",
+			version: "1.4.1",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -1506,22 +1506,28 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 									if ( PID = _this.isHashbanged(g.paths[ i1 ].clipPath ) ) {
 
 										if ( group.clippings[ PID ] ) {
-											var mask = group.clippings[ PID ].childNodes[ 0 ];
-											var transform = g.paths[ i1 ].svg.getAttribute( "transform" ) || "translate(0,0)";
-
-											transform = transform.slice( 10, -1 ).split( "," );
 
 											g.paths[ i1 ].set( {
-												clipTo: ( function( mask, transform ) {
+												clipTo: ( function( i1, PID ) {
 													return function( ctx ) {
+														var mask = group.clippings[ PID ].childNodes[ 0 ];
 														var width = Number( mask.getAttribute( "width" ) || "0" );
 														var height = Number( mask.getAttribute( "height" ) || "0" );
 														var x = Number( mask.getAttribute( "x" ) || "0" );
 														var y = Number( mask.getAttribute( "y" ) || "0" );
+														var transform = g.paths[ i1 ].svg.getAttribute( "transform" ) || "translate(0,0)";
+														var tagName = g.paths[ i1 ].svg.tagName;
 
-														ctx.rect( Number( transform[ 0 ] ) * -1 + x, Number( transform[ 1 ] ) * -1 + y, width, height );
+														transform = transform.slice( 10, -1 ).split( "," );
+
+														// TODO: LOOK FOR A BETTER SOLUTION; CIRCLE TEXT CLIPPATH EXCEPTION
+														if ( ["circle","text"].indexOf(tagName) != -1 ) {
+															ctx.rect( Number( transform[ 0 ] ) * -1, Number( transform[ 1 ] ) * -1, width, height );
+														} else {
+															ctx.rect( Number( transform[ 0 ] ) * -1 + x, Number( transform[ 1 ] ) * -1 + y, width, height );
+														}
 													}
-												} )( mask, transform )
+												} )( i1, PID )
 											} );
 										}
 									}
