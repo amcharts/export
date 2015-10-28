@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.1
+Version: 1.4.2
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -68,7 +68,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.4.1",
+			version: "1.4.2",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -425,6 +425,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				position: "top-right",
 				fileName: "amCharts",
 				action: "download",
+				overflow: true,
 				path: ( ( chart.path || "" ) + "plugins/export/" ),
 				formats: {
 					JPG: {
@@ -2919,8 +2920,10 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							// CREATE REFERENCE
 							_this.setup.chart.AmExport = _this;
 
-							// OVERWRITE PARENT OVERVIEW
-							_this.setup.chart.div.style.overflow = "visible";
+							// OVERWRITE PARENT OVERFLOW
+							if ( _this.config.overflow ) {
+								_this.setup.chart.div.style.overflow = "visible";
+							}
 
 							// ATTACH EVENTS
 							_this.loadListeners();

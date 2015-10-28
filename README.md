@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.1
+Version: 1.4.2
 
 
 ## Description
@@ -143,6 +143,7 @@ dateFormat | YYYY-MM-DD | Formats the category field in given date format ( data
 keyListener | false | If true it observes the pressed keys to undo/redo the annotations
 fileListener | false | If true it observes the drag and drop feature and loads the dropped image file into the annotation
 drawing | {} | Object which holds all possible settings for the annotation mode ([skip to chapter](#annotation-settings))
+overflow | true | Flag to overwrite the css attribute 'overflow' of the chart container to avoid cropping the menu on small container
 
 
 ## Configuring export menu
@@ -875,6 +876,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.2
+* Added: `overflow` flag to overwrite the css attribute 'overflow' of the chart container
 
 ### 1.4.1
 * Fixed: cropped bullets on XY charts
