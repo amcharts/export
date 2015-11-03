@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.2
+Version: 1.4.3
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -68,7 +68,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.4.2",
+			version: "1.4.3",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -636,10 +636,10 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 				// NAMESPACE CHECK
 				for ( i1 in _this.libs.namespaces ) {
-					var namespace = _this.libs.namespaces[i1];
+					var namespace = _this.libs.namespaces[ i1 ];
 					var check = src.toLowerCase();
 					var item = i1.toLowerCase();
-					if ( check.indexOf(item) != -1 && window[namespace] !== undefined ) {
+					if ( check.indexOf( item ) != -1 && window[ namespace ] !== undefined ) {
 						exist = true;
 						break;
 					}
@@ -750,7 +750,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			isHashbanged: function( thingy ) {
 				var str = String( thingy );
 
-				return str.slice(0,3) == "url" ? str.slice( str.indexOf("#") + 1, str.length - 1 ) : false;
+				return str.slice( 0, 3 ) == "url" ? str.slice( str.indexOf( "#" ) + 1, str.length - 1 ) : false;
 			},
 
 			/**
@@ -864,7 +864,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				var value, lvl = lvl ? lvl : 0,
 					limit = limit ? limit : 3;
 
-				if ( _this.isElement(elm) ) {
+				if ( _this.isElement( elm ) ) {
 					value = ( elm.getAttribute( "class" ) || "" ).split( " " ).indexOf( className ) != -1;
 
 					if ( !value && lvl < limit ) {
@@ -884,7 +884,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				for ( i1 = 0; i1 < group.children.length; i1++ ) {
 					var childNode = group.children[ i1 ];
 
-						// CLIPPATH
+					// CLIPPATH
 					if ( childNode.tagName == "clipPath" ) {
 						for ( i2 = 0; i2 < childNode.childNodes.length; i2++ ) {
 							childNode.childNodes[ i2 ].setAttribute( "fill", "transparent" );
@@ -1004,16 +1004,16 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					included: 0
 				}
 
-				fabric.ElementsParser.prototype.resolveGradient = function(obj, property) {
+				fabric.ElementsParser.prototype.resolveGradient = function( obj, property ) {
 
-					var instanceFillValue = obj.get(property);
-					if (!(/^url\(/).test(instanceFillValue)) {
+					var instanceFillValue = obj.get( property );
+					if ( !( /^url\(/ ).test( instanceFillValue ) ) {
 						return;
 					}
-					var gradientId = instanceFillValue.slice(instanceFillValue.indexOf("#") + 1, instanceFillValue.length - 1);
-					if (fabric.gradientDefs[this.svgUid][gradientId]) {
-						obj.set(property,
-						fabric.Gradient.fromElement(fabric.gradientDefs[this.svgUid][gradientId], obj));
+					var gradientId = instanceFillValue.slice( instanceFillValue.indexOf( "#" ) + 1, instanceFillValue.length - 1 );
+					if ( fabric.gradientDefs[ this.svgUid ][ gradientId ] ) {
+						obj.set( property,
+							fabric.Gradient.fromElement( fabric.gradientDefs[ this.svgUid ][ gradientId ], obj ) );
 					}
 				};
 
@@ -1395,16 +1395,16 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						// REGULAR CHARTS; SVG OFFSET
 					} else {
 						// POSITION; ABSOLUTE
-						if ( group.parent.style.position == "absolute"  ) {
+						if ( group.parent.style.position == "absolute" ) {
 							group.offset.absolute = true;
-							group.offset.top = _this.pxToNumber(group.parent.style.top);
-							group.offset.right = _this.pxToNumber(group.parent.style.right,true);
-							group.offset.bottom = _this.pxToNumber(group.parent.style.bottom,true);
-							group.offset.left = _this.pxToNumber(group.parent.style.left);
-							group.offset.width = _this.pxToNumber(group.parent.style.width);
-							group.offset.height = _this.pxToNumber(group.parent.style.height);
+							group.offset.top = _this.pxToNumber( group.parent.style.top );
+							group.offset.right = _this.pxToNumber( group.parent.style.right, true );
+							group.offset.bottom = _this.pxToNumber( group.parent.style.bottom, true );
+							group.offset.left = _this.pxToNumber( group.parent.style.left );
+							group.offset.width = _this.pxToNumber( group.parent.style.width );
+							group.offset.height = _this.pxToNumber( group.parent.style.height );
 
-						// POSITION; RELATIVE
+							// POSITION; RELATIVE
 						} else if ( group.parent.style.top && group.parent.style.left ) {
 							group.offset.y = _this.pxToNumber( group.parent.style.top );
 							group.offset.x = _this.pxToNumber( group.parent.style.left );
@@ -1492,7 +1492,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 										} );
 
 										// FILLING; TODO: DISTINGUISH OPACITY TYPES
-									} else if ( PID = _this.isHashbanged(g.paths[ i1 ].fill) ) {
+									} else if ( PID = _this.isHashbanged( g.paths[ i1 ].fill ) ) {
 
 										// PATTERN
 										if ( group.patterns && group.patterns[ PID ] ) {
@@ -1504,7 +1504,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 									}
 
 									// CLIPPATH;
-									if ( PID = _this.isHashbanged(g.paths[ i1 ].clipPath ) ) {
+									if ( PID = _this.isHashbanged( g.paths[ i1 ].clipPath ) ) {
 
 										if ( group.clippings[ PID ] ) {
 
@@ -1522,7 +1522,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 														transform = transform.slice( 10, -1 ).split( "," );
 
 														// TODO: LOOK FOR A BETTER SOLUTION; CIRCLE TEXT CLIPPATH EXCEPTION
-														if ( ["circle","text"].indexOf(tagName) != -1 ) {
+														if ( [ "circle", "text" ].indexOf( tagName ) != -1 ) {
 															ctx.rect( Number( transform[ 0 ] ) * -1, Number( transform[ 1 ] ) * -1, width, height );
 														} else {
 															ctx.rect( Number( transform[ 0 ] ) * -1 + x, Number( transform[ 1 ] ) * -1 + y, width, height );
@@ -2242,6 +2242,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					dataFields: [],
 					dataFieldsMap: {},
 					exportTitles: _this.config.exportTitles,
+					exportFields: _this.config.exportFields,
 					exportSelection: _this.config.exportSelection,
 					columnNames: _this.config.columnNames
 				}, options || {}, true );
@@ -2393,6 +2394,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					dataDateFormat: _this.setup.chart.dataDateFormat,
 					dateFormat: _this.config.dateFormat || _this.setup.chart.dataDateFormat || "YYYY-MM-DD",
 					exportTitles: _this.config.exportTitles,
+					exportFields: _this.config.exportFields,
 					exportSelection: _this.config.exportSelection,
 					columnNames: _this.config.columnNames
 				}, options || {}, true );
@@ -2407,6 +2409,13 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 								cfg.dataFieldsMap[ i2 ] = i2;
 							}
 						}
+					}
+
+					// REMOVE FIELDS SELECTIVELY
+					if ( cfg.exportFields !== undefined ) {
+						cfg.dataFields = cfg.dataFields.filter( function( n ) {
+							return cfg.exportFields.indexOf( n ) != -1;
+						} );
 					}
 
 					// REBUILD DATA
@@ -2434,9 +2443,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 								if ( cfg.dataDateFormat && ( value instanceof String || typeof value == "string" ) ) {
 									value = AmCharts.stringToDate( value, cfg.dataDateFormat );
 
-								// CONVERT TIMESTAMP TO DATE OBJECT
+									// CONVERT TIMESTAMP TO DATE OBJECT
 								} else if ( cfg.dateFormat && ( value instanceof Number || typeof value == "number" ) ) {
-									value = new Date(value);
+									value = new Date( value );
 								}
 
 								// CATEGORY RANGE
@@ -3079,6 +3088,6 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
  * Set init handler
  */
 AmCharts.addInitHandler( function( chart ) {
-	new AmCharts["export"]( chart );
+	new AmCharts[ "export" ]( chart );
 
 }, [ "pie", "serial", "xy", "funnel", "radar", "gauge", "stock", "map", "gantt" ] );

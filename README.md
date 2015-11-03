@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.2
+Version: 1.4.3
 
 
 ## Description
@@ -135,6 +135,7 @@ pdfMake | {} | Overwrites the default settings for PDF export (pdfMake library)
 position | top-right | A position of export icon. Possible values: "top-left", "top-right" (default), "bottom-left", "bottom-right"
 removeImages | true | If true export checks for and removes "tainted" images that area lodead from different domains
 delay | | General setting to delay the capturing of the chart ([skip to chapter](#delay-the-capturing-before-export))
+exportFields | [] | If set, only fields in this array will be exported ( data export only )
 exportTitles | false | Exchanges the data field names with it's dedicated title ( data export only )
 columnNames | {} | An object of key/value pairs to use as column names when exporting to data formats. `exportTitles` needs to be set for this to work as well.
 exportSelection | false | Exports the current data selection only ( data export only )
@@ -622,6 +623,7 @@ content | Array of elements which represents the content ([details](#exporting-t
 multiplier | Scale factor for the generated image
 lossless | Flag to print the actual vector graphic instead of buffered bitmap (print option only, experimental)
 delay | A numeric value to delay the capturing in seconds ([details](#delay-the-capturing-before-export))
+exportFields | [] | If set, only fields in this array will be exported ( data export only )
 exportTitles | Exchanges the data field names with it's dedicated title ( data export only )
 columnNames | An object of key/value pairs to use as column names when exporting ( data export only )
 exportSelection | Exports the current data selection only ( data export only )
@@ -876,6 +878,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.3
+* Added: `exportFields` option which is an array of fields to export in data formats (if you want to export just some fields as opposed to all fields)
 
 ### 1.4.2
 * Added: `overflow` flag to overwrite the css attribute 'overflow' of the chart container
