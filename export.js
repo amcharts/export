@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.3
+Version: 1.4.4
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -68,7 +68,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.4.3",
+			version: "1.4.4",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -1534,17 +1534,33 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 									}
 
 									// TODO; WAIT FOR TSPAN SUPPORT FROM FABRICJS SIDE
-									if ( g.paths[ i1 ].originalBBox ) {
-										var bb = g.paths[ i1 ].originalBBox;
-										if ( g.paths[ i1 ].textAlign == "left" ) {
-											g.paths[ i1 ].set( {
-												left: bb.left + ( g.paths[ i1 ].width / 2 )
-											} );
-										} else {
-											g.paths[ i1 ].set( {
-												left: bb.left - ( g.paths[ i1 ].width / 2 )
-											} );
+									if ( g.paths[ i1 ].TSPANWORKAROUND ) {
+										var parsedAttributes = fabric.parseAttributes(g.paths[ i1 ].svg, fabric.Text.ATTRIBUTE_NAMES);
+										var options = fabric.util.object.extend({}, parsedAttributes);
+
+										// CREATE NEW SET
+										var tmpBuffer = [];
+										for ( var i = 0; i < g.paths[ i1 ].svg.childNodes.length; i++ ) {
+											var textNode = g.paths[ i1 ].svg.childNodes[i];
+											var textElement = fabric.Text.fromElement(textNode,options);
+
+											textElement.set({
+												left: 0
+											});
+
+											tmpBuffer.push(textElement);
 										}
+
+										// HIDE ORIGINAL ELEMENT
+										g.paths[ i1 ].set({
+											opacity: 0
+										});
+
+										// REPLACE BY GROUP AND CANCEL FIRST OFFSET
+										var tmpGroup = new fabric.Group( tmpBuffer, {
+											top: g.paths[ i1 ].top * -1
+										} );
+										_this.setup.fabric.add( tmpGroup );
 									}
 								}
 							}
@@ -1560,31 +1576,38 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 									if ( cfg.balloonFunction instanceof Function ) {
 										cfg.balloonFunction.apply( _this, [ balloons[ i1 ], group ] );
 									} else {
-										var parent = balloons[ i1 ];
-										var text = parent.childNodes[ 0 ];
-										var label = new fabric.Text( text.innerText || text.innerHTML, {
-											fontSize: _this.pxToNumber( text.style.fontSize ),
-											fontFamily: text.style.fontFamily,
-											fill: text.style.color,
-											top: _this.pxToNumber( parent.style.top ) + group.offset.y,
-											left: _this.pxToNumber( parent.style.left ) + group.offset.x,
-											selectable: false
+										var elm_parent = balloons[ i1 ];
+										var style_parent = fabric.parseStyleAttribute(elm_parent);
+										var style_text = fabric.parseStyleAttribute(elm_parent.childNodes[ 0 ]);
+										var fabric_label = new fabric.Text( elm_parent.innerText || elm_parent.innerHTML, {
+											selectable: false,
+											top: style_parent.top + group.offset.y,
+											left: style_parent.left + group.offset.x,
+											fill: style_text["color"],
+											fontSize: style_text["fontSize"],
+											fontFamily: style_text["fontFamily"],
+											textAlign: style_text["text-align"]
 										} );
 
-										_this.setup.fabric.add( label );
+										_this.setup.fabric.add( fabric_label );
 									}
 								}
 							}
+
 							if ( group.svg.nextSibling && group.svg.nextSibling.tagName == "A" ) {
-								var label = new fabric.Text( group.svg.nextSibling.innerText || group.svg.nextSibling.innerHTML, {
-									fontSize: _this.pxToNumber( group.svg.nextSibling.style.fontSize ),
-									fontFamily: group.svg.nextSibling.style.fontFamily,
-									fill: group.svg.nextSibling.style.color,
-									top: _this.pxToNumber( group.svg.nextSibling.style.top ) + group.offset.y,
-									left: _this.pxToNumber( group.svg.nextSibling.style.left ) + group.offset.x,
-									selectable: false
+								var elm_parent = group.svg.nextSibling;
+								var style_parent = fabric.parseStyleAttribute(elm_parent);
+								var fabric_label = new fabric.Text( elm_parent.innerText || elm_parent.innerHTML, {
+									selectable: false,
+									top: style_parent.top + group.offset.y,
+									left: style_parent.left + group.offset.x,
+									fill: style_parent["color"],
+									fontSize: style_parent["fontSize"],
+									fontFamily: style_parent["fontFamily"],
+									opacity: style_parent["opacity"]
 								} );
-								_this.setup.fabric.add( label );
+
+								_this.setup.fabric.add( fabric_label );
 							}
 
 							groups.pop();
@@ -1616,28 +1639,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 						// TODO; WAIT FOR TSPAN SUPPORT FROM FABRICJS SIDE
 						if ( svg.tagName == "text" && svg.childNodes.length > 1 ) {
-							var lines = [];
-							var textAnchor = svg.getAttribute( "text-anchor" ) || "left";
-							var anchorMap = {
-								"start": "left",
-								"middle": "center",
-								"end": "right"
-							}
-
-							for ( i1 = 0; i1 < svg.childNodes.length; i1++ ) {
-								lines.push( svg.childNodes[ i1 ].textContent );
-							}
-
-							if ( textAnchor != "middle" ) {
-								obj.originalBBox = obj.getBoundingRect();
-							}
-							obj.set( {
-								lineHeight: 1.05,
-								top: obj.top + obj.height - ( obj.fontSize * ( 0.18 + obj._fontSizeFraction ) / 2 ),
-								text: lines.join( "\n" ),
-								textAlign: anchorMap[ textAnchor ],
-								selectable: false
-							} );
+							obj.TSPANWORKAROUND = true;
 						}
 
 						// HIDE HIDDEN ELEMENTS; TODO: FIND A BETTER WAY TO HANDLE THAT

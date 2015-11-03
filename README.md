@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.3
+Version: 1.4.4
 
 
 ## Description
@@ -878,6 +878,10 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.4
+* Added: Balloon text orientation
+* Fixed: Issue with multiline label positioning
 
 ### 1.4.3
 * Added: `exportFields` option which is an array of fields to export in data formats (if you want to export just some fields as opposed to all fields)
