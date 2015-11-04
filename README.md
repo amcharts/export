@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.4
+Version: 1.4.5
 
 
 ## Description
@@ -878,6 +878,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.5
+* Fixed: Issue with the "canvas-container" on chart revalidations
 
 ### 1.4.4
 * Added: Balloon text orientation

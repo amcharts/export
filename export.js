@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.4
+Version: 1.4.5
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -68,7 +68,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.4.4",
+			version: "1.4.5",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -88,7 +88,8 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			config: {},
 			setup: {
 				chart: chart,
-				hasBlob: false
+				hasBlob: false,
+				wrapper: false
 			},
 			drawing: {
 				enabled: false,
@@ -170,8 +171,11 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						_this.drawing.redos = [];
 						_this.createMenu( _this.config.menu );
 						_this.setup.fabric.deactivateAll();
-						_this.setup.wrapper.setAttribute( "class", _this.setup.chart.classNamePrefix + "-export-canvas" );
-						_this.setup.wrapper.style.display = "none";
+
+						if ( _this.setup.wrapper ) {
+							_this.setup.chart.containerDiv.removeChild( _this.setup.wrapper );
+							_this.setup.wrapper = false;
+						}
 					},
 					add: function( options ) {
 						var cfg = _this.deepMerge( {
@@ -1080,13 +1084,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				// CLEAR IF EXIST
 				_this.drawing.buffer.enabled = cfg.action == "draw";
 
-				if ( !_this.setup.wrapper ) {
-					_this.setup.wrapper = document.createElement( "div" );
-					_this.setup.wrapper.setAttribute( "class", _this.setup.chart.classNamePrefix + "-export-canvas" );
-					_this.setup.chart.containerDiv.appendChild( _this.setup.wrapper );
-				} else {
-					_this.setup.wrapper.innerHTML = "";
-				}
+				_this.setup.wrapper = document.createElement( "div" );
+				_this.setup.wrapper.setAttribute( "class", _this.setup.chart.classNamePrefix + "-export-canvas" );
+				_this.setup.chart.containerDiv.appendChild( _this.setup.wrapper );
 
 				// STOCK CHART; SELECTOR OFFSET
 				if ( _this.setup.chart.type == "stock" ) {
