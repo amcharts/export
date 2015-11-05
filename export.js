@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.5
+Version: 1.4.6
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -68,7 +68,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.4.5",
+			version: "1.4.6",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -918,30 +918,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						} else {
 							images.included++;
 
-							// LOAD IMAGE MANUALLY; TO RERENDER THE CANVAS
-							fabric.Image.fromURL( props.source, ( function( props ) {
-								return function( img ) {
-									images.loaded++;
-
-									var patternSourceCanvas = new fabric.StaticCanvas( undefined, {
-										backgroundColor: props.fill
-									} );
-									patternSourceCanvas.add( img );
-
-									var pattern = new fabric.Pattern( {
-										source: function() {
-											patternSourceCanvas.setDimensions( {
-												width: props.width,
-												height: props.height
-											} );
-											return patternSourceCanvas.getElement();
-										},
-										repeat: 'repeat'
-									} );
-
-									group.patterns[ props.node.id ] = pattern;
-								}
-							} )( props ) );
+							group.patterns[ props.node.id ] = props;
 						}
 
 						// IMAGES
@@ -1496,10 +1473,37 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 										// PATTERN
 										if ( group.patterns && group.patterns[ PID ] ) {
-											g.paths[ i1 ].set( {
-												fill: group.patterns[ PID ],
-												opacity: g.paths[ i1 ].fillOpacity
-											} );
+
+											var props = group.patterns[ PID ];
+
+											// LOAD IMAGE MANUALLY; TO RERENDER THE CANVAS
+											fabric.Image.fromURL( props.source, ( function( props, i1 ) {
+												return function( img ) {
+													images.loaded++;
+
+													var pattern = null;
+													var patternSourceCanvas = new fabric.StaticCanvas( undefined, {
+														backgroundColor: props.fill
+													} );
+													patternSourceCanvas.add( img );
+
+													pattern = new fabric.Pattern( {
+														source: function() {
+															patternSourceCanvas.setDimensions( {
+																width: props.width,
+																height: props.height
+															} );
+															return patternSourceCanvas.getElement();
+														},
+														repeat: 'repeat'
+													} );
+
+													g.paths[ i1 ].set( {
+														fill: pattern,
+														opacity: g.paths[ i1 ].fillOpacity
+													} );
+												}
+											} )( props, i1 ) );
 										}
 									}
 

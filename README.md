@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.5
+Version: 1.4.6
 
 
 ## Description
@@ -878,6 +878,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.6
+* Fixed: Loading issue with patterns in firefox
 
 ### 1.4.5
 * Fixed: Issue with the "canvas-container" on chart revalidations
