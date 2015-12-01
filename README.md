@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.6
+Version: 1.4.7
 
 
 ## Description
@@ -878,6 +878,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.7
+* Fixed: Zeroes were being exported to data formats as empty strings rather than numbers
 
 ### 1.4.6
 * Fixed: Loading issue with patterns in firefox

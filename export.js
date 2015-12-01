@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.6
+Version: 1.4.7
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -68,7 +68,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.4.6",
+			version: "1.4.7",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -1539,26 +1539,26 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 									// TODO; WAIT FOR TSPAN SUPPORT FROM FABRICJS SIDE
 									if ( g.paths[ i1 ].TSPANWORKAROUND ) {
-										var parsedAttributes = fabric.parseAttributes(g.paths[ i1 ].svg, fabric.Text.ATTRIBUTE_NAMES);
-										var options = fabric.util.object.extend({}, parsedAttributes);
+										var parsedAttributes = fabric.parseAttributes( g.paths[ i1 ].svg, fabric.Text.ATTRIBUTE_NAMES );
+										var options = fabric.util.object.extend( {}, parsedAttributes );
 
 										// CREATE NEW SET
 										var tmpBuffer = [];
 										for ( var i = 0; i < g.paths[ i1 ].svg.childNodes.length; i++ ) {
-											var textNode = g.paths[ i1 ].svg.childNodes[i];
-											var textElement = fabric.Text.fromElement(textNode,options);
+											var textNode = g.paths[ i1 ].svg.childNodes[ i ];
+											var textElement = fabric.Text.fromElement( textNode, options );
 
-											textElement.set({
+											textElement.set( {
 												left: 0
-											});
+											} );
 
-											tmpBuffer.push(textElement);
+											tmpBuffer.push( textElement );
 										}
 
 										// HIDE ORIGINAL ELEMENT
-										g.paths[ i1 ].set({
+										g.paths[ i1 ].set( {
 											opacity: 0
-										});
+										} );
 
 										// REPLACE BY GROUP AND CANCEL FIRST OFFSET
 										var tmpGroup = new fabric.Group( tmpBuffer, {
@@ -1581,16 +1581,16 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 										cfg.balloonFunction.apply( _this, [ balloons[ i1 ], group ] );
 									} else {
 										var elm_parent = balloons[ i1 ];
-										var style_parent = fabric.parseStyleAttribute(elm_parent);
-										var style_text = fabric.parseStyleAttribute(elm_parent.childNodes[ 0 ]);
+										var style_parent = fabric.parseStyleAttribute( elm_parent );
+										var style_text = fabric.parseStyleAttribute( elm_parent.childNodes[ 0 ] );
 										var fabric_label = new fabric.Text( elm_parent.innerText || elm_parent.innerHTML, {
 											selectable: false,
 											top: style_parent.top + group.offset.y,
 											left: style_parent.left + group.offset.x,
-											fill: style_text["color"],
-											fontSize: style_text["fontSize"],
-											fontFamily: style_text["fontFamily"],
-											textAlign: style_text["text-align"]
+											fill: style_text[ "color" ],
+											fontSize: style_text[ "fontSize" ],
+											fontFamily: style_text[ "fontFamily" ],
+											textAlign: style_text[ "text-align" ]
 										} );
 
 										_this.setup.fabric.add( fabric_label );
@@ -1600,15 +1600,15 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 							if ( group.svg.nextSibling && group.svg.nextSibling.tagName == "A" ) {
 								var elm_parent = group.svg.nextSibling;
-								var style_parent = fabric.parseStyleAttribute(elm_parent);
+								var style_parent = fabric.parseStyleAttribute( elm_parent );
 								var fabric_label = new fabric.Text( elm_parent.innerText || elm_parent.innerHTML, {
 									selectable: false,
 									top: style_parent.top + group.offset.y,
 									left: style_parent.left + group.offset.x,
-									fill: style_parent["color"],
-									fontSize: style_parent["fontSize"],
-									fontFamily: style_parent["fontFamily"],
-									opacity: style_parent["opacity"]
+									fill: style_parent[ "color" ],
+									fontSize: style_parent[ "fontSize" ],
+									fontFamily: style_parent[ "fontFamily" ],
+									opacity: style_parent[ "opacity" ]
 								} );
 
 								_this.setup.fabric.add( fabric_label );
@@ -1930,12 +1930,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 				function enchant( value, column ) {
 
-					// STRING
-					if ( typeof value === "string" ) {
-						value = value;
-					}
-
-					// WRAP IN QUOTES				
+					// WRAP IN QUOTES
 					if ( typeof value === "string" ) {
 						if ( cfg.escape ) {
 							value = value.replace( '"', '""' );
@@ -2086,9 +2081,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						for ( col in cols ) {
 							if ( !isNaN( col ) ) {
 								var col = cols[ col ];
-								var value = cfg.data[ row ][ col ] || "";
-
-								if ( cfg.stringify ) {
+								if ( value == null ) {
+									value = "";
+								} else if ( cfg.stringify ) {
 									value = String( value );
 								} else {
 									value = value;
@@ -2433,7 +2428,10 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							var uniqueField = cfg.dataFields[ i2 ];
 							var dataField = cfg.dataFieldsMap[ uniqueField ];
 							var title = ( cfg.columnNames && cfg.columnNames[ uniqueField ] ) || cfg.titles[ uniqueField ] || uniqueField;
-							var value = cfg.data[ i1 ][ dataField ] || undefined;
+							var value = cfg.data[ i1 ][ dataField ];
+							if ( value == null ) {
+								value = undefined;
+							}
 
 							// TITLEFY
 							if ( cfg.exportTitles && _this.setup.chart.type != "gantt" ) {
