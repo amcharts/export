@@ -2081,6 +2081,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						for ( col in cols ) {
 							if ( !isNaN( col ) ) {
 								var col = cols[ col ];
+								var value = cfg.data[ row ][ col ];
 								if ( value == null ) {
 									value = "";
 								} else if ( cfg.stringify ) {
