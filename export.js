@@ -1922,7 +1922,8 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					data: _this.getChartData( options ),
 					delimiter: ",",
 					quotes: true,
-					escape: true
+					escape: true,
+					withHeader: true
 				}, options || {}, true );
 				var data = "";
 				var cols = [];
@@ -1948,7 +1949,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					buffer.push( enchant( value ) );
 					cols.push( value );
 				}
-				data += buffer.join( cfg.delimiter ) + "\n";
+				if ( cfg.withHeader ) {
+					data += buffer.join( cfg.delimiter ) + "\n";
+				}
 
 				// BODY
 				for ( row in cfg.data ) {
