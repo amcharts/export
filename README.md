@@ -347,6 +347,7 @@ Property | Default | Available values | Description
 delimiter | "," | string | A string to use as a column delimiter
 quotes | true | true/false | Set whether to enclose strings in doublequotes
 escape | true | true/false | Set whether to escape strings
+withHeader | true | true/false | Add header row with column names
 
 **XLSX**
 
