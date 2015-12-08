@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.7
+Version: 1.4.8
 
 
 ## Description
@@ -879,6 +879,11 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.8
+* Fixed: Clippath positioning issue
+* Fixed: Issue removing tainted images
+* Fixed: Hashbanged url interpretation issue in IE (related to reusable svg nodes)
 
 ### 1.4.7
 * Fixed: Zeroes were being exported to data formats as empty strings rather than numbers

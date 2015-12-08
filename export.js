@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.7
+Version: 1.4.8
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -68,7 +68,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.4.7",
+			version: "1.4.8",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -752,7 +752,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			 * Checks if given argument contains a hashbang and returns it
 			 */
 			isHashbanged: function( thingy ) {
-				var str = String( thingy );
+				var str = String( thingy ).replace( /\"/g, "" );
 
 				return str.slice( 0, 3 ) == "url" ? str.slice( str.indexOf( "#" ) + 1, str.length - 1 ) : false;
 			},
@@ -890,10 +890,25 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 					// CLIPPATH
 					if ( childNode.tagName == "clipPath" ) {
+						var bbox = {};
+						var transform = fabric.parseTransformAttribute( _this.gatherAttribute( childNode, "transform" ) );
+
+						// HIDE SIBLINGS; GATHER IT'S DIMENSIONS
 						for ( i2 = 0; i2 < childNode.childNodes.length; i2++ ) {
 							childNode.childNodes[ i2 ].setAttribute( "fill", "transparent" );
+							bbox = {
+								x: _this.pxToNumber( childNode.childNodes[ i2 ].getAttribute( "x" ) ),
+								y: _this.pxToNumber( childNode.childNodes[ i2 ].getAttribute( "y" ) ),
+								width: _this.pxToNumber( childNode.childNodes[ i2 ].getAttribute( "width" ) ),
+								height: _this.pxToNumber( childNode.childNodes[ i2 ].getAttribute( "height" ) )
+							}
 						}
-						group.clippings[ childNode.id ] = childNode;
+
+						group.clippings[ childNode.id ] = {
+							svg: childNode,
+							bbox: bbox,
+							transform: transform
+						};
 
 						// PATTERN
 					} else if ( childNode.tagName == "pattern" ) {
@@ -1421,10 +1436,12 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						return function( objects, options ) {
 							var i1;
 							var g = fabric.util.groupSVGElements( objects, options );
+							var paths = [];
 							var tmp = {
 								selectable: false
 							};
 
+							// GROUP OFFSET; ABSOLUTE
 							if ( group.offset.absolute ) {
 								if ( group.offset.bottom !== undefined ) {
 									tmp.top = offset.height - group.offset.height - group.offset.bottom;
@@ -1438,11 +1455,13 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 									tmp.left = group.offset.left;
 								}
 
+								// GROUP OFFSET; REGULAR
 							} else {
 								tmp.top = group.offset.y;
 								tmp.left = group.offset.x;
 							}
 
+							// WALKTHROUGH ELEMENTS
 							for ( i1 = 0; i1 < g.paths.length; i1++ ) {
 								var PID = null;
 
@@ -1451,7 +1470,6 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 									// CHECK ORIGIN; REMOVE TAINTED
 									if ( cfg.removeImages && _this.isTainted( g.paths[ i1 ][ "xlink:href" ] ) ) {
-										g.paths.splice( i1, 1 );
 										continue;
 									}
 
@@ -1510,27 +1528,20 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 									// CLIPPATH;
 									if ( PID = _this.isHashbanged( g.paths[ i1 ].clipPath ) ) {
 
-										if ( group.clippings[ PID ] ) {
-
+										if ( group.clippings && group.clippings[ PID ] ) {
 											g.paths[ i1 ].set( {
 												clipTo: ( function( i1, PID ) {
 													return function( ctx ) {
-														var mask = group.clippings[ PID ].childNodes[ 0 ];
-														var width = Number( mask.getAttribute( "width" ) || "0" );
-														var height = Number( mask.getAttribute( "height" ) || "0" );
-														var x = Number( mask.getAttribute( "x" ) || "0" );
-														var y = Number( mask.getAttribute( "y" ) || "0" );
-														var transform = g.paths[ i1 ].svg.getAttribute( "transform" ) || "translate(0,0)";
-														var tagName = g.paths[ i1 ].svg.tagName;
-
-														transform = transform.slice( 10, -1 ).split( "," );
-
-														// TODO: LOOK FOR A BETTER SOLUTION; CIRCLE TEXT CLIPPATH EXCEPTION
-														if ( [ "circle", "text" ].indexOf( tagName ) != -1 ) {
-															ctx.rect( Number( transform[ 0 ] ) * -1, Number( transform[ 1 ] ) * -1, width, height );
-														} else {
-															ctx.rect( Number( transform[ 0 ] ) * -1 + x, Number( transform[ 1 ] ) * -1 + y, width, height );
+														var cp = group.clippings[ PID ];
+														var tm = this.transformMatrix || [ 1, 0, 0, 1, 0, 0 ];
+														var dim = {
+															top: ( cp.bbox.y - tm[ 5 ] ) + cp.transform[ 5 ],
+															left: ( cp.bbox.x - tm[ 4 ] ) + cp.transform[ 4 ],
+															width: cp.bbox.width,
+															height: cp.bbox.height
 														}
+
+														ctx.rect( dim.left, dim.top, dim.width, dim.height );
 													}
 												} )( i1, PID )
 											} );
@@ -1567,10 +1578,16 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 										_this.setup.fabric.add( tmpGroup );
 									}
 								}
+								paths.push( g.paths[ i1 ] );
 							}
 
+							// REPLACE WITH WHITELIST
+							g.paths = paths;
+
+							// SET PROPS
 							g.set( tmp );
 
+							// ADD TO CANVAS
 							_this.setup.fabric.add( g );
 
 							// ADD BALLOONS
