@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.10
+Version: 1.4.11
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -68,7 +68,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.4.10",
+			version: "1.4.11",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -1590,7 +1590,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 										var tmpGroup = new fabric.Group( tmpBuffer, {
 											top: g.paths[ i1 ].top * -1
 										} );
-										_this.setup.fabric.add( tmpGroup );
+										g.paths[ i1 ] = tmpGroup;
 									}
 								}
 								paths.push( g.paths[ i1 ] );
