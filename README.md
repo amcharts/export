@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.14 
+Version: 1.4.14
 
 
 ## Description
@@ -896,8 +896,8 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 ## Changelog
 
-### 1.4.13
-* Added: ([border](#adding-overlaying-border)) config-property to add an overlaying border on the output image.
+### 1.4.14 
+* Added: ([border](#adding-overlaying-border)) config-property to add an overlaying border on the output image. 
 
 ### 1.4.13
 * Fixed: Issue on balloons showing it's content as HTML added "textContent" as alternative getter
