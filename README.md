@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.14
+Version: 1.4.14 
 
 
 ## Description
