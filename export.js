@@ -2286,7 +2286,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			 * Border handler; injects additional border to canvas
 			 */
 			handleBorder: function( options ) {
-				if ( options.border instanceof Object ) {
+				if ( _this.config.border instanceof Object ) {
 					var cfg = _this.deepMerge( _this.defaults.fabric.border, options.border || {}, true );
 					var border = new fabric.Rect();
 
@@ -3071,7 +3071,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 				// MERGE SETTINGS
 				_this.config.drawing = _this.deepMerge( _this.defaults.fabric.drawing, _this.config.drawing || {}, true );
-				_this.config.border = _this.deepMerge( _this.defaults.fabric.border, _this.config.border || {}, true );
+				if ( _this.config.border ) {
+					_this.config.border = _this.deepMerge( _this.defaults.fabric.border, _this.config.border || {}, true );
+				}
 				_this.deepMerge( _this.defaults.fabric, _this.config, true );
 				_this.deepMerge( _this.defaults.fabric, _this.config.fabric || {}, true );
 				_this.deepMerge( _this.defaults.pdfMake, _this.config, true );
