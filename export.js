@@ -2502,6 +2502,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					columnNames: _this.config.columnNames
 				}, options || {}, true );
 				var i1, i2;
+				var tempFields = [];
 
 				if ( cfg.data.length ) {
 					// GATHER MISSING FIELDS
@@ -2514,11 +2515,18 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						}
 					}
 
-					// REMOVE FIELDS SELECTIVELY
+					// REMOVE AND ORDER FIELDS SELECTIVELY
+					
 					if ( cfg.exportFields !== undefined ) {
-						cfg.dataFields = cfg.dataFields.filter( function( n ) {
-							return cfg.exportFields.indexOf( n ) != -1;
+						cfg.dataFields.forEach( function( n ) {
+							var idx = cfg.exportFields.indexOf( n );
+							if(idx !== -1)
+							{
+								tempFields[idx] = n; // Place field in the proper spot within the array.
+							}
+
 						} );
+						cfg.dataFields = tempFields;
 					}
 
 					// REBUILD DATA
