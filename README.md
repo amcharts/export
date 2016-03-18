@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.14
+Version: 1.4.15
 
 
 ## Description
@@ -895,6 +895,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.15
+* Fixed: Menu items obtain the global `multiplier` setting to scale the output image.
 
 ### 1.4.14 
 * Added: ([border](#adding-overlaying-border)) config-property to add an overlaying border on the output image. 

@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.14
+Version: 1.4.15
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -68,7 +68,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.4.14",
+			version: "1.4.15",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -1755,7 +1755,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				var cfg = _this.deepMerge( {
 					format: "png",
 					quality: 1,
-					multiplier: 1
+					multiplier: this.config.multiplier
 				}, options || {} );
 				var data = cfg.data;
 				var img = document.createElement( "img" );
@@ -1817,7 +1817,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				var cfg = _this.deepMerge( {
 					format: "jpeg",
 					quality: 1,
-					multiplier: 1
+					multiplier: this.config.multiplier
 				}, options || {} );
 				cfg.format = cfg.format.toLowerCase();
 				var data = _this.setup.fabric.toDataURL( cfg );
@@ -1834,7 +1834,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				var cfg = _this.deepMerge( {
 					format: "png",
 					quality: 1,
-					multiplier: 1
+					multiplier: this.config.multiplier
 				}, options || {} );
 				var data = _this.setup.fabric.toDataURL( cfg );
 
