@@ -146,6 +146,7 @@ fileListener | false | If true it observes the drag and drop feature and loads t
 drawing | {} | Object which holds all possible settings for the annotation mode ([skip to chapter](#annotation-settings))
 overflow | true | Flag to overwrite the css attribute 'overflow' of the chart container to avoid cropping the menu on small container
 border | {} | An object of key/value pairs to define the overlaying border
+processData | | A function which can be used to change the dataProvider when exporting to CSV, XLSX, or JSON
 
 
 ## Configuring export menu
@@ -658,7 +659,6 @@ exportSelection | Exports the current data selection only ( data export only )
 dataDateFormat | Format to convert date strings to date objects, uses by default charts dataDateFormat ( data export only )
 dateFormat | Formats the category field in given date format ( data export only )
 border | An object of key/value pairs to define the overlaying border
-processData | A function which can be used to change the dataProvider when exporting to CSV, XLSX, or JSON
 
 Available `format` values:
 
