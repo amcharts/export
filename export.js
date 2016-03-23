@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.16
+Version: 1.4.17
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -68,7 +68,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.4.16",
+			version: "1.4.17",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -1557,7 +1557,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 												var toSVG = g.paths[ i1 ].toSVG;
 
 												g.paths[ i1 ].toSVG = function( original_reviver ) {
-													return toSVG.apply(this, [ function( string ) {
+													return toSVG.apply( this, [ function( string ) {
 														return original_reviver( string, group.clippings[ PID ] );
 													} ] );
 												}
@@ -1569,10 +1569,20 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 														var cp = group.clippings[ PID ];
 														var tm = this.transformMatrix || [ 1, 0, 0, 1, 0, 0 ];
 														var dim = {
-															top: ( cp.bbox.y - tm[ 5 ] ) + cp.transform[ 5 ],
-															left: ( cp.bbox.x - tm[ 4 ] ) + cp.transform[ 4 ],
+															top: cp.bbox.y,
+															left: cp.bbox.x,
 															width: cp.bbox.width,
 															height: cp.bbox.height
+														}
+
+														if ( _this.setup.chart.type == "map" ) {
+															dim.top += cp.transform[ 5 ];
+															dim.left += cp.transform[ 4 ];
+														}
+
+														if ( cp.bbox.x && tm[ 4 ] && cp.bbox.y && tm[ 5 ] ) {
+															dim.top -= tm[ 5 ];
+															dim.left -= tm[ 4 ];
 														}
 
 														ctx.rect( dim.left, dim.top, dim.width, dim.height );
@@ -1883,20 +1893,20 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						// TODO: WAIT UNTIL FABRICJS HANDLES CLIPPATH FOR SVG OUTPUT
 						if ( clipPath ) {
 							var sliceOffset = 2;
-							var end = string.slice( - sliceOffset);
+							var end = string.slice( -sliceOffset );
 
 							if ( end != "/>" ) {
 								sliceOffset = 3;
-								end = string.slice( - sliceOffset);
+								end = string.slice( -sliceOffset );
 							}
 
-							var start = string.slice(0,string.length - sliceOffset);
-							var clipPathAttr = " clip-path=\"url(#"+ clipPath.svg.id +")\" ";
-							var clipPathString = new XMLSerializer().serializeToString(clipPath.svg);
+							var start = string.slice( 0, string.length - sliceOffset );
+							var clipPathAttr = " clip-path=\"url(#" + clipPath.svg.id + ")\" ";
+							var clipPathString = new XMLSerializer().serializeToString( clipPath.svg );
 
 							string = start + clipPathAttr + end;
 
-							clipPaths.push(clipPathString);
+							clipPaths.push( clipPathString );
 						}
 
 						return string;
@@ -1906,9 +1916,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 				// TODO: WAIT UNTIL FABRICJS HANDLES CLIPPATH FOR SVG OUTPUT
 				if ( clipPaths.length ) {
-					var start = data.slice(0,data.length-6);
-					var end = data.slice(-6);
-					data = start + clipPaths.join("") + end;
+					var start = data.slice( 0, data.length - 6 );
+					var end = data.slice( -6 );
+					data = start + clipPaths.join( "" ) + end;
 				}
 
 				if ( cfg.getBase64 ) {
@@ -2293,9 +2303,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					cfg.width = _this.setup.fabric.width - cfg.strokeWidth;
 					cfg.height = _this.setup.fabric.height - cfg.strokeWidth;
 
-					border.set(cfg);
+					border.set( cfg );
 
-					_this.setup.fabric.add(border);
+					_this.setup.fabric.add( border );
 				}
 			},
 

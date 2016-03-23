@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.16
+Version: 1.4.17
 
 
 ## Description
@@ -908,6 +908,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.17
+* Fixed: `clip-path` issue on XY serial charts which exposed the drawn line beyond the plotarea.
 
 ### 1.4.16
 * Added: ([processData](#changing-the-dataprovider-when-exporting)) config-property to change the dataProvider when exporting.
