@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.17
+Version: 1.4.18
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -68,7 +68,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.4.17",
+			version: "1.4.18",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -1430,10 +1430,15 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							}
 						}
 
-						// PANEL
+						// PANEL OFFSET (STOCK CHARTS)
 						if ( isLegend && isPanel && isPanel.style.marginTop ) {
 							offset.y += _this.pxToNumber( isPanel.style.marginTop );
-							group.offset.y += _this.pxToNumber( isPanel.style.marginTop );
+							group.offset.y += _this.pxToNumber( isPanel.style.marginTop );	
+
+						// GENERAL LEFT / RIGHT POSITION
+						} else if ( _this.setup.chart.legend && [ "left", "right" ].indexOf( _this.setup.chart.legend.position ) != -1 ) {
+							group.offset.y = _this.pxToNumber( group.parent.style.top );
+							group.offset.x = _this.pxToNumber( group.parent.style.left );
 						}
 					}
 

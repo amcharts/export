@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.17
+Version: 1.4.18
 
 
 ## Description
@@ -908,6 +908,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.18
+* Fixed: Issue with the legend positioning on the left side
 
 ### 1.4.17
 * Fixed: `clip-path` issue on XY serial charts which exposed the drawn line beyond the plotarea.
