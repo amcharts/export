@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.18
+Version: 1.4.19
 
 
 ## Description
@@ -908,6 +908,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.19
+* Fixed: Issue with radial gradient
 
 ### 1.4.18
 * Fixed: Issue with the legend positioning on the left side
