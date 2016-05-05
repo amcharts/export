@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.20
+Version: 1.4.21
 
 
 ## Description
@@ -147,6 +147,7 @@ drawing | {} | Object which holds all possible settings for the annotation mode 
 overflow | true | Flag to overwrite the css attribute 'overflow' of the chart container to avoid cropping the menu on small container
 border | {} | An object of key/value pairs to define the overlaying border
 processData | | A function which can be used to change the dataProvider when exporting to CSV, XLSX, or JSON
+pageOrigin | true | A flag to show / hide the origin of the generated PDF ( pdf export only )
 
 
 ## Configuring export menu
@@ -659,6 +660,7 @@ exportSelection | Exports the current data selection only ( data export only )
 dataDateFormat | Format to convert date strings to date objects, uses by default charts dataDateFormat ( data export only )
 dateFormat | Formats the category field in given date format ( data export only )
 border | An object of key/value pairs to define the overlaying border
+pageOrigin | A flag to show / hide the origin of the generated PDF ( pdf export only )
 
 Available `format` values:
 
@@ -908,6 +910,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.21
+* Fixed: Issue with file:// image origin, forced removal as it does not fit to the CORS policy and blocks the image export.
 
 ### 1.4.20
 * Fixed: Issue with disappearing images in PDFs caused by exceeding boundary box for images
