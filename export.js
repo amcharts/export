@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.21
+Version: 1.4.22
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -70,7 +70,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.4.21",
+			version: "1.4.22",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -470,6 +470,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				fabric: {
 					backgroundColor: "#FFFFFF",
 					removeImages: true,
+					forceRemoveImages: false,
 					selection: false,
 					drawing: {
 						enabled: true,
@@ -857,7 +858,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				if (
 					source &&
 					source.indexOf( "//" ) != -1 &&
-					( source.indexOf( origin.replace( /.*:/, "" ) ) == -1 || source.indexOf( "file://" ) != -1 )
+					( source.indexOf( origin.replace( /.*:/, "" ) ) == -1 || source.indexOf( "file://" ) != -1 || _this.config.fabric.forceRemoveImages )
 				) {
 					return true;
 				}
@@ -2218,7 +2219,8 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				function datenum( v, date1904 ) {
 					if ( date1904 ) v += 1462;
 					var epoch = Date.parse( v );
-					return ( epoch - new Date( Date.UTC( 1899, 11, 30 ) ) ) / ( 24 * 60 * 60 * 1000 );
+					var offset = v.getTimezoneOffset() * 60 * 1000;
+					return ( epoch - offset - new Date( Date.UTC( 1899, 11, 30 ) ) ) / ( 24 * 60 * 60 * 1000 );
 				}
 
 				function sheet_from_array_of_arrays( data, opts ) {
@@ -2420,7 +2422,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							data.push( arguments[ i1 ] );
 						}
 					}
-					callback.apply( _this, data );
+					return callback.apply( _this, data );
 				}
 			},
 
@@ -2725,11 +2727,10 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				}
 
 				if ( cfg.processData !== undefined ) {
-					return cfg.processData( cfg.data );
-
-				} else {
-					return cfg.data;
+					cfg.data = _this.handleCallback( cfg.processData, cfg.data, cfg );
 				}
+
+				return cfg.data;
 			},
 
 			/**

@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.21
+Version: 1.4.22
 
 
 ## Description
@@ -148,6 +148,7 @@ overflow | true | Flag to overwrite the css attribute 'overflow' of the chart co
 border | {} | An object of key/value pairs to define the overlaying border
 processData | | A function which can be used to change the dataProvider when exporting to CSV, XLSX, or JSON
 pageOrigin | true | A flag to show / hide the origin of the generated PDF ( pdf export only )
+forceRemoveImages | false | If true export removes all images
 
 
 ## Configuring export menu
@@ -910,6 +911,11 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.22
+* Fixed: Local time offset issue on XLSX exports
+* Added: `forceRemoveImages` to remove images regardless if they are tainted or not
+* Added: Used config ([processData](#changing-the-dataprovider-when-exporting)) as additional given parameter.
 
 ### 1.4.21
 * Fixed: Issue with file:// image origin, forced removal as it does not fit to the CORS policy and blocks the image export.
