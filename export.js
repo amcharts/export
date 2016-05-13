@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.22
+Version: 1.4.23
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -70,7 +70,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.4.22",
+			version: "1.4.23",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -849,19 +849,40 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			},
 
 			/**
+			 * Checks if given source needs to be removed
+			 */
+			removeImage: function( source ) {
+				if ( source ) {
+					// FORCE REMOVAL
+					if ( _this.config.fabric.forceRemoveImages ) {
+						return true;
+
+					// REMOVE TAINTED
+					} else if ( _this.config.fabric.removeImages && _this.isTainted(source) ) {
+						return true;
+					}
+				}
+				return false
+			},
+
+			/**
 			 * Checks if given source is within the current origin
 			 */
 			isTainted: function( source ) {
 				var origin = String( window.location.origin || window.location.protocol + "//" + window.location.hostname + ( window.location.port ? ':' + window.location.port : '' ) );
 
-				// CHECK IF TAINTED
-				if (
-					source &&
-					source.indexOf( "//" ) != -1 &&
-					( source.indexOf( origin.replace( /.*:/, "" ) ) == -1 || source.indexOf( "file://" ) != -1 || _this.config.fabric.forceRemoveImages )
-				) {
-					return true;
+				// CHECK GIVEN SOURCE
+				if ( source ) {
+					// LOCAL FILES ARE ALWAYS TAINTED
+					if ( source.indexOf( "file://" ) != -1 ) {
+						return true
+
+					// MISMATCHING ORIGIN
+					} else if ( source.indexOf( "//" ) != -1 && source.indexOf( origin.replace( /.*:/, "" ) ) == -1 ) {
+						return true;
+					}
 				}
+
 				return false;
 			},
 
@@ -997,7 +1018,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						}
 
 						// TAINTED
-						if ( cfg.removeImages && _this.isTainted( props.source ) ) {
+						if ( _this.removeImage( props.source ) ) {
 							group.patterns[ childNode.id ] = props.fill ? props.fill : "transparent";
 						} else {
 							images.included++;
@@ -1542,7 +1563,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 								if ( g.paths[ i1 ] ) {
 
 									// CHECK ORIGIN; REMOVE TAINTED
-									if ( cfg.removeImages && _this.isTainted( g.paths[ i1 ][ "xlink:href" ] ) ) {
+									if ( _this.removeImage( g.paths[ i1 ][ "xlink:href" ] ) ) {
 										continue;
 									}
 

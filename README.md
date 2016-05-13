@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.22
+Version: 1.4.23
 
 
 ## Description
@@ -911,6 +911,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.23
+* Fixed: Issue with `forceRemoveImages` in local enviroment
 
 ### 1.4.22
 * Fixed: Local time offset issue on XLSX exports
