@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.23
+Version: 1.4.24
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -70,15 +70,14 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.4.23",
+			version: "1.4.24",
 			libs: {
 				async: true,
 				autoLoad: true,
 				reload: false,
-				resources: [ {
-					"pdfmake/pdfmake.js": [ "pdfmake/vfs_fonts.js" ],
-					"jszip/jszip.js": [ "xlsx/xlsx.js" ]
-				}, "fabric.js/fabric.js", "FileSaver.js/FileSaver.js" ],
+				resources: [ "fabric.js/fabric.min.js", "FileSaver.js/FileSaver.min.js", "jszip/jszip.min.js", "xlsx/xlsx.min.js", {
+					"pdfmake/pdfmake.min.js": [ "pdfmake/vfs_fonts.js" ]
+				} ],
 				namespaces: {
 					"pdfmake.js": "pdfMake",
 					"jszip.js": "JSZip",
@@ -857,8 +856,8 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					if ( _this.config.fabric.forceRemoveImages ) {
 						return true;
 
-					// REMOVE TAINTED
-					} else if ( _this.config.fabric.removeImages && _this.isTainted(source) ) {
+						// REMOVE TAINTED
+					} else if ( _this.config.fabric.removeImages && _this.isTainted( source ) ) {
 						return true;
 					}
 				}
@@ -874,10 +873,13 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				// CHECK GIVEN SOURCE
 				if ( source ) {
 					// LOCAL FILES ARE ALWAYS TAINTED
-					if ( source.indexOf( "file://" ) != -1 ) {
+					if (
+						origin.indexOf( ":\\" ) != -1 || source.indexOf( ":\\" ) != -1 ||
+						origin.indexOf( "file://" ) != -1 || source.indexOf( "file://" ) != -1
+					) {
 						return true
 
-					// MISMATCHING ORIGIN
+						// MISMATCHING ORIGIN
 					} else if ( source.indexOf( "//" ) != -1 && source.indexOf( origin.replace( /.*:/, "" ) ) == -1 ) {
 						return true;
 					}
@@ -1128,7 +1130,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				}
 
 				// GATHER EXTERNAL LEGEND
-				if ( _this.config.legend && _this.setup.chart.legend && _this.setup.chart.legend.position == "outside" ) {
+				if ( _this.config.legend && _this.setup.chart.legend && _this.setup.chart.legend.divId ) {
 					var group = {
 						svg: _this.setup.chart.legend.container.container,
 						parent: _this.setup.chart.legend.container.container.parentNode,

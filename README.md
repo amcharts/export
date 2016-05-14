@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.23
+Version: 1.4.24
 
 
 ## Description
@@ -911,6 +911,13 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.24
+* Fixed: Issue with external legends in maps
+* Fixed: Resource dependency issue of xlsx with jszip
+* Fixed: Issue with `forceRemoveImages` in local enviroment (includes all ":\" and "file://" sources)
+* Changed: Resource loading order according to it's priority
+* Changed: Loading minified resource versions by default to improve the payload significantly
 
 ### 1.4.23
 * Fixed: Issue with `forceRemoveImages` in local enviroment
