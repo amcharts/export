@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.25
+Version: 1.4.26
 
 
 ## Description
@@ -911,6 +911,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.26
+* Fixed: IE10 SVG image handing issue, caused by an internal bug of IE10 (removes SVGs automatically to avoid triggering the security policy)
 
 ### 1.4.25
 * Fixed: `export.config.advanced.js` sample config issue with drawing callbacks

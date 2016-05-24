@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.25
+Version: 1.4.26
 Author URI: http://www.amcharts.com/
 
 Copyright 2015 amCharts
@@ -70,7 +70,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.4.25",
+			version: "1.4.26",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -853,12 +853,17 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			 */
 			removeImage: function( source ) {
 				if ( source ) {
+
 					// FORCE REMOVAL
 					if ( _this.config.fabric.forceRemoveImages ) {
 						return true;
 
 						// REMOVE TAINTED
 					} else if ( _this.config.fabric.removeImages && _this.isTainted( source ) ) {
+						return true;
+
+						// IE 10 internal bug handling SVG images in canvas context
+					} else if ( AmCharts.isIE && AmCharts.IEversion == 10 && source.toLowerCase().indexOf( ".svg" ) != -1 ) {
 						return true;
 					}
 				}
