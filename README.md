@@ -273,6 +273,7 @@ This needs to be a function reference. I.e.:
 
 In case you have an external legend you need to define the position where it should get placed in your export.
 By default it obtains the dimensions from the container but you can optionally overwrite those settings as shown below.
+If the defined width or height is less than 0, the size of the svg will be used.
 
 ```
 "export": {
