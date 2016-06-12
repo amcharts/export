@@ -2,10 +2,10 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.27
+Version: 1.4.28
 Author URI: http://www.amcharts.com/
 
-Copyright 2015 amCharts
+Copyright 2016 amCharts
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -70,12 +70,12 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.4.27",
+			version: "1.4.28",
 			libs: {
 				async: true,
 				autoLoad: true,
 				reload: false,
-				resources: [ "fabric.js/fabric.min.js", "FileSaver.js/FileSaver.min.js", "jszip/jszip.min.js", "xlsx/xlsx.min.js", {
+				resources: [ "fabric.js/fabric.js", "FileSaver.js/FileSaver.min.js", "jszip/jszip.min.js", "xlsx/xlsx.min.js", {
 					"pdfmake/pdfmake.min.js": [ "pdfmake/vfs_fonts.js" ]
 				} ],
 				namespaces: {
@@ -1078,6 +1078,104 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				return ref;
 			},
 
+			modifyFabric: function() {
+
+				// ADAPTED THE WAY TO RECEIVE THE GRADIENTID
+				fabric.ElementsParser.prototype.resolveGradient = function( obj, property ) {
+
+					var instanceFillValue = obj.get( property );
+					if ( !( /^url\(/ ).test( instanceFillValue ) ) {
+						return;
+					}
+					var gradientId = instanceFillValue.slice( instanceFillValue.indexOf( "#" ) + 1, instanceFillValue.length - 1 );
+					if ( fabric.gradientDefs[ this.svgUid ][ gradientId ] ) {
+						obj.set( property, fabric.Gradient.fromElement( fabric.gradientDefs[ this.svgUid ][ gradientId ], obj ) );
+					}
+				};
+
+				// MULTILINE SUPPORT; TODO: BETTER POSITIONING
+				fabric.Text.fromElement = function( element, options ) {
+					if ( !element ) {
+						return null;
+					}
+
+					var parsedAttributes = fabric.parseAttributes( element, fabric.Text.ATTRIBUTE_NAMES );
+					options = fabric.util.object.extend( ( options ? fabric.util.object.clone( options ) : {} ), parsedAttributes );
+
+					options.top = options.top || 0;
+					options.left = options.left || 0;
+					if ( 'dx' in parsedAttributes ) {
+						options.left += parsedAttributes.dx;
+					}
+					if ( 'dy' in parsedAttributes ) {
+						options.top += parsedAttributes.dy;
+					}
+					if ( !( 'fontSize' in options ) ) {
+						options.fontSize = fabric.Text.DEFAULT_SVG_FONT_SIZE;
+					}
+
+					if ( !options.originX ) {
+						options.originX = 'left';
+					}
+
+					var textContent = '';
+					var textBuffer = [];
+
+					// The XML is not properly parsed in IE9 so a workaround to get
+					// textContent is through firstChild.data. Another workaround would be
+					// to convert XML loaded from a file to be converted using DOMParser (same way loadSVGFromString() does)
+					if ( !( 'textContent' in element ) ) {
+						if ( 'firstChild' in element && element.firstChild !== null ) {
+							if ( 'data' in element.firstChild && element.firstChild.data !== null ) {
+								textBuffer.push( element.firstChild.data );
+							}
+						}
+					} else if ( element.childNodes ) {
+						for ( var i1 = 0; i1 < element.childNodes.length; i1++ ) {
+							textBuffer.push( element.childNodes[ i1 ].textContent );
+						}
+					} else {
+						textBuffer.push( element.textContent );
+					}
+
+					textContent = textBuffer.join( "\n" );
+					//textContent = textContent.replace(/^\s+|\s+$|\n+/g, '').replace(/\s+/g, ' ');
+
+					var text = new fabric.Text( textContent, options ),
+						/*
+						  Adjust positioning:
+						    x/y attributes in SVG correspond to the bottom-left corner of text bounding box
+						    top/left properties in Fabric correspond to center point of text bounding box
+						*/
+						offX = 0;
+
+					if ( text.originX === 'left' ) {
+						offX = text.getWidth() / 2;
+					}
+					if ( text.originX === 'right' ) {
+						offX = -text.getWidth() / 2;
+					}
+
+					if ( textBuffer.length > 1 ) {
+
+						text.set( {
+							left: text.getLeft() + offX,
+							top: text.getTop() + text.fontSize * ( textBuffer.length - 1 ) * ( 0.18 + text._fontSizeFraction ),
+							textAlign: options.originX,
+							lineHeight: textBuffer.length > 1 ? 0.965 : 1.16,
+						} );
+
+					} else {
+						text.set( {
+							left: text.getLeft() + offX,
+							top: text.getTop() - text.getHeight() / 2 + text.fontSize * ( 0.18 + text._fontSizeFraction ) /* 0.3 is the old lineHeight */
+						} );
+					}
+
+					return text;
+				};
+			},
+
 			/**
 			 * Method to capture the current state of the chart
 			 */
@@ -1098,17 +1196,8 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					included: 0
 				}
 
-				fabric.ElementsParser.prototype.resolveGradient = function( obj, property ) {
-
-					var instanceFillValue = obj.get( property );
-					if ( !( /^url\(/ ).test( instanceFillValue ) ) {
-						return;
-					}
-					var gradientId = instanceFillValue.slice( instanceFillValue.indexOf( "#" ) + 1, instanceFillValue.length - 1 );
-					if ( fabric.gradientDefs[ this.svgUid ][ gradientId ] ) {
-						obj.set( property, fabric.Gradient.fromElement( fabric.gradientDefs[ this.svgUid ][ gradientId ], obj ) );
-					}
-				};
+				// MODIFY FABRIC UNTIL IT'S OFFICIALLY SUPPORTED
+				_this.modifyFabric();
 
 				// BEFORE CAPTURING
 				_this.handleCallback( cfg.beforeCapture, cfg );
@@ -1171,7 +1260,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				}
 
 				// CLEAR IF EXIST
-				_this.drawing.enabled = cfg.action == "draw";
+				_this.drawing.enabled = cfg.drawing.enabled = cfg.action == "draw";
 				_this.drawing.buffer.enabled = _this.drawing.enabled; // history reasons
 
 				_this.setup.wrapper = document.createElement( "div" );
@@ -1538,7 +1627,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					// ADD TO CANVAS
 					fabric.parseSVGDocument( group.svg, ( function( group ) {
 						return function( objects, options ) {
-							var i1;
+							var i1, i2;
 							var g = fabric.util.groupSVGElements( objects, options );
 							var paths = [];
 							var tmp = {
@@ -1679,33 +1768,21 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 									}
 
 									// TODO; WAIT FOR TSPAN SUPPORT FROM FABRICJS SIDE
-									if ( g.paths[ i1 ].TSPANWORKAROUND ) {
-										var parsedAttributes = fabric.parseAttributes( g.paths[ i1 ].svg, fabric.Text.ATTRIBUTE_NAMES );
-										var options = fabric.util.object.extend( {}, parsedAttributes );
+									if ( g.paths[ i1 ].TSPANWORKAROUND_ ) {
 
 										// CREATE NEW SET
-										var tmpBuffer = [];
-										for ( var i = 0; i < g.paths[ i1 ].svg.childNodes.length; i++ ) {
-											var textNode = g.paths[ i1 ].svg.childNodes[ i ];
-											var textElement = fabric.Text.fromElement( textNode, options );
+										var textNode = g.paths[ i1 ];
+										var textBuffer = [];
+										var textAnchor = textNode.svg.getAttribute( "text-anchor" );
+										var textAlign = textAnchor === "start" ? "left" : textAnchor === "end" ? "right" : "center";
 
-											textElement.set( {
-												left: 0
-											} );
-
-											tmpBuffer.push( textElement );
+										// GATHER NODES
+										for ( i2 = 0; i2 < textNode.svg.childNodes.length; i2++ ) {
+											textBuffer.push( textNode.svg.childNodes[ i2 ].textContent );
 										}
 
-										// HIDE ORIGINAL ELEMENT
-										g.paths[ i1 ].set( {
-											opacity: 0
-										} );
+										textNode.text = textBuffer.join( "\n" );
 
-										// REPLACE BY GROUP AND CANCEL FIRST OFFSET
-										var tmpGroup = new fabric.Group( tmpBuffer, {
-											top: g.paths[ i1 ].top * -1
-										} );
-										g.paths[ i1 ] = tmpGroup;
 									}
 								}
 								paths.push( g.paths[ i1 ] );
@@ -2676,14 +2753,14 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				for ( i1 = 0; i1 < _this.setup.fabric._objects.length; i1++ ) {
 
 					// Internal flag to distinguish between annotations and "core" elements
-					if ( !_this.setup.fabric._objects[i1].isCoreElement ) {
-						var obj = _this.setup.fabric._objects[i1].toJSON();
+					if ( !_this.setup.fabric._objects[ i1 ].isCoreElement ) {
+						var obj = _this.setup.fabric._objects[ i1 ].toJSON();
 
 						// Revive before adding to allow modifying the object
 						_this.handleCallback( cfg.reviver, obj, i1 );
 
 						// Push into output
-						data.push(obj);
+						data.push( obj );
 					}
 				}
 

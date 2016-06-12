@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.27
+Version: 1.4.28
 
 
 ## Description
@@ -945,6 +945,10 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.28
+* Fixed: Positioning / handling issue on multiline labels (injected modifed fabricJS snippet to handle it)
+* Fixed: Cursor issue on regular exports which flashed the crosshair cursor for a moment
 
 ### 1.4.27
 * Added: [Annotations API](#annotations-api) to get or set annotations within drawing mode.
