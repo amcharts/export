@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.29
+Version: 1.4.30
 
 
 ## Description
@@ -970,6 +970,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.30
+* Fixed: Pattern loading, positioning issue, supports x,y offset now
 
 ### 1.4.29
 * Added: `libs.loadTimeout` dependency namespace timeout used within onReady handler

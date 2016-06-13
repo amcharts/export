@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.29
+Version: 1.4.30
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -70,7 +70,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.4.29",
+			version: "1.4.30",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -1017,13 +1017,25 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							source: childNode.getAttribute( "xlink:href" ),
 							width: Number( childNode.getAttribute( "width" ) ),
 							height: Number( childNode.getAttribute( "height" ) ),
-							repeat: "repeat"
+							repeat: "repeat",
+							offsetX: 0,
+							offsetY: 0
 						}
 
-						// GATHER BACKGROUND COLOR
+						// GATHER BACKGROUND
 						for ( i2 = 0; i2 < childNode.childNodes.length; i2++ ) {
+							// RECT; COLOR
 							if ( childNode.childNodes[ i2 ].tagName == "rect" ) {
 								props.fill = childNode.childNodes[ i2 ].getAttribute( "fill" );
+
+								// IMAGE
+							} else if ( childNode.childNodes[ i2 ].tagName == "image" ) {
+								var attrs = fabric.parseAttributes( childNode.childNodes[ i2 ], fabric.SHARED_ATTRIBUTES );
+
+								if ( attrs.transformMatrix ) {
+									props.offsetX = attrs.transformMatrix[ 4 ];
+									props.offsetY = attrs.transformMatrix[ 5 ];
+								}
 							}
 						}
 
@@ -1051,7 +1063,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							var attrVal = String( childNode.getAttribute( attr ) || "none" );
 
 							// CHECk VALUE AGAINST BLACKLIST
-							if ( [ "none", "transparent" ].indexOf( attrVal ) == -1 ) {
+							if ( [ "none", "transparent" ].indexOf( attrVal ) == -1 && !_this.isHashbanged( attrVal ) ) {
 								var attrRGBA = fabric.Color.fromHex( attrVal ).getSource();
 
 								// ENOUGH IS ENOUGH, SOMETHING IS WRONG, LETS RESET IT
@@ -1719,23 +1731,41 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 												return function( img ) {
 													images.loaded++;
 
-													var pattern = null;
+													// ADAPT IMAGE
+													img.set( {
+														top: props.offsetY,
+														left: props.offsetX,
+														width: props.width,
+														height: props.height
+													} );
+
+													// RETINA DISPLAY
+													if ( _this.setup.fabric._isRetinaScaling() ) {
+														img.set( {
+															top: props.offsetY / 2,
+															left: props.offsetX / 2,
+															scaleX: 0.5,
+															scaleY: 0.5
+														} );
+													}
+
+													// CREATE CANVAS WITH BACKGROUND COLOR
 													var patternSourceCanvas = new fabric.StaticCanvas( undefined, {
-														backgroundColor: props.fill
+														backgroundColor: props.fill,
+														width: img.getWidth(),
+														height: img.getHeight()
 													} );
 													patternSourceCanvas.add( img );
 
-													pattern = new fabric.Pattern( {
-														source: function() {
-															patternSourceCanvas.setDimensions( {
-																width: props.width,
-																height: props.height
-															} );
-															return patternSourceCanvas.getElement();
-														},
-														repeat: 'repeat'
+													// CREATE PATTERN OBTAIN OFFSET TO TARGET
+													var pattern = new fabric.Pattern( {
+														source: patternSourceCanvas.getElement(),
+														offsetX: g.paths[ i1 ].width / 2,
+														offsetY: g.paths[ i1 ].height / 2,
+														repeat: 'repeat',
 													} );
 
+													// ASSIGN TO OBJECT
 													g.paths[ i1 ].set( {
 														fill: pattern,
 														opacity: g.paths[ i1 ].fillOpacity
