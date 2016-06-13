@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.28
+Version: 1.4.29
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -70,12 +70,12 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.4.28",
+			version: "1.4.29",
 			libs: {
 				async: true,
 				autoLoad: true,
 				reload: false,
-				resources: [ "fabric.js/fabric.js", "FileSaver.js/FileSaver.min.js", "jszip/jszip.min.js", "xlsx/xlsx.min.js", {
+				resources: [ "fabric.js/fabric.min.js", "FileSaver.js/FileSaver.min.js", "jszip/jszip.min.js", "xlsx/xlsx.min.js", {
 					"pdfmake/pdfmake.min.js": [ "pdfmake/vfs_fonts.js" ]
 				} ],
 				namespaces: {
@@ -84,7 +84,8 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					"xlsx.js": "XLSX",
 					"fabric.js": "fabric",
 					"FileSaver.js": "saveAs"
-				}
+				},
+				loadTimeout: 10000
 			},
 			config: {},
 			setup: {
@@ -472,6 +473,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					removeImages: true,
 					forceRemoveImages: false,
 					selection: false,
+					loadTimeout: 5000,
 					drawing: {
 						enabled: true,
 						arrow: "end",
@@ -1029,8 +1031,6 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						if ( _this.removeImage( props.source ) ) {
 							group.patterns[ childNode.id ] = props.fill ? props.fill : "transparent";
 						} else {
-							images.included++;
-
 							group.patterns[ props.node.id ] = props;
 						}
 
@@ -1042,6 +1042,25 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						fabric.Image.fromURL( childNode.getAttribute( "xlink:href" ), function( img ) {
 							images.loaded++;
 						} );
+
+						// FILL STROKE POLYFILL ON EVERY ELEMENT
+					} else {
+						var attrs = [ "fill", "stroke" ];
+						for ( i2 = 0; i2 < attrs.length; i2++ ) {
+							var attr = attrs[ i2 ]
+							var attrVal = String( childNode.getAttribute( attr ) || "none" );
+
+							// CHECk VALUE AGAINST BLACKLIST
+							if ( [ "none", "transparent" ].indexOf( attrVal ) == -1 ) {
+								var attrRGBA = fabric.Color.fromHex( attrVal ).getSource();
+
+								// ENOUGH IS ENOUGH, SOMETHING IS WRONG, LETS RESET IT
+								if ( attrRGBA === undefined ) {
+									childNode.setAttribute( attr, "none" );
+									childNode.setAttribute( attr + "-opacity", "0" );
+								}
+							}
+						}
 					}
 				}
 				return group;
@@ -1302,6 +1321,8 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				// CREATE CANVAS
 				_this.setup.canvas = document.createElement( "canvas" );
 				_this.setup.wrapper.appendChild( _this.setup.canvas );
+
+
 				_this.setup.fabric = new fabric.Canvas( _this.setup.canvas, _this.deepMerge( {
 					width: offset.width,
 					height: offset.height,
@@ -1691,6 +1712,8 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 											var props = group.patterns[ PID ];
 
+											images.included++;
+
 											// LOAD IMAGE MANUALLY; TO RERENDER THE CANVAS
 											fabric.Image.fromURL( props.source, ( function( props, i1 ) {
 												return function( img ) {
@@ -1766,24 +1789,6 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 											} );
 										}
 									}
-
-									// TODO; WAIT FOR TSPAN SUPPORT FROM FABRICJS SIDE
-									if ( g.paths[ i1 ].TSPANWORKAROUND_ ) {
-
-										// CREATE NEW SET
-										var textNode = g.paths[ i1 ];
-										var textBuffer = [];
-										var textAnchor = textNode.svg.getAttribute( "text-anchor" );
-										var textAlign = textAnchor === "start" ? "left" : textAnchor === "end" ? "right" : "center";
-
-										// GATHER NODES
-										for ( i2 = 0; i2 < textNode.svg.childNodes.length; i2++ ) {
-											textBuffer.push( textNode.svg.childNodes[ i2 ].textContent );
-										}
-
-										textNode.text = textBuffer.join( "\n" );
-
-									}
 								}
 								paths.push( g.paths[ i1 ] );
 							}
@@ -1844,8 +1849,12 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 							// TRIGGER CALLBACK WITH SAFETY DELAY
 							if ( !groups.length ) {
+								var ts1 = Number( new Date() );
 								var timer = setInterval( function() {
-									if ( images.loaded == images.included ) {
+									var ts2 = Number( new Date() );
+
+									// WAIT FOR LOADED IMAGES OR UNTIL THE TIMEOUT KICKS IN
+									if ( images.loaded == images.included || ts2 - ts1 > _this.config.fabric.loadTimeout ) {
 										clearTimeout( timer );
 										_this.handleBorder( cfg );
 										_this.handleCallback( cfg.afterCapture, cfg );
@@ -1868,11 +1877,6 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						obj.clipPath = clipPath;
 						obj.svg = svg;
 
-						// TODO; WAIT FOR TSPAN SUPPORT FROM FABRICJS SIDE
-						if ( svg.tagName == "text" && svg.childNodes.length > 1 ) {
-							obj.TSPANWORKAROUND = true;
-						}
-
 						// HIDE HIDDEN ELEMENTS; TODO: FIND A BETTER WAY TO HANDLE THAT
 						if ( visibility == "hidden" ) {
 							obj.opacity = 0;
@@ -1884,15 +1888,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							var attrs = [ "fill", "stroke" ];
 							for ( i1 = 0; i1 < attrs.length; i1++ ) {
 								var attr = attrs[ i1 ]
-								var attrVal = String( svg.getAttribute( attr ) || "" );
+								var attrVal = String( svg.getAttribute( attr ) || "none" );
 								var attrOpacity = Number( svg.getAttribute( attr + "-opacity" ) || "1" );
 								var attrRGBA = fabric.Color.fromHex( attrVal ).getSource();
-
-								// EXCEPTION
-								if ( obj.classList.indexOf( _this.setup.chart.classNamePrefix + "-guide-fill" ) != -1 && !attrVal ) {
-									attrOpacity = 0;
-									attrRGBA = fabric.Color.fromHex( "#000000" ).getSource();
-								}
 
 								if ( attrRGBA ) {
 									attrRGBA.pop();
@@ -1918,7 +1916,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				}, options || {} );
 				var data = _this.setup.canvas;
 
-				_this.handleCallback( callback, data );
+				_this.handleCallback( callback, data, cfg );
 
 				return data;
 			},
@@ -1947,7 +1945,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 				img.setAttribute( "src", data );
 
-				_this.handleCallback( callback, img );
+				_this.handleCallback( callback, img, cfg );
 
 				return img;
 			},
@@ -1980,7 +1978,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					} );
 				}
 
-				_this.handleCallback( callback, data );
+				_this.handleCallback( callback, data, cfg );
 
 				return data;
 			},
@@ -1997,7 +1995,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				cfg.format = cfg.format.toLowerCase();
 				var data = _this.setup.fabric.toDataURL( cfg );
 
-				_this.handleCallback( callback, data );
+				_this.handleCallback( callback, data, cfg );
 
 				return data;
 			},
@@ -2013,7 +2011,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				}, options || {} );
 				var data = _this.setup.fabric.toDataURL( cfg );
 
-				_this.handleCallback( callback, data );
+				_this.handleCallback( callback, data, cfg );
 
 				return data;
 			},
@@ -2090,7 +2088,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					data = "data:image/svg+xml;base64," + btoa( data );
 				}
 
-				_this.handleCallback( callback, data );
+				_this.handleCallback( callback, data, cfg );
 
 				return data;
 			},
@@ -2227,7 +2225,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						}
 					}
 					document.body.removeChild( data );
-					_this.handleCallback( callback, data );
+					_this.handleCallback( callback, data, cfg );
 				}, cfg.delay );
 
 				return data;
@@ -2243,7 +2241,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				cfg.data = cfg.data ? cfg.data : _this.getChartData( cfg );
 				var data = JSON.stringify( cfg.data, undefined, "\t" );
 
-				_this.handleCallback( callback, data );
+				_this.handleCallback( callback, data, cfg );
 
 				return data;
 			},
@@ -2304,7 +2302,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					}
 				}
 
-				_this.handleCallback( callback, data );
+				_this.handleCallback( callback, data, cfg );
 
 				return data;
 			},
@@ -2387,7 +2385,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 				data = "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64," + data;
 
-				_this.handleCallback( callback, data );
+				_this.handleCallback( callback, data, cfg );
 
 				return data;
 			},
@@ -2435,7 +2433,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					}
 				}
 
-				_this.handleCallback( callback, data );
+				_this.handleCallback( callback, data, cfg );
 
 				return data;
 			},
@@ -2517,7 +2515,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					return arr
 				}
 
-				_this.handleCallback( callback, data );
+				_this.handleCallback( callback, data, cfg );
 
 				return data;
 			},
@@ -2586,6 +2584,34 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							}
 						}
 					}
+				}
+			},
+
+			/**
+			 * Calls ready callback when dependencies are available within window scope
+			 */
+			handleReady: function( callback ) {
+				var t1, t2;
+				var _this = this;
+				var tsStart = Number( new Date() );
+
+				// READY FOR DATA EXPORT
+				_this.handleCallback( callback, "data", false );
+
+				// READY CALLBACK FOR EACH DEPENDENCY
+				for ( filename in _this.libs.namespaces ) {
+					var namespace = _this.libs.namespaces[ filename ];
+
+					( function( namespace ) {
+						var t1 = setInterval( function() {
+							var tsEnd = Number( new Date() );
+
+							if ( tsEnd - tsStart > _this.libs.loadTimeout || namespace in window ) {
+								clearTimeout( t1 );
+								_this.handleCallback( callback, namespace, tsEnd - tsStart > _this.libs.loadTimeout );
+							}
+						}, AmCharts.updateRate )
+					} )( namespace );
 				}
 			},
 
@@ -3228,7 +3254,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					} else if ( label ) {
 						label.innerHTML = _this.i18l( "capturing.delayed.menu.label" ).replace( "{{duration}}", AmCharts.toFixed( diff, 2 ) );
 					}
-				}, 10 );
+				}, AmCharts.updateRate );
 
 				// CALLBACK
 				t2 = setTimeout( function() {
@@ -3383,6 +3409,8 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 							// CREATE MENU
 							_this.createMenu( _this.config.menu );
+
+							_this.handleReady( _this.config.onReady );
 						}
 					}
 				}, AmCharts.updateRate );
