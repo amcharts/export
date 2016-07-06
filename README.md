@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.30
+Version: 1.4.31
 
 
 ## Description
@@ -970,6 +970,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.31
+* Changed: Included independent IE detection to handle specific IE10, IE11 svg image in canvas issue
 
 ### 1.4.30
 * Fixed: Pattern loading, positioning issue, supports x,y offset now

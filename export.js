@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.30
+Version: 1.4.31
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -70,7 +70,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.4.30",
+			version: "1.4.31",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -91,7 +91,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			setup: {
 				chart: chart,
 				hasBlob: false,
-				wrapper: false
+				wrapper: false,
+				isIE: !!window.document.documentMode,
+				IEversion: window.document.documentMode
 			},
 			drawing: {
 				enabled: false,
@@ -865,7 +867,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						return true;
 
 						// IE 10 internal bug handling SVG images in canvas context
-					} else if ( AmCharts.isIE && AmCharts.IEversion == 10 && source.toLowerCase().indexOf( ".svg" ) != -1 ) {
+					} else if ( _this.setup.isIE && ( _this.setup.IEversion == 10 || _this.setup.IEversion == 11 ) && source.toLowerCase().indexOf( ".svg" ) != -1 ) {
 						return true;
 					}
 				}
@@ -906,7 +908,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				}
 
 				// CHECK IE; ATTEMPT TO ACCESS HEAD ELEMENT
-				if ( AmCharts.isIE && AmCharts.IEversion <= 9 ) {
+				if ( _this.setup.isIE && _this.setup.IEversion <= 9 ) {
 					if ( !Array.prototype.indexOf || !document.head || _this.config.fallback === false ) {
 						return false;
 					}
