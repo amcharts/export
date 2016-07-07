@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.31
+Version: 1.4.32
 
 
 ## Description
@@ -970,6 +970,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.32
+* Fixed: Issue polyfilling the color attributes with "rgba" color codes
 
 ### 1.4.31
 * Changed: Included independent IE detection to handle specific IE10, IE11 svg image in canvas issue
