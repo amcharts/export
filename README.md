@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.32
+Version: 1.4.33
 
 
 ## Description
@@ -970,6 +970,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.33
+* Fixed: fill/stroke polyfilling issue on svg elements with color validation/preparation for fabric 
 
 ### 1.4.32
 * Fixed: Issue polyfilling the color attributes with "rgba" color codes

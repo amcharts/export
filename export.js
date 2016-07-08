@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.32
+Version: 1.4.33
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -70,7 +70,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.4.32",
+			version: "1.4.33",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -1061,11 +1061,12 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					} else {
 						var attrs = [ "fill", "stroke" ];
 						for ( i2 = 0; i2 < attrs.length; i2++ ) {
-							var attr = attrs[ i2 ]
-							var attrVal = String( childNode.getAttribute( attr ) || "none" );
+							var attr = attrs[ i2 ];
+							var attrVal = childNode.getAttribute( attr );
+							var attrRGBA = _this.getRGBA( attrVal );
 
-							// CHECk VALUE AGAINST BLACKLIST
-							if ( !_this.getRGBA( attrVal ) ) {
+							// VALIDATE AND RESET UNKNOWN COLORS (avoids fabric to crash)
+							if ( attrVal && !attrRGBA ) {
 								childNode.setAttribute( attr, "none" );
 								childNode.setAttribute( attr + "-opacity", "0" );
 							}
@@ -1080,7 +1081,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			 */
 			getRGBA: function( source, returnInstance ) {
 
-				if ( source != "none" && !_this.isHashbanged( source ) ) {
+				if ( source != "none" && source != "transparent" && !_this.isHashbanged( source ) ) {
 					source = new fabric.Color( source );
 
 					if ( source._source ) {
