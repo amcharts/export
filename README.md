@@ -600,7 +600,7 @@ your exported images.
         top: 50,
         left: 100,
         family: this.setup.chart.fontFamily,
-        size: this.setup.chart.fontSize * 2
+        fontSize: this.setup.chart.fontSize * 2
       });
       this.setup.fabric.add(text);
   },
@@ -615,7 +615,7 @@ your exported images.
           top: 50,
           left: 100,
           family: this.setup.chart.fontFamily,
-          size: this.setup.chart.fontSize * 2
+          fontSize: this.setup.chart.fontSize * 2
         });
         this.setup.fabric.add(text);
     }
