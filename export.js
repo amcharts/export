@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.34
+Version: 1.4.33
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -70,7 +70,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.4.34",
+			version: "1.4.33",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -762,23 +762,6 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			 */
 			numberToPx: function( attr ) {
 				return String( attr ) + "px";
-			},
-
-			/**
-			 * Referenceless copy of array type variables
-			 */
-			copyArrayType: function( o ) {
-				var clone, v, k;
-				clone = Array.isArray( o ) ? [] : {};
-
-				// Walkthrough values
-				for ( k in o ) {
-					v = o[ k ];
-
-					// Set value; call recursivly if value is an object
-					clone[ k ] = ( typeof v === "object" ) ? _this.copyArrayType( v ) : v;
-				}
-				return clone;
 			},
 
 			/**
@@ -2693,7 +2676,6 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				}, options || {}, true );
 				var uid, i1, i2, i3;
 				var lookupFields = [ "valueField", "openField", "closeField", "highField", "lowField", "xField", "yField" ];
-				var buffer;
 
 				// HANDLE FIELDS
 				function addField( field, title, type ) {
@@ -2714,10 +2696,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				}
 
 				if ( cfg.data.length == 0 ) {
-
 					// STOCK DATA; GATHER COMPARED GRAPHS
 					if ( _this.setup.chart.type == "stock" ) {
-						cfg.data = _this.copyArrayType( _this.setup.chart.mainDataSet.dataProvider );
+						cfg.data = _this.setup.chart.mainDataSet.dataProvider;
 
 						// CATEGORY AXIS
 						addField( _this.setup.chart.mainDataSet.categoryField );
@@ -2740,35 +2721,19 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							}
 						}
 
-						// MERGE DATA OF COMPARED GRAPHS IN RIGHT PLACE
-						if ( _this.setup.chart.comparedGraphs.length ) {
+						// WALKTHROUGH COMPARISON AND MERGE IT'S DATA
+						for ( i1 = 0; i1 < _this.setup.chart.comparedGraphs.length; i1++ ) {
+							var graph = _this.setup.chart.comparedGraphs[ i1 ];
+							for ( i2 = 0; i2 < graph.dataSet.dataProvider.length; i2++ ) {
+								for ( i3 = 0; i3 < graph.dataSet.fieldMappings.length; i3++ ) {
+									var fieldMap = graph.dataSet.fieldMappings[ i3 ];
+									var uid = graph.dataSet.id + "_" + fieldMap.toField;
 
-							// BUFFER DATES FROM MAIN DATA SET
-							buffer = [];
-							for ( i1 = 0; i1 < cfg.data.length; i1++ ) {
-								buffer.push( cfg.data[ i1 ][ _this.setup.chart.mainDataSet.categoryField ] );
-							}
+									if ( i2 < cfg.data.length ) {
+										cfg.data[ i2 ][ uid ] = graph.dataSet.dataProvider[ i2 ][ fieldMap.fromField ];
 
-							// WALKTHROUGH COMPARISON AND MERGE IT'S DATA
-							for ( i1 = 0; i1 < _this.setup.chart.comparedGraphs.length; i1++ ) {
-								var graph = _this.setup.chart.comparedGraphs[ i1 ];
-								for ( i2 = 0; i2 < graph.dataSet.dataProvider.length; i2++ ) {
-									var categoryField = graph.dataSet.categoryField;
-									var categoryValue = graph.dataSet.dataProvider[ i2 ][ categoryField ];
-									var comparedIndex = buffer.indexOf( categoryValue );
-
-									// PLACE IN RIGHT PLACE
-									if ( comparedIndex != -1 ) {
-										for ( i3 = 0; i3 < graph.dataSet.fieldMappings.length; i3++ ) {
-											var fieldMap = graph.dataSet.fieldMappings[ i3 ];
-											var uid = graph.dataSet.id + "_" + fieldMap.toField;
-
-											cfg.data[ comparedIndex ][ uid ] = graph.dataSet.dataProvider[ i2 ][ fieldMap.fromField ];
-
-											// UNIQUE TITLE
-											if ( !cfg.titles[ uid ] ) {
-												addField( uid, graph.dataSet.title )
-											}
+										if ( !cfg.titles[ uid ] ) {
+											addField( uid, graph.dataSet.title )
 										}
 									}
 								}
