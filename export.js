@@ -3162,9 +3162,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 									return function() {
 										if ( item.capture || item.action == "print" || item.format == "PRINT" ) {
 											this.capture( item, function() {
-												if ( this.config.drawing.autoClose ) {
-													this.drawing.handler.done();
-												}
+												this.drawing.handler.done();
 												this[ "to" + item.format ]( item, function( data ) {
 													if ( item.action == "download" ) {
 														this.download( data, item.mimeType, [ item.fileName, item.extension ].join( "." ) );
