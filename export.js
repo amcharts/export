@@ -2268,6 +2268,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				var data = _this.toImage( cfg );
 				var states = [];
 				var items = document.body.childNodes;
+				var scroll = document.documentElement.scrollTop || document.body.scrollTop;
 
 				data.setAttribute( "style", "width: 100%; max-height: 100%;" );
 
@@ -2288,6 +2289,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						}
 					}
 					document.body.removeChild( data );
+					document.documentElement.scrollTop = document.body.scrollTop = scroll;
 					_this.handleCallback( callback, data, cfg );
 				}, cfg.delay );
 
