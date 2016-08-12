@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.34
+Version: 1.4.35
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -70,7 +70,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.4.34",
+			version: "1.4.35",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -93,7 +93,8 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				hasBlob: false,
 				wrapper: false,
 				isIE: !!window.document.documentMode,
-				IEversion: window.document.documentMode
+				IEversion: window.document.documentMode,
+				hasTouch: typeof window.Touch == "object"
 			},
 			drawing: {
 				enabled: false,
@@ -3018,6 +3019,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			 */
 			createMenu: function( list, container ) {
 				var div;
+				var buffer = [];
 
 				function buildList( list, container ) {
 					var i1, i2, ul = document.createElement( "ul" );
@@ -3210,6 +3212,87 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						} )( item.click || function( e ) {
 							e.preventDefault();
 						}, item ) );
+
+						// ENABLE MANUAL ACTIVE STATE ON TOUCH DEVICES
+						if ( _this.setup.hasTouch && li.classList ) {
+							a.addEventListener( "click", ( function( item ) {
+								return function( e ) {
+									e.preventDefault();
+									var li = item.elements.li;
+									var parentIsActive = hasActiveParent( li );
+									var siblingIsActive = hasActiveSibling( li );
+									var childHasSubmenu = hasSubmenu( li );
+
+									// CHECK IF PARENT IS ACTIVE
+									function hasActiveParent( elm ) {
+										var parentNode = elm.parentNode.parentNode;
+										var classList = parentNode.classList;
+
+										if ( parentNode.tagName == "LI" && classList.contains( "active" ) ) {
+											return true;
+										}
+										return false;
+									}
+
+									// CHECK IF ANY SIBLING IS ACTIVE
+									function hasActiveSibling( elm ) {
+										var siblings = elm.parentNode.children;
+
+										for ( i1 = 0; i1 < siblings.length; i1++ ) {
+											var sibling = siblings[ i1 ];
+											var classList = sibling.classList;
+											if ( sibling !== elm && classList.contains( "active" ) ) {
+												classList.remove( "active" );
+												return true;
+											}
+										}
+
+										return false;
+									}
+
+									// CHECK IF SUBEMNU EXIST
+									function hasSubmenu( elm ) {
+										return elm.getElementsByTagName( "ul" ).length > 0;
+									}
+
+									// CHECK FOR ROOT ITEMS
+									function isRoot( elm ) {
+										return elm.classList.contains( "export-main" ) || elm.classList.contains( "export-drawing" );
+									}
+
+									// TOGGLE MAIN MENU
+									if ( isRoot( li ) || !childHasSubmenu ) {
+										_this.setup.menu.classList.toggle( "active" );
+									}
+
+									// UNTOGGLE BUFFERED ITEMS
+									if ( !parentIsActive || !childHasSubmenu ) {
+										while ( buffer.length ) {
+											var tmp = buffer.pop();
+											var tmpRoot = isRoot( tmp );
+											var tmpOdd = tmp !== li;
+
+											if ( tmpRoot ) {
+												if ( !childHasSubmenu ) {
+													tmp.classList.remove( "active" );
+												}
+											} else if ( tmpOdd ) {
+												tmp.classList.remove( "active" );
+											}
+										}
+									}
+
+									// BUFFER ITEMS
+									buffer.push( li );
+
+									// TOGGLE CLASS
+									if ( childHasSubmenu ) {
+										li.classList.toggle( "active" );
+									}
+								}
+							} )( item ) );
+						}
+
 						li.appendChild( a );
 
 						// ADD LABEL

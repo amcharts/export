@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.34
+Version: 1.4.35
 
 
 ## Description
@@ -970,6 +970,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.35
+* Fixed: Menu handling issue on touch devices, uses css classname to toggle menu items (updated CSS file, on devices only where the "Touch" object is within window scope)
 
 ### 1.4.34
 * Fixed: Data shifting issue in data exports with compared graphs (stock only)
