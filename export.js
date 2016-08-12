@@ -1302,12 +1302,12 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						legend: {
 							type: [ "top", "left" ].indexOf( _this.config.legend.position ) != -1 ? "unshift" : "push",
 							position: _this.config.legend.position,
-							width: _this.config.legend.width ? _this.config.legend.width : _this.setup.chart.legend.container.width,
-							height: _this.config.legend.height ? _this.config.legend.height : _this.setup.chart.legend.container.height
+							width: _this.config.legend.width ? (_this.config.legend.width < 0 ? _this.setup.chart.legend.container.container.getBBox().width : _this.config.legend.width) : _this.setup.chart.legend.container.width,
+							height: _this.config.legend.height ? (_this.config.legend.height < 0 ? _this.setup.chart.legend.container.container.getBBox().height : _this.config.legend.height) : _this.setup.chart.legend.container.height
 						},
 						patterns: {},
 						clippings: {}
-					}
+					};
 
 					// ADAPT CANVAS DIMENSIONS
 					if ( [ "left", "right" ].indexOf( group.legend.position ) != -1 ) {
