@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.35
+Version: 1.4.36
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -70,7 +70,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.4.35",
+			version: "1.4.36",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -79,11 +79,11 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					"pdfmake/pdfmake.min.js": [ "pdfmake/vfs_fonts.js" ]
 				} ],
 				namespaces: {
-					"pdfmake.js": "pdfMake",
-					"jszip.js": "JSZip",
-					"xlsx.js": "XLSX",
-					"fabric.js": "fabric",
-					"FileSaver.js": "saveAs"
+					"pdfmake.min.js": "pdfMake",
+					"jszip.min.js": "JSZip",
+					"xlsx.min.js": "XLSX",
+					"fabric.min.js": "fabric",
+					"FileSaver.min.js": "saveAs"
 				},
 				loadTimeout: 10000
 			},
@@ -2268,7 +2268,8 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				}, options || {} );
 				var data = _this.toImage( cfg );
 				var states = [];
-				var items = document.body.childNodes;
+				var items = document.body.childNodes;				
+ 				var scroll = document.documentElement.scrollTop || document.body.scrollTop;
 
 				data.setAttribute( "style", "width: 100%; max-height: 100%;" );
 
@@ -2289,6 +2290,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						}
 					}
 					document.body.removeChild( data );
+					document.documentElement.scrollTop = document.body.scrollTop = scroll;
 					_this.handleCallback( callback, data, cfg );
 				}, cfg.delay );
 
@@ -2935,9 +2937,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 					// REMOVE FIELDS SELECTIVELY
 					if ( cfg.exportFields !== undefined ) {
-						cfg.dataFields = cfg.dataFields.filter( function( n ) {
-							return cfg.exportFields.indexOf( n ) != -1;
-						} );
+						cfg.dataFields = cfg.exportFields.filter( function( n ) {
+							return cfg.dataFields.indexOf( n ) != -1;
+						});
 					}
 
 					// REBUILD DATA
@@ -3164,9 +3166,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 									return function() {
 										if ( item.capture || item.action == "print" || item.format == "PRINT" ) {
 											this.capture( item, function() {
-												if ( this.config.drawing.autoClose ) {
-													this.drawing.handler.done();
-												}
+												this.drawing.handler.done();
 												this[ "to" + item.format ]( item, function( data ) {
 													if ( item.action == "download" ) {
 														this.download( data, item.mimeType, [ item.fileName, item.extension ].join( "." ) );
