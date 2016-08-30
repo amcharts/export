@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.36
+Version: 1.4.37
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -70,7 +70,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.4.36",
+			version: "1.4.37",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -1084,9 +1084,10 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							var attr = attrs[ i2 ];
 							var attrVal = childNode.getAttribute( attr );
 							var attrRGBA = _this.getRGBA( attrVal );
+							var isHashbanged = _this.isHashbanged( attrVal );
 
 							// VALIDATE AND RESET UNKNOWN COLORS (avoids fabric to crash)
-							if ( attrVal && !attrRGBA ) {
+							if ( attrVal && !attrRGBA && !isHashbanged ) {
 								childNode.setAttribute( attr, "none" );
 								childNode.setAttribute( attr + "-opacity", "0" );
 							}
@@ -1253,12 +1254,21 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					y: 0,
 					pX: 0,
 					pY: 0,
+					lX: 0,
+					lY: 0,
 					width: _this.setup.chart.divRealWidth,
 					height: _this.setup.chart.divRealHeight
 				};
 				var images = {
 					loaded: 0,
 					included: 0
+				}
+				var legends = {
+					items: [],
+					width: 0,
+					height: 0,
+					maxWidth: 0,
+					maxHeight: 0
 				}
 
 				// MODIFY FABRIC UNTIL IT'S OFFICIALLY SUPPORTED
@@ -1290,38 +1300,72 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				}
 
 				// GATHER EXTERNAL LEGEND
-				if ( _this.config.legend && _this.setup.chart.legend && _this.setup.chart.legend.divId ) {
-					var group = {
-						svg: _this.setup.chart.legend.container.container,
-						parent: _this.setup.chart.legend.container.container.parentNode,
-						children: _this.setup.chart.legend.container.container.getElementsByTagName( "*" ),
-						offset: {
-							x: 0,
-							y: 0
-						},
-						legend: {
-							type: [ "top", "left" ].indexOf( _this.config.legend.position ) != -1 ? "unshift" : "push",
-							position: _this.config.legend.position,
-							width: _this.config.legend.width ? _this.config.legend.width : _this.setup.chart.legend.container.width,
-							height: _this.config.legend.height ? _this.config.legend.height : _this.setup.chart.legend.container.height
-						},
-						patterns: {},
-						clippings: {}
+				if ( _this.config.legend ) {
+
+					// STOCK
+					if ( _this.setup.chart.type == "stock" ) {
+						for ( i1 = 0; i1 < _this.setup.chart.panels.length; i1++ ) {
+							if ( _this.setup.chart.panels[ i1 ].stockLegend && _this.setup.chart.panels[ i1 ].stockLegend.divId ) {
+								legends.items.push( _this.setup.chart.panels[ i1 ].stockLegend );
+							}
+						}
+
+						// NORMAL
+					} else if ( _this.setup.chart.legend && _this.setup.chart.legend.divId ) {
+						legends.items.push( _this.setup.chart.legend );
 					}
 
-					// ADAPT CANVAS DIMENSIONS
-					if ( [ "left", "right" ].indexOf( group.legend.position ) != -1 ) {
-						offset.width += group.legend.width;
-						offset.height = group.legend.height > offset.height ? group.legend.height : offset.height;
-					} else if ( [ "top", "bottom" ].indexOf( group.legend.position ) != -1 ) {
-						offset.height += group.legend.height;
+					// WALKTHROUGH
+					for ( i1 = 0; i1 < legends.items.length; i1++ ) {
+						var legend = legends.items[ i1 ];
+						var group = {
+							svg: legend.container.container,
+							parent: legend.container.container.parentNode,
+							children: legend.container.container.getElementsByTagName( "*" ),
+							offset: {
+								x: 0,
+								y: 0
+							},
+							legend: {
+								id: i1,
+								type: [ "top", "left" ].indexOf( _this.config.legend.position ) != -1 ? "unshift" : "push",
+								position: _this.config.legend.position,
+								width: _this.config.legend.width ? _this.config.legend.width : legend.container.div.offsetWidth,
+								height: _this.config.legend.height ? _this.config.legend.height : legend.container.div.offsetHeight
+							},
+							patterns: {},
+							clippings: {}
+						}
+
+						// GATHER DIMENSIONS
+						legends.width += group.legend.width;
+						legends.height += group.legend.height;
+						legends.maxWidth = group.legend.width > legends.maxWidth ? group.legend.width : legends.maxWidth;
+						legends.maxHeight = group.legend.height > legends.maxHeight ? group.legend.height : legends.maxHeight;
+
+						// GATHER ELEMENTS
+						group = _this.gatherElements( group, cfg, images );
+
+						// PRE/APPEND SVG
+						groups[ group.legend.type ]( group );
 					}
 
-					// GATHER ELEMENTS
-					group = _this.gatherElements( group, cfg, images );
+					// ADAPT WIDTH IF NEEDED; EXPAND HEIGHT
+					if ( [ "top", "bottom" ].indexOf( _this.config.legend.position ) != -1 ) {
+						offset.width = legends.maxWidth > offset.width ? legends.maxWidth : offset.width;
+						offset.height += legends.height;
 
-					// PRE/APPEND SVG
-					groups[ group.legend.type ]( group );
+						// EXPAND WIDTH; ADAPT HEIGHT IF NEEDED
+					} else if ( [ "left", "right" ].indexOf( _this.config.legend.position ) != -1 ) {
+						offset.width += legends.maxWidth;
+						offset.height = legends.height > offset.height ? legends.height : offset.height;
+
+						// SIMPLY EXPAND CANVAS
+					} else {
+						offset.height += legends.height;
+						offset.width += legends.maxWidth;
+					}
+
 				}
 
 				// CLEAR IF EXIST
@@ -1596,7 +1640,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					var isPanel = _this.gatherClassName( group.parent, _this.setup.chart.classNamePrefix + "-stock-panel-div" );
 					var isScrollbar = _this.gatherClassName( group.parent, _this.setup.chart.classNamePrefix + "-scrollbar-chart-div" );
 
-					// STOCK CHART; SVG OFFSET;; SVG OFFSET
+					// STOCK CHART; SVG OFFSET; SVG OFFSET
 					if ( _this.setup.chart.type == "stock" && _this.setup.chart.legendSettings.position ) {
 
 						// TOP / BOTTOM
@@ -1641,6 +1685,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 						// REGULAR CHARTS; SVG OFFSET
 					} else {
+
 						// POSITION; ABSOLUTE
 						if ( group.parent.style.position == "absolute" ) {
 							group.offset.absolute = true;
@@ -1662,14 +1707,18 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							// EXTERNAL LEGEND
 							if ( group.legend ) {
 								if ( group.legend.position == "left" ) {
-									offset.x += group.legend.width;
+									offset.x = legends.maxWidth;
 								} else if ( group.legend.position == "right" ) {
-									group.offset.x += offset.width - group.legend.width;
+									group.offset.x = offset.width - legends.maxWidth;
 								} else if ( group.legend.position == "top" ) {
 									offset.y += group.legend.height;
 								} else if ( group.legend.position == "bottom" ) {
-									group.offset.y += offset.height - group.legend.height; // OFFSET.Y
+									group.offset.y = offset.height - legends.height;
 								}
+
+								// STACK LEGENDS
+								group.offset.y += offset.lY;
+								offset.lY += group.legend.height;
 
 								// NORMAL
 							} else {
@@ -2268,8 +2317,8 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				}, options || {} );
 				var data = _this.toImage( cfg );
 				var states = [];
-				var items = document.body.childNodes;				
- 				var scroll = document.documentElement.scrollTop || document.body.scrollTop;
+				var items = document.body.childNodes;
+				var scroll = document.documentElement.scrollTop || document.body.scrollTop;
 
 				data.setAttribute( "style", "width: 100%; max-height: 100%;" );
 
@@ -2939,7 +2988,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					if ( cfg.exportFields !== undefined ) {
 						cfg.dataFields = cfg.exportFields.filter( function( n ) {
 							return cfg.dataFields.indexOf( n ) != -1;
-						});
+						} );
 					}
 
 					// REBUILD DATA

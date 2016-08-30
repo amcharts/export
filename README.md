@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.36
+Version: 1.4.37
 
 
 ## Description
@@ -970,6 +970,11 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.37
+* Fixed: Gradient issue which left the chart elements hidden after the export process
+* Fixed: Typo in examples dropdown
+* Added: Support for external stock chart legends
 
 ### 1.4.36
 * Fixed: exportFields order being considered
