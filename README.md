@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.37
+Version: 1.4.38
 
 
 ## Description
@@ -970,6 +970,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.38
+* Fixed: Support for external stock chart legends, overlapping issue with free licensed version of amcharts
 
 ### 1.4.37
 * Fixed: Gradient issue which left the chart elements hidden after the export process

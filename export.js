@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.37
+Version: 1.4.38
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -70,7 +70,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 	AmCharts[ "export" ] = function( chart, config ) {
 		var _this = {
 			name: "export",
-			version: "1.4.37",
+			version: "1.4.38",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -1289,8 +1289,18 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							y: 0
 						},
 						patterns: {},
-						clippings: {}
+						clippings: {},
+						has: {
+							legend: false,
+							panel: false,
+							scrollbar: false
+						}
 					}
+
+					// CHECK IT'S SURROUNDINGS
+					group.has.legend = _this.gatherClassName( group.parent, _this.setup.chart.classNamePrefix + "-legend-div", 1 );
+					group.has.panel = _this.gatherClassName( group.parent, _this.setup.chart.classNamePrefix + "-stock-panel-div" );
+					group.has.scrollbar = _this.gatherClassName( group.parent, _this.setup.chart.classNamePrefix + "-scrollbar-chart-div" );
 
 					// GATHER ELEMENTS
 					group = _this.gatherElements( group, cfg, images );
@@ -1334,7 +1344,12 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 								height: _this.config.legend.height ? _this.config.legend.height : legend.container.div.offsetHeight
 							},
 							patterns: {},
-							clippings: {}
+							clippings: {},
+							has: {
+								legend: false,
+								panel: false,
+								scrollbar: false
+							}
 						}
 
 						// GATHER DIMENSIONS
@@ -1636,9 +1651,6 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 				for ( i1 = 0; i1 < groups.length; i1++ ) {
 					var group = groups[ i1 ];
-					var isLegend = _this.gatherClassName( group.parent, _this.setup.chart.classNamePrefix + "-legend-div", 1 );
-					var isPanel = _this.gatherClassName( group.parent, _this.setup.chart.classNamePrefix + "-stock-panel-div" );
-					var isScrollbar = _this.gatherClassName( group.parent, _this.setup.chart.classNamePrefix + "-scrollbar-chart-div" );
 
 					// STOCK CHART; SVG OFFSET; SVG OFFSET
 					if ( _this.setup.chart.type == "stock" && _this.setup.chart.legendSettings.position ) {
@@ -1658,12 +1670,12 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 								offset.y += _this.pxToNumber( group.parent.style.height );
 
 								// LEGEND; OFFSET
-								if ( isPanel ) {
-									offset.pY = _this.pxToNumber( isPanel.style.marginTop );
+								if ( group.has.panel ) {
+									offset.pY = _this.pxToNumber( group.has.panel.style.marginTop );
 									group.offset.y += offset.pY;
 
 									// SCROLLBAR; OFFSET
-								} else if ( isScrollbar ) {
+								} else if ( group.has.scrollbar ) {
 									group.offset.y += offset.pY;
 								}
 							}
@@ -1674,11 +1686,11 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							group.offset.x = _this.pxToNumber( group.parent.style.left ) + offset.pX;
 
 							// LEGEND; OFFSET
-							if ( isLegend ) {
-								offset.pY += _this.pxToNumber( isPanel.style.height ) + _this.setup.chart.panelsSettings.panelSpacing;
+							if ( group.has.legend ) {
+								offset.pY += _this.pxToNumber( group.has.panel.style.height ) + _this.setup.chart.panelsSettings.panelSpacing;
 
 								// SCROLLBAR; OFFSET
-							} else if ( isScrollbar ) {
+							} else if ( group.has.scrollbar ) {
 								group.offset.y -= _this.setup.chart.panelsSettings.panelSpacing;
 							}
 						}
@@ -1729,9 +1741,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						}
 
 						// PANEL OFFSET (STOCK CHARTS)
-						if ( isLegend && isPanel && isPanel.style.marginTop ) {
-							offset.y += _this.pxToNumber( isPanel.style.marginTop );
-							group.offset.y += _this.pxToNumber( isPanel.style.marginTop );
+						if ( group.has.legend && group.has.panel && group.has.panel.style.marginTop ) {
+							offset.y += _this.pxToNumber( group.has.panel.style.marginTop );
+							group.offset.y += _this.pxToNumber( group.has.panel.style.marginTop );
 
 							// GENERAL LEFT / RIGHT POSITION
 						} else if ( _this.setup.chart.legend && [ "left", "right" ].indexOf( _this.setup.chart.legend.position ) != -1 ) {
@@ -1955,7 +1967,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 									isCoreElement: true
 								} );
 
-								_this.setup.fabric.add( fabric_label );
+								if ( !group.has.scrollbar ) {
+									_this.setup.fabric.add( fabric_label );
+								}
 							}
 
 							groups.pop();
