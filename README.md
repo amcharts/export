@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.39
+Version: 1.4.40
 
 
 ## Description
@@ -971,6 +971,10 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.40
+* Fixed: Infinite loop in Angular2 Zones
+* Fixed: `compress` option being obtained from the global config
 
 ### 1.4.39
 * Added: New menu option `compress` to compress the generated output (svg only).

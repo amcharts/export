@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.39
+Version: 1.4.40
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -68,9 +68,10 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
  */
 ( function() {
 	AmCharts[ "export" ] = function( chart, config ) {
+		var _timer;
 		var _this = {
 			name: "export",
-			version: "1.4.39",
+			version: "1.4.40",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -567,7 +568,8 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				menuWalker: null,
 				fallback: true,
 				keyListener: true,
-				fileListener: true
+				fileListener: true,
+				compress: true
 			},
 
 			/**
@@ -2149,7 +2151,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			toSVG: function( options, callback ) {
 				var clipPaths = [];
 				var cfg = _this.deepMerge( {
-					compress: true,
+					compress: _this.config.compress,
 					reviver: function( string, clipPath ) {
 						var matcher = new RegExp( /\bstyle=(['"])(.*?)\1/ );
 						var match = matcher.exec( string )[ 0 ].slice( 7, -1 );
@@ -3622,11 +3624,11 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			 * Initiate export menu; waits for chart container to place menu
 			 */
 			init: function() {
-				clearTimeout( _this.timer );
+				clearTimeout( _timer );
 
-				_this.timer = setInterval( function() {
+				_timer = setInterval( function() {
 					if ( _this.setup.chart.containerDiv ) {
-						clearTimeout( _this.timer );
+						clearTimeout( _timer );
 
 						if ( _this.config.enabled ) {
 							// CREATE REFERENCE
