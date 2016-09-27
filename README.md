@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.40
+Version: 1.4.41
 
 
 ## Description
@@ -971,6 +971,11 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.41
+* Added: quote, escape option to `toArray` method
+* Fixed: toArray method to respect `exportFields` order
+* Fixed: toCSV, toXLSX to respect `exportFields` order
 
 ### 1.4.40
 * Fixed: Infinite loop in Angular2 Zones

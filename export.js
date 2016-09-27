@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.40
+Version: 1.4.41
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -71,7 +71,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 		var _timer;
 		var _this = {
 			name: "export",
-			version: "1.4.40",
+			version: "1.4.41",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -2216,7 +2216,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 				// SOLVES #21840
 				if ( cfg.compress ) {
-					data = data.replace(/[\t\r\n]+/g,"");
+					data = data.replace( /[\t\r\n]+/g, "" );
 				}
 
 				if ( cfg.getBase64 ) {
@@ -2397,45 +2397,12 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				}, options || {}, true );
 				var data = "";
 				var cols = [];
-				var buffer = [];
+				var buffer = _this.toArray( cfg );
 
-				function enchant( value, column ) {
-
-					// WRAP IN QUOTES
-					if ( typeof value === "string" ) {
-						if ( cfg.escape ) {
-							value = value.replace( '"', '""' );
-						}
-						if ( cfg.quotes ) {
-							value = [ '"', value, '"' ].join( "" );
-						}
-					}
-
-					return value;
-				}
-
-				// HEADER
-				for ( value in cfg.data[ 0 ] ) {
-					buffer.push( enchant( value ) );
-					cols.push( value );
-				}
-				if ( cfg.withHeader ) {
-					data += buffer.join( cfg.delimiter ) + "\n";
-				}
-
-				// BODY
-				for ( row in cfg.data ) {
-					buffer = [];
+				// MERGE
+				for ( row in buffer ) {
 					if ( !isNaN( row ) ) {
-						for ( col in cols ) {
-							if ( !isNaN( col ) ) {
-								var column = cols[ col ];
-								var value = cfg.data[ row ][ column ];
-
-								buffer.push( enchant( value, column ) );
-							}
-						}
-						data += buffer.join( cfg.delimiter ) + "\n";
+						data += buffer[ row ].join( cfg.delimiter ) + "\n";
 					}
 				}
 
@@ -2535,22 +2502,53 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				var cfg = _this.deepMerge( {
 					data: _this.getChartData( options ),
 					withHeader: false,
-					stringify: true
+					stringify: true,
+					escape: false,
+					quotes: false,
+					exportFields: _this.config.exportFields
 				}, options || {}, true );
 				var data = [];
 				var cols = [];
+				var buffer = [];
+
+				// STRING PROCESSOR
+				function enchant( value ) {
+
+					if ( typeof value === "string" ) {
+						if ( cfg.escape ) {
+							value = value.replace( '"', '""' );
+						}
+						if ( cfg.quotes ) {
+							value = [ '"', value, '"' ].join( "" );
+						}
+					}
+
+					return value;
+				}
+
+				// COLUMN ORDER
+				if ( cfg.exportFields ) {
+					cols = cfg.exportFields;
+				} else {
+					for ( col in cfg.data[ 0 ] ) {
+						cols.push( col );
+					}
+				}
 
 				// HEADER
-				for ( col in cfg.data[ 0 ] ) {
-					cols.push( col );
-				}
 				if ( cfg.withHeader ) {
-					data.push( cols );
+					buffer = [];
+					for ( col in cols ) {
+						if ( !isNaN( col ) ) {
+							buffer.push( enchant( cols[ col ] ) );
+						}
+					}
+					data.push( buffer );
 				}
 
 				// BODY
 				for ( row in cfg.data ) {
-					var buffer = [];
+					buffer = [];
 					if ( !isNaN( row ) ) {
 						for ( col in cols ) {
 							if ( !isNaN( col ) ) {
@@ -2563,7 +2561,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 								} else {
 									value = value;
 								}
-								buffer.push( value );
+								buffer.push( enchant( value ) );
 							}
 						}
 						data.push( buffer );
