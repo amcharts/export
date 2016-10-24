@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.43
+Version: 1.4.44
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -71,7 +71,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 		var _timer;
 		var _this = {
 			name: "export",
-			version: "1.4.43",
+			version: "1.4.44",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -1157,7 +1157,13 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					}
 					var gradientId = instanceFillValue.slice( instanceFillValue.indexOf( "#" ) + 1, instanceFillValue.length - 1 );
 					if ( fabric.gradientDefs[ this.svgUid ][ gradientId ] ) {
-						obj.set( property, fabric.Gradient.fromElement( fabric.gradientDefs[ this.svgUid ][ gradientId ], obj ) );
+						var tmp = fabric.Gradient.fromElement( fabric.gradientDefs[ this.svgUid ][ gradientId ], obj );
+						// WORKAROUND FOR VERTICAL GRADIENT ISSUE;
+						if ( tmp.coords.y1 ) {
+							tmp.coords.y2 = tmp.coords.y1 * -1;
+							tmp.coords.y1 = 0;
+						}
+						obj.set( property, tmp );
 					}
 				};
 

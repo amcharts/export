@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.43
+Version: 1.4.44
 
 
 ## Description
@@ -971,6 +971,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.44
+* Fixed: Vertical gradient issue
 
 ### 1.4.43
 * Fixed: Shown label in hidden valueAxis
