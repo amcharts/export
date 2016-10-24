@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.44
+Version: 1.4.45
 
 
 ## Description
@@ -971,6 +971,11 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.45
+* Fixed: Object selection issue on charts with heavy amount of datapoints
+* Fixed: Line/Arrow drawing issue on vertical movement
+* Changed: Pressing escape while an object has been selected will deselect first instead quiting the annotation mode
 
 ### 1.4.44
 * Fixed: Vertical gradient issue
