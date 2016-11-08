@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.46
+Version: 1.4.47
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -71,7 +71,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 		var _timer;
 		var _this = {
 			name: "export",
-			version: "1.4.46",
+			version: "1.4.47",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -433,7 +433,6 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							}
 						} else {
 							for ( i1 = 0; i1 < cfg.group.length; i1++ ) {
-								cfg.group[ i1 ].noUndo = true;
 								_this.setup.fabric.add( cfg.group[ i1 ] );
 							}
 						}
@@ -1618,16 +1617,10 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						}
 					} );
 
-					if ( !_this.drawing.buffer.isDrawing && !item.noUndo ) {
-						_this.setup.fabric.remove( item );
-						_this.setup.fabric.renderAll();
-						return;
-					}
-
 					state = JSON.stringify( state );
 					item.recentState = state;
 
-					if ( item.selectable && !item.known && !item.noUndo ) {
+					if ( item.selectable && !item.known ) {
 						item.isAnnotation = true;
 						_this.drawing.undos.push( {
 							action: "added",
@@ -1966,9 +1959,6 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							// SET PROPS
 							g.set( tmp );
 
-							// UNUNDOABLE
-							g.noUndo = true;
-
 							// ADD TO CANVAS
 							_this.setup.fabric.add( g );
 
@@ -2233,11 +2223,11 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						// TODO: WAIT UNTIL FABRICJS HANDLES CLIPPATH FOR SVG OUTPUT
 						if ( clipPath && clipPath.svg ) {
 							var clipPathId = clipPath.svg.id;
-							if ( clipPathIds.indexOf(clipPathId) == -1 ) {
+							if ( clipPathIds.indexOf( clipPathId ) == -1 ) {
 								var sliceOffset = 2;
 								var end = string.slice( -sliceOffset );
 
-								clipPathIds.push(clipPath.svg.id);
+								clipPathIds.push( clipPath.svg.id );
 
 								if ( end != "/>" ) {
 									sliceOffset = 3;

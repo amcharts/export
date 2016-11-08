@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.46
+Version: 1.4.47
 
 
 ## Description
@@ -971,6 +971,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.47
+* Fixed: `afterCapture` issue which removed injected elements.
 
 ### 1.4.46
 * Fixed: toSVG clipPath issue which exported multiple times the same clipPath
