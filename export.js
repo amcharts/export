@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.45
+Version: 1.4.46
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -71,7 +71,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 		var _timer;
 		var _this = {
 			name: "export",
-			version: "1.4.45",
+			version: "1.4.46",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -2196,6 +2196,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			 */
 			toSVG: function( options, callback ) {
 				var clipPaths = [];
+				var clipPathIds = [];
 				var cfg = _this.deepMerge( {
 					compress: _this.config.compress,
 					reviver: function( string, clipPath ) {
@@ -2230,22 +2231,27 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						string = string.replace( match, replacement.join( ";" ) );
 
 						// TODO: WAIT UNTIL FABRICJS HANDLES CLIPPATH FOR SVG OUTPUT
-						if ( clipPath ) {
-							var sliceOffset = 2;
-							var end = string.slice( -sliceOffset );
+						if ( clipPath && clipPath.svg ) {
+							var clipPathId = clipPath.svg.id;
+							if ( clipPathIds.indexOf(clipPathId) == -1 ) {
+								var sliceOffset = 2;
+								var end = string.slice( -sliceOffset );
 
-							if ( end != "/>" ) {
-								sliceOffset = 3;
-								end = string.slice( -sliceOffset );
+								clipPathIds.push(clipPath.svg.id);
+
+								if ( end != "/>" ) {
+									sliceOffset = 3;
+									end = string.slice( -sliceOffset );
+								}
+
+								var start = string.slice( 0, string.length - sliceOffset );
+								var clipPathAttr = " clip-path=\"url(#" + clipPath.svg.id + ")\" ";
+								var clipPathString = new XMLSerializer().serializeToString( clipPath.svg );
+
+								string = start + clipPathAttr + end;
+
+								clipPaths.push( clipPathString );
 							}
-
-							var start = string.slice( 0, string.length - sliceOffset );
-							var clipPathAttr = " clip-path=\"url(#" + clipPath.svg.id + ")\" ";
-							var clipPathString = new XMLSerializer().serializeToString( clipPath.svg );
-
-							string = start + clipPathAttr + end;
-
-							clipPaths.push( clipPathString );
 						}
 
 						return string;

@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.45
+Version: 1.4.46
 
 
 ## Description
@@ -971,6 +971,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.46
+* Fixed: toSVG clipPath issue which exported multiple times the same clipPath
 
 ### 1.4.45
 * Fixed: Object selection issue on charts with heavy amount of datapoints
