@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.48
+Version: 1.4.49
 
 
 ## Description
@@ -971,6 +971,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.49
+* Fixed: Custom data export issue through toXSLX and toJSON which results in an empty data sheet.
 
 ### 1.4.48
 * Fixed: toXLSX issue handling objects/array in data points.
