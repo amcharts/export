@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.50
+Version: 1.4.51
 
 
 ## Description
@@ -971,6 +971,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.51
+* Fixed: Render issue on maps due half pixel position correction; simplified the positioning.
 
 ### 1.4.50
 * Fixed: Half pixel positioning issue which caused the blurriness within the canvas and exported image.

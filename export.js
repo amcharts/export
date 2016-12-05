@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.50
+Version: 1.4.51
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -71,7 +71,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 		var _timer;
 		var _this = {
 			name: "export",
-			version: "1.4.50",
+			version: "1.4.51",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -1956,6 +1956,10 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							// REPLACE WITH WHITELIST
 							g.paths = paths;
 
+							// CANCEL HALFPIXEL OFFSET ON CANVAS, KEEPS THE DECIMALS ON INDIVIDUAL PATHS
+							tmp.top += 0.5;
+							tmp.left += 0.5;
+
 							// SET PROPS
 							g.set( tmp );
 
@@ -2062,34 +2066,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							}
 						}
 
-						// CANCEL HALF PIXEL OFFSET ON PATHS
-						_this.cancelPreTranslation( obj.path );
-
 						// REVIVER
 						_this.handleCallback( cfg.reviver, obj, svg );
 					} );
-				}
-			},
-
-			/**
-			 * Removes the half pixel positions on given list
-			 */
-			cancelPreTranslation: function( list ) {
-				var _this = this;
-				var i1 = 0;
-
-				if ( !( list instanceof Array ) ) {
-					return;
-				}
-
-				for ( i1 = 0; i1 < list.length; i1++ ) {
-					var item = list[ i1 ];
-
-					if ( item instanceof Array ) {
-						_this.cancelPreTranslation( item );
-					} else if ( !isNaN( item ) ) {
-						list[ i1 ] = Math.floor( item );
-					}
 				}
 			},
 
