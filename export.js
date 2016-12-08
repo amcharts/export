@@ -584,7 +584,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			 * Returns translated message, takes english as default
 			 */
 			i18l: function( key, language ) {
-				var lang = language ? langugage : _this.setup.chart.language ? _this.setup.chart.language : "en";
+				var lang = language ? language : _this.setup.chart.language ? _this.setup.chart.language : "en";
 				var catalog = AmCharts.translations[ _this.name ][ lang ] || AmCharts.translations[ _this.name ][ "en" ];
 
 				return catalog[ key ] || key;
