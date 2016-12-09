@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.51
+Version: 1.4.52
 
 
 ## Description
@@ -971,6 +971,10 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.52
+* Fixed: Blank export issue especifically in chrome on IOS devices.
+* Updated: FileSaver.js due the chrome export issue on IOS
 
 ### 1.4.51
 * Fixed: Render issue on maps due half pixel position correction; simplified the positioning.
