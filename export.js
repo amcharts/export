@@ -1,3 +1,12 @@
+require('./libs/blob.js/blob.js');
+require('./libs/jszip/jszip.min.js');
+require('./libs/pdfmake/pdfmake');
+require('./libs/pdfmake/vfs_fonts.js');
+const XLSX = require('./libs/xlsx/xlsx');
+require('fabric');
+
+window.saveAs = require('file-saver').saveAs;
+
 /*
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
