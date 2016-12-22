@@ -810,7 +810,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					v = b[ i1 ];
 
 					// NEW
-					if ( a[ i1 ] == undefined || overwrite ) {
+					if ( (a && a[ i1 ] == undefined) || overwrite ) {
 						if ( v instanceof Array ) {
 							a[ i1 ] = new Array();
 						} else if ( v instanceof Function ) {
@@ -836,7 +836,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					} else {
 						if ( a instanceof Array && !overwrite ) {
 							a.push( v );
-						} else {
+						} else if (a) {
 							a[ i1 ] = v;
 						}
 					}
