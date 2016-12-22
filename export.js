@@ -57,7 +57,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 		"menu.label.draw": "Annotate ...",
 		"menu.label.draw.change": "Change ...",
 		"menu.label.draw.add": "Add ...",
-		"menu.label.draw.shapes": "Shape ...",
+		// "menu.label.draw.shapes": "Shape ...",
 		"menu.label.draw.colors": "Color ...",
 		"menu.label.draw.widths": "Size ...",
 		"menu.label.draw.opacities": "Opacity ...",
@@ -67,6 +67,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 		"menu.label.draw.modes.pencil": "Pencil",
 		"menu.label.draw.modes.line": "Line",
 		"menu.label.draw.modes.arrow": "Arrow",
+        "menu.label.draw.modes.select": "Select",
 
 		"label.saved.from": "Saved from: "
 	}
@@ -500,10 +501,10 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						arrow: "end",
 						lineCap: "butt",
 						mode: "pencil",
-						modes: [ "pencil", "line", "arrow" ],
+						modes: [ "pencil", "line", "arrow", "select" ],
 						color: "#000000",
 						colors: [ "#000000", "#FFFFFF", "#FF0000", "#00FF00", "#0000FF" ],
-						shapes: [ "11.svg", "14.svg", "16.svg", "17.svg", "20.svg", "27.svg" ],
+						//shapes: [ "11.svg", "14.svg", "16.svg", "17.svg", "20.svg", "27.svg" ],
 						width: 1,
 						fontSize: 11,
 						widths: [ 1, 5, 10, 15 ],
@@ -1492,7 +1493,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						_this.drawing.buffer.isDrawing = true;
 
 						// CREATE INITIAL LINE / ARROW; JUST ON LEFT CLICK
-						if ( !_this.drawing.buffer.line && _this.drawing.mode != "pencil" && ( p.xD > 5 || p.yD > 5 ) ) {
+						if ( !_this.drawing.buffer.line && _this.drawing.mode != "pencil" && _this.drawing.mode != "select" && ( p.xD > 5 || p.yD > 5 ) ) {
 
 							// FORCE FABRIC TO DISABLE DRAWING MODE WHILE PRESSED / MOVEING MOUSE INPUT
 							_this.setup.fabric.isDrawingMode = false;
@@ -3257,17 +3258,19 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 									"label": items[ i2 ]
 								}
 
-								if ( type == "shapes" ) {
-									var io = items[ i2 ].indexOf( "//" ) == -1;
-									var url = ( io ? _this.config.path + "shapes/" : "" ) + items[ i2 ];
+                                // if ( type == "shapes" ) {
+                                //     var io = items[ i2 ].indexOf( "//" ) == -1;
+                                //     var url = ( io ? _this.config.path + "shapes/" : "" ) + items[ i2 ];
+                                //
+                                //     tmp.action = "add";
+                                //     tmp.url = url;
+                                //     tmp.icon = url;
+                                //     tmp.ignore = io;
+                                //     tmp[ "class" ] = "export-drawing-shape";
+                                //
+                                // } else
 
-									tmp.action = "add";
-									tmp.url = url;
-									tmp.icon = url;
-									tmp.ignore = io;
-									tmp[ "class" ] = "export-drawing-shape";
-
-								} else if ( type == "colors" ) {
+								if ( type == "colors" ) {
 									tmp.style = "background-color: " + items[ i2 ];
 									tmp.action = "change";
 									tmp.color = items[ i2 ];
@@ -3798,10 +3801,12 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							"class": "export-drawing",
 							menu: [ {
 								label: _this.i18l( "menu.label.draw.add" ),
-								menu: [ {
-									label: _this.i18l( "menu.label.draw.shapes" ),
-									action: "draw.shapes"
-								}, {
+								menu: [
+									// {
+									// 	label: _this.i18l( "menu.label.draw.shapes" ),
+									// 	action: "draw.shapes"
+									// },
+									{
 									label: _this.i18l( "menu.label.draw.text" ),
 									action: "text"
 								} ]
