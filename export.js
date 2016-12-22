@@ -325,7 +325,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 							// ADD UNDO
 							if ( !skipped ) {
-								state = JSON.stringify( _this.deepMerge( current.saveState().originalState, {
+								state = JSON.stringify( _this.deepMerge( current.saveState()._stateProperties, {
 									cfg: {
 										color: cfg.color,
 										width: cfg.width,
@@ -1617,7 +1617,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				// OBSERVE OBJECT MODIFICATIONS
 				_this.setup.fabric.on( "object:added", function( e ) {
 					var item = e.target;
-					var state = _this.deepMerge( item.saveState().originalState, {
+					var state = _this.deepMerge( item.saveState()._stateProperties, {
 						cfg: {
 							color: _this.drawing.color,
 							width: _this.drawing.width,
@@ -1649,8 +1649,8 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				} );
 				_this.setup.fabric.on( "object:modified", function( e ) {
 					var item = e.target;
-					var recentState = JSON.parse( item.recentState );
-					var state = _this.deepMerge( item.saveState().originalState, {
+					var recentState = item.recentState;
+					var state = _this.deepMerge( item.saveState()._stateProperties, {
 						cfg: recentState.cfg
 					} );
 
@@ -1669,7 +1669,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					var item = e.target;
 					clearTimeout( item.timer );
 					item.timer = setTimeout( function() {
-						var state = JSON.stringify( item.saveState().originalState );
+						var state = JSON.stringify( item.saveState()._stateProperties );
 
 						item.recentState = state;
 
