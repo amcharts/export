@@ -1,6 +1,6 @@
 {
   "name": "amcharts3-export",
-  "version": "1.4.44",
+  "version": "1.4.45",
   "license": "SEE LICENSE IN LICENSE",
   "main": "index.js",
   "repository": {
@@ -11,9 +11,7 @@
     "canvas": "^1.6.2",
     "fabric": "^1.7.2",
     "jsdom": "^9.9.1",
-    "xlsx": "^0.8.0"
-  },
-  "dependencies": {
+    "xlsx": "^0.8.0",
     "file-saver": "^1.3.3",
     "xmldom": "^0.1.27"
   }
