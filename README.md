@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.52
+Version: 1.4.53
 
 
 ## Description
@@ -971,6 +971,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.53
+* Fixed: IOS print issue, captured the whole page instead of the single page
 
 ### 1.4.52
 * Fixed: Blank export issue especifically in chrome on IOS devices.
