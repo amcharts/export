@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.53
+Version: 1.4.54
 
 
 ## Description
@@ -971,6 +971,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.54
+* Fixed: Default text size on width changes
 
 ### 1.4.53
 * Fixed: IOS print issue, captured the whole page instead of the single page

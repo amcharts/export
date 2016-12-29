@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.53
+Version: 1.4.54
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -71,7 +71,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 		var _timer;
 		var _this = {
 			name: "export",
-			version: "1.4.53",
+			version: "1.4.54",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -235,7 +235,13 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						}
 						if ( cfg.width ) {
 							_this.drawing.width = cfg.width;
-							_this.drawing.fontSize = cfg.width * 3;
+							_this.drawing.fontSize = cfg.fontSize = cfg.width * 3;
+
+							// BACK TO DEFAULT
+							if ( _this.drawing.width == 1 ) {
+								_this.drawing.fontSize = cfg.fontSize = _this.defaults.fabric.drawing.fontSize;
+							}
+
 						}
 						if ( cfg.fontSize ) {
 							_this.drawing.fontSize = cfg.fontSize;
@@ -264,7 +270,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 								cfg.color = cfg.color || state.color;
 								cfg.width = cfg.width || state.width;
 								cfg.opacity = cfg.opacity || state.opacity;
-								cfg.fontSize = cfg.fontSize || cfg.width * 3;
+								cfg.fontSize = cfg.fontSize || state.fontSize;
 
 								rgba = _this.getRGBA( cfg.color );
 								rgba.pop();
