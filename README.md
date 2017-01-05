@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.54
+Version: 1.4.55
 
 
 ## Description
@@ -971,6 +971,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.55
+* Added: Radial gradient issue on pie caused by the vertical gradient fix (v1.4.44)
 
 ### 1.4.54
 * Fixed: Default text size on width changes
