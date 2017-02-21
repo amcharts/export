@@ -828,8 +828,8 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					// ASSIGN VALUE
 					v = b[ i1 ];
 
-					// NEW INSTANCE
-					if ( a[ i1 ] == undefined || overwrite ) {
+					// NEW
+					if ( (a && a[ i1 ] == undefined) || overwrite ) {
 						if ( v instanceof Array ) {
 							a[ i1 ] = new Array();
 						} else if ( v instanceof Function ) {
@@ -858,7 +858,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					} else {
 						if ( a instanceof Array && !overwrite ) {
 							a.push( v );
-						} else {
+						} else if (a) {
 							a[ i1 ] = v;
 						}
 					}
@@ -3897,7 +3897,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				clearTimeout( _timer );
 
 				_timer = setInterval( function() {
-					if ( _this.setup.chart.containerDiv ) {
+					if ( _this.setup && _this.setup.chart.containerDiv ) {
 						clearTimeout( _timer );
 
 						if ( _this.config.enabled ) {
