@@ -3909,7 +3909,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				clearTimeout( _timer );
 
 				_timer = setInterval( function() {
-					if ( _this.setup.chart.containerDiv ) {
+					if ( _this.setup && _this.setup.chart.containerDiv ) {
 						clearTimeout( _timer );
 
 						if ( _this.config.enabled ) {
