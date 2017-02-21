@@ -2603,13 +2603,13 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				}
 
 				// NAMESPACE CHECK
-				if ( !_this.handleNamespace( "XLSX", {
-						scope: this,
-						cb: _this.toXLSX,
-						args: arguments
-					} ) ) {
-					return false;
-				}
+// 				if ( !_this.handleNamespace( "XLSX", {
+// 						scope: this,
+// 						cb: _this.toXLSX,
+// 						args: arguments
+// 					} ) ) {
+// 					return false;
+// 				}
 
 				// GATHER DATA
 				buffer = _this.toArray( cfg );
