@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.57
+Version: 1.4.58
 
 
 ## Description
@@ -972,6 +972,10 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.58
+* Fixed: SVG clip-path export issue; injection control; wrap elements to support fill reference
+* Fixed: Keyboard navigation disabled on touch devices
 
 ### 1.4.57
 * Added: Support for keyboard navigation (tabs and arrow keys).

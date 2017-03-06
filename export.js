@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.57
+Version: 1.4.58
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -71,7 +71,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 		var _timer;
 		var _this = {
 			name: "export",
-			version: "1.4.57",
+			version: "1.4.58",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -2293,24 +2293,25 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						// TODO: WAIT UNTIL FABRICJS HANDLES CLIPPATH FOR SVG OUTPUT
 						if ( clipPath && clipPath.svg ) {
 							var clipPathId = clipPath.svg.id;
+							var sliceOffset = 2;
+							var end = string.slice( -sliceOffset );
+
+							if ( end != "/>" ) {
+								sliceOffset = 3;
+								end = string.slice( -sliceOffset );
+							}
+
+							var start = string.slice( 0, string.length - sliceOffset );
+							var clipPathAttr = " clip-path=\"url(#" + clipPath.svg.id + ")\" ";
+
+							// WRAP ELEMENT TO BE ABLE TO APPLY THE CLIP-PATH
+							string = "<g " + clipPathAttr + ">" + string + "</g>";
+
+							// INJECT CLIP PATH ONCE INTO THE DOCUMENT
 							if ( clipPathIds.indexOf( clipPathId ) == -1 ) {
-								var sliceOffset = 2;
-								var end = string.slice( -sliceOffset );
-
-								clipPathIds.push( clipPath.svg.id );
-
-								if ( end != "/>" ) {
-									sliceOffset = 3;
-									end = string.slice( -sliceOffset );
-								}
-
-								var start = string.slice( 0, string.length - sliceOffset );
-								var clipPathAttr = " clip-path=\"url(#" + clipPath.svg.id + ")\" ";
 								var clipPathString = new XMLSerializer().serializeToString( clipPath.svg );
-
-								string = start + clipPathAttr + end;
-
 								clipPaths.push( clipPathString );
+								clipPathIds.push( clipPath.svg.id );
 							}
 						}
 
@@ -3369,11 +3370,14 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 						item.format = String( item.format ).toUpperCase();
 
-						// LISTEN ON FOCUS
+						// LISTEN ON FOCUS; NON-TOUCH DEVICES ONLY
 						a.addEventListener( "focus", function( e ) {
-							_this.setup.focusedMenuItem = this;
-							this.parentNode.classList.add( "active" );
-							this.parentNode.parentNode.parentNode.classList.add( "active" );
+							if ( !_this.setup.hasTouch ) {
+								_this.setup.focusedMenuItem = this;
+
+								this.parentNode.classList.add( "active" );
+								this.parentNode.parentNode.parentNode.classList.add( "active" );	
+							}
 						} );
 
 						// MERGE WITH GIVEN FORMAT
@@ -3892,7 +3896,11 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						function blurAll() {
 							function unselectParents( elm ) {
 								elm.blur();
-								elm.parentNode.classList.remove( "active" );
+
+								// BLUR PARENT
+								if ( elm.parentNode ) {
+									elm.parentNode.classList.remove( "active" );
+								}
 
 								// ENOUGH; EXIT ON MENU WRAPPER
 								if ( !elm.classList.contains( "amExportButton" ) ) {
