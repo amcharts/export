@@ -4009,6 +4009,30 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					}
 				}
 
+				let annotateMenu = _this.config.isAnnotationMsg ? {
+                        label: _this.i18l( "menu.label.draw" ),
+                        action: "draw",
+                        menu: _this.config.fabric.drawing.menu,
+                        afterCapture: function() {
+                            this.config.afterCapture ? this.config.afterCapture(this.setup) : {};
+                            let canvas = this.setup.fabric;
+                            let save = new fabric.Text("Don't forget to save your's annotation", {
+                                originX: "center",
+                                originY: "center",
+                                top: 40,
+                                left: canvas.width / 2,
+                                fontSize: 18,
+                                fill: '#f69d00'
+                            });
+                            this.setup.fabric.add(save);
+                        }
+                    } :
+                    {
+                        label: _this.i18l( "menu.label.draw" ),
+                        action: "draw",
+                        menu: _this.config.fabric.drawing.menu
+                    };
+
 				// MERGE; SETUP MAIN MENU
 				if ( _this.config.menu === undefined ) {
 					_this.config.menu = [];
@@ -4022,24 +4046,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							}, {
 								label: _this.i18l( "menu.label.save.data" ),
 								menu: [ "CSV", "XLSX", "JSON" ]
-							}, {
-								label: _this.i18l( "menu.label.draw" ),
-								action: "draw",
-								menu: _this.config.fabric.drawing.menu,
-                                afterCapture: function() {
-                                    this.config.afterCapture ? this.config.afterCapture(this.setup) : {};
-                                    let canvas = this.setup.fabric;
-                                    let save = new fabric.Text("Don't forget to save your's annotation", {
-                                        originX: "center",
-                                        originY: "center",
-                                        top: 40,
-                                        left: canvas.width / 2,
-                                        fontSize: 18,
-                                        fill: '#f69d00'
-                                    });
-                                    this.setup.fabric.add(save);
-                                }
-							}, {
+							}, annotateMenu , {
 								format: "PRINT",
 								label: _this.i18l( "menu.label.print" )
 							} ]
