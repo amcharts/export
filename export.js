@@ -4016,7 +4016,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
                         afterCapture: function() {
                             this.config.afterCapture ? this.config.afterCapture(this.setup) : {};
                             let canvas = this.setup.fabric;
-                            let save = new fabric.Text("Don't forget to save your's annotation", {
+                            let save = new fabric.Text("Don't forget to download your's annotation", {
                                 originX: "center",
                                 originY: "center",
                                 top: 40,
