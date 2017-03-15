@@ -2603,13 +2603,13 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				}
 
 				// NAMESPACE CHECK
-				if ( !_this.handleNamespace( "XLSX", {
-						scope: this,
-						cb: _this.toXLSX,
-						args: arguments
-					} ) ) {
-					return false;
-				}
+// 				if ( !_this.handleNamespace( "XLSX", {
+// 						scope: this,
+// 						cb: _this.toXLSX,
+// 						args: arguments
+// 					} ) ) {
+// 					return false;
+// 				}
 
 				// GATHER DATA
 				buffer = _this.toArray( cfg );
@@ -4025,7 +4025,20 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							}, {
 								label: _this.i18l( "menu.label.draw" ),
 								action: "draw",
-								menu: _this.config.fabric.drawing.menu
+								menu: _this.config.fabric.drawing.menu,
+                                afterCapture: function() {
+                                    this.config.afterCapture ? this.config.afterCapture(this.setup) : {};
+                                    let canvas = this.setup.fabric;
+                                    let save = new fabric.Text("Don't forget to save your's annotation", {
+                                        originX: "center",
+                                        originY: "center",
+                                        top: 40,
+                                        left: canvas.width / 2,
+                                        fontSize: 18,
+                                        fill: '#f69d00'
+                                    });
+                                    this.setup.fabric.add(save);
+                                }
 							}, {
 								format: "PRINT",
 								label: _this.i18l( "menu.label.print" )
