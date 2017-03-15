@@ -4010,6 +4010,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				}
 
 				let annotateMenu = _this.config.isAnnotationMsg ? {
+                        "class": _this.config.isAnnotationDisabled ? "annotation-disabled" : '',
                         label: _this.i18l( "menu.label.draw" ),
                         action: "draw",
                         menu: _this.config.fabric.drawing.menu,
@@ -4028,6 +4029,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
                         }
                     } :
                     {
+                        "class": _this.config.isAnnotationDisabled ? "annotation-disabled" : '',
                         label: _this.i18l( "menu.label.draw" ),
                         action: "draw",
                         menu: _this.config.fabric.drawing.menu
