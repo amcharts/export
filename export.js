@@ -4020,7 +4020,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
                                 originX: "center",
                                 originY: "center",
                                 top: 40,
-                                left: canvas.width / 2,
+                                left: canvas.width - 200,
                                 fontSize: 18,
                                 fill: '#f69d00'
                             });
