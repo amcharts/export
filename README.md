@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.58
+Version: 1.4.59
 
 
 ## Description
@@ -972,6 +972,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.59
+* Fixed: Issue with blurred element when closing annotation mode
 
 ### 1.4.58
 * Fixed: SVG clip-path export issue; injection control; wrap elements to support fill reference
