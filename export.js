@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.59
+Version: 1.4.60
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -71,7 +71,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 		var _timer;
 		var _this = {
 			name: "export",
-			version: "1.4.59",
+			version: "1.4.60",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -2490,29 +2490,34 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				}
 
 				document.body.appendChild( data );
-				window.print();
 
-				// CONVERT TO SECONDS
-				cfg.delay *= 1000;
+				// DELAY WHOLE PROCESS
+				setTimeout(function() {
+					// PRINT
+					window.print();
 
-				// IOS EXCEPTION DELAY MIN. 1 SECOND
-				var isIOS = /iPad|iPhone|iPod/.test( navigator.userAgent ) && !window.MSStream;
-				if ( isIOS && cfg.delay < 1000 ) {
-					cfg.delay = 1000;
-				}
+					// CONVERT TO SECONDS
+					cfg.delay *= 1000;
 
-				setTimeout( function() {
-					for ( i1 = 0; i1 < items.length; i1++ ) {
-						if ( _this.isElement( items[ i1 ] ) ) {
-							items[ i1 ].style.display = states[ i1 ];
-						}
+					// IOS EXCEPTION DELAY MIN. 1 SECOND
+					var isIOS = /iPad|iPhone|iPod/.test( navigator.userAgent ) && !window.MSStream;
+					if ( isIOS && cfg.delay < 1000 ) {
+						cfg.delay = 1000;
 					}
-					document.body.removeChild( data );
-					document.documentElement.scrollTop = document.body.scrollTop = scroll;
 
-					// TRIGGER CALLBACK
-					_this.handleCallback( callback, data, cfg );
-				}, cfg.delay );
+					setTimeout( function() {
+						for ( i1 = 0; i1 < items.length; i1++ ) {
+							if ( _this.isElement( items[ i1 ] ) ) {
+								items[ i1 ].style.display = states[ i1 ];
+							}
+						}
+						document.body.removeChild( data );
+						document.documentElement.scrollTop = document.body.scrollTop = scroll;
+
+						// TRIGGER CALLBACK
+						_this.handleCallback( callback, data, cfg );
+					}, cfg.delay );
+				},1);
 
 				return data;
 			},

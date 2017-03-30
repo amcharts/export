@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.59
+Version: 1.4.60
 
 
 ## Description
@@ -972,6 +972,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.60
+* Fixed: Empty print output in chrome version 57
 
 ### 1.4.59
 * Fixed: Issue with blurred element when closing annotation mode
