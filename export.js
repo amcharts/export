@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.60
+Version: 1.4.61
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -71,7 +71,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 		var _timer;
 		var _this = {
 			name: "export",
-			version: "1.4.60",
+			version: "1.4.61",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -1976,7 +1976,27 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 															dim.left -= tm[ 4 ];
 														}
 
-														ctx.rect( dim.left, dim.top, dim.width, dim.height );
+														// SMOOTHCUSTOMBULLETS PLUGIN SUPPORT; ROUND BORDER
+														if (
+															_this.setup.chart.smoothCustomBullets !== undefined &&
+															this.className == _this.setup.chart.classNamePrefix + "-graph-bullet" &&
+															g.paths[ i1 ].svg.tagName == "image"
+														) {
+															radius = cp.svg.firstChild.rx.baseVal.value / 2 + 2;
+															ctx.beginPath();
+															ctx.moveTo(dim.left + radius, dim.top);
+															ctx.lineTo(dim.left + dim.width - radius, dim.top);
+															ctx.quadraticCurveTo(dim.left + dim.width, dim.top, dim.left + dim.width, dim.top + radius);
+															ctx.lineTo(dim.left + dim.width, dim.top + dim.height - radius);
+															ctx.quadraticCurveTo(dim.left + dim.width, dim.top + dim.height, dim.left + dim.width - radius, dim.top + dim.height);
+															ctx.lineTo(dim.left + radius, dim.top + dim.height);
+															ctx.quadraticCurveTo(dim.left, dim.top + dim.height, dim.left, dim.top + dim.height - radius);
+															ctx.lineTo(dim.left, dim.top + radius);
+															ctx.quadraticCurveTo(dim.left, dim.top, dim.left + radius, dim.top);
+															ctx.closePath();
+														} else {
+															ctx.rect( dim.left, dim.top, dim.width, dim.height );
+														}
 													}
 												} )( i1, PID )
 											} );
