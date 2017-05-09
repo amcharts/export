@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.62
+Version: 1.4.63
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -71,7 +71,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 		var _timer;
 		var _this = {
 			name: "export",
-			version: "1.4.62",
+			version: "1.4.63",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -2322,16 +2322,23 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							}
 
 							var start = string.slice( 0, string.length - sliceOffset );
-							var clipPathAttr = " clip-path=\"url(#" + clipPath.svg.id + ")\" ";
+							var clipPathAttr = " clip-path=\"url(#" + clipPathId + ")\" ";
+							var parentClassList = clipPath.svg.parentNode.classList;
+
+							// APPLY CLIP PATH DIRECTLY ON GRAPHLINES
+							if ( parentClassList.contains(_this.setup.chart.classNamePrefix + "-graph-line") ) {
+								string = start + clipPathAttr + end;
 
 							// WRAP ELEMENT TO BE ABLE TO APPLY THE CLIP-PATH
-							string = "<g " + clipPathAttr + ">" + string + "</g>";
+							} else {
+								string = "<g " + clipPathAttr + ">" + string + "</g>";
+							}
 
 							// INJECT CLIP PATH ONCE INTO THE DOCUMENT
 							if ( clipPathIds.indexOf( clipPathId ) == -1 ) {
 								var clipPathString = new XMLSerializer().serializeToString( clipPath.svg );
 								clipPaths.push( clipPathString );
-								clipPathIds.push( clipPath.svg.id );
+								clipPathIds.push( clipPathId );
 							}
 						}
 
