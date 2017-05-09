@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.63
+Version: 1.4.64
 
 
 ## Description
@@ -972,6 +972,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.64
+* Fixed: classList issue on IE11
 
 ### 1.4.63
 * Fixed: Clip-path issue on graph lines

@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.63
+Version: 1.4.64
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -71,7 +71,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 		var _timer;
 		var _this = {
 			name: "export",
-			version: "1.4.63",
+			version: "1.4.64",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -2323,10 +2323,12 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 							var start = string.slice( 0, string.length - sliceOffset );
 							var clipPathAttr = " clip-path=\"url(#" + clipPathId + ")\" ";
-							var parentClassList = clipPath.svg.parentNode.classList;
+							var parentClassList = _this.gatherAttribute(clipPath.svg,"class");
+
+							parentClassList = parentClassList ? parentClassList.split(" ") : [];
 
 							// APPLY CLIP PATH DIRECTLY ON GRAPHLINES
-							if ( parentClassList.contains(_this.setup.chart.classNamePrefix + "-graph-line") ) {
+							if ( parentClassList.indexOf(_this.setup.chart.classNamePrefix + "-graph-line") != -1 ) {
 								string = start + clipPathAttr + end;
 
 							// WRAP ELEMENT TO BE ABLE TO APPLY THE CLIP-PATH
