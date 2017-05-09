@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.61
+Version: 1.4.62
 
 
 ## Description
@@ -972,6 +972,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.62
+* Fixed: Gantt category issue
 
 ### 1.4.61
 * Fixed: SmoothCustomBullet plugin support, clip-path issue on curved corners

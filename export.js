@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.61
+Version: 1.4.62
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -71,7 +71,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 		var _timer;
 		var _this = {
 			name: "export",
-			version: "1.4.61",
+			version: "1.4.62",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -3137,7 +3137,6 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					} else if ( _this.setup.chart.type == "gantt" ) {
 						// CATEGORY AXIS
 						addField( _this.setup.chart.categoryField );
-						cfg.dateFields.push( _this.setup.chart.categoryField );
 
 						var field = _this.setup.chart.segmentsField;
 						for ( i1 = 0; i1 < _this.setup.chart.dataProvider.length; i1++ ) {
