@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.64
+Version: 1.4.65
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -71,7 +71,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 		var _timer;
 		var _this = {
 			name: "export",
-			version: "1.4.64",
+			version: "1.4.65",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -3407,6 +3407,17 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						a.addEventListener( "focus", function( e ) {
 							if ( !_this.setup.hasTouch ) {
 								_this.setup.focusedMenuItem = this;
+								var list = this.parentNode;
+
+								if ( list.tagName != "UL" ) {
+									list = list.parentNode;
+								}
+
+								// REMOVE ACTIVE CLASSES
+								var items = list.getElementsByTagName("li");
+								for ( i1 = 0; i1 < items.length; i1++ ) {
+									items[i1].classList.remove("active");
+								}
 
 								this.parentNode.classList.add( "active" );
 								this.parentNode.parentNode.parentNode.classList.add( "active" );	
@@ -3518,6 +3529,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 								item.click = ( function( item ) {
 									return function() {
 										this.drawing.handler[ item.action ]( item );
+										this.createMenu( this.config.fabric.drawing.menu );
 									}
 								} )( item );
 
@@ -3546,6 +3558,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 												this[ "to" + item.format ]( item, function( data ) {
 													if ( item.action == "download" ) {
 														this.download( data, item.mimeType, [ item.fileName, item.extension ].join( "." ) );
+														this.createMenu( this.config.menu );
 													}
 												} );
 											} )
@@ -3553,6 +3566,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 										} else if ( this[ "to" + item.format ] ) {
 											this[ "to" + item.format ]( item, function( data ) {
 												this.download( data, item.mimeType, [ item.fileName, item.extension ].join( "." ) );
+												this.createMenu( this.config.menu );
 											} );
 										} else {
 											throw new Error( 'Invalid format. Could not determine output type.' );

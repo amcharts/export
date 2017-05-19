@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.64
+Version: 1.4.65
 
 
 ## Description
@@ -972,6 +972,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.65
+* Fixed: Menu active state issue, menu kept its active when it hasn't been rerendered.
 
 ### 1.4.64
 * Fixed: classList issue on IE11
