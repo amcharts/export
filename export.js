@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.65
+Version: 1.4.66
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -71,7 +71,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 		var _timer;
 		var _this = {
 			name: "export",
-			version: "1.4.65",
+			version: "1.4.66",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -3403,6 +3403,11 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 						item.format = String( item.format ).toUpperCase();
 
+						// REMOVE ACTIVE CLASS ON MOUSELEAVE
+						li.addEventListener("mouseleave",function(e) {
+							this.classList.remove("active");
+						});
+
 						// LISTEN ON FOCUS; NON-TOUCH DEVICES ONLY
 						a.addEventListener( "focus", function( e ) {
 							if ( !_this.setup.hasTouch ) {
@@ -3529,7 +3534,10 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 								item.click = ( function( item ) {
 									return function() {
 										this.drawing.handler[ item.action ]( item );
-										this.createMenu( this.config.fabric.drawing.menu );
+
+										if ( item.action != "cancel" ) {
+											this.createMenu( this.config.fabric.drawing.menu );
+										}
 									}
 								} )( item );
 
