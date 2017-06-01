@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.66
+Version: 1.4.67
 
 
 ## Description
@@ -972,6 +972,10 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.67
+* Fixed: PDFmake multiplier issue on iOS devices; forced to 1
+* Updated: Libaries (ensure to replace/update the resources)
 
 ### 1.4.66
 * Fixed: Menu active state on mouseleave.
