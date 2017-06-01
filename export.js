@@ -136,11 +136,6 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							}
 
 							_this.setup.fabric.renderAll();
-
-							// RECALL
-							if ( item.state == item.target.recentState && !skipped ) {
-								_this.drawing.handler.undo( item, true );
-							}
 						}
 					},
 					redo: function( options, skipped ) {
@@ -166,11 +161,6 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							}
 
 							_this.setup.fabric.renderAll();
-
-							// RECALL
-							if ( item.action == "addified" ) {
-								_this.drawing.handler.redo();
-							}
 						}
 					},
 					done: function( options ) {
@@ -324,7 +314,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 							// ADD UNDO
 							if ( !skipped ) {
-								state = JSON.stringify( _this.deepMerge( current.saveState().originalState, {
+								state = JSON.stringify( _this.deepMerge( current.saveState()._stateProperties, {
 									cfg: {
 										color: cfg.color,
 										width: cfg.width,
@@ -441,6 +431,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							}
 						} else {
 							for ( i1 = 0; i1 < cfg.group.length; i1++ ) {
+								cfg.group[ i1 ].ignoreUndo = true;
 								_this.setup.fabric.add( cfg.group[ i1 ] );
 							}
 						}
@@ -1476,6 +1467,8 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				_this.setup.canvas = document.createElement( "canvas" );
 				_this.setup.wrapper.appendChild( _this.setup.canvas );
 
+				// REMOVE CLICK 
+				cfg.click = cfg.onClick = undefined;
 
 				_this.setup.fabric = new fabric.Canvas( _this.setup.canvas, _this.deepMerge( {
 					width: offset.width,
@@ -1521,6 +1514,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							// FORCE FABRIC TO DISABLE DRAWING MODE WHILE PRESSED / MOVEING MOUSE INPUT
 							_this.setup.fabric.isDrawingMode = false;
 							_this.setup.fabric._isCurrentlyDrawing = false;
+							_this.drawing.buffer.ignoreUndoOnMouseUp = true;
 							_this.setup.fabric.freeDrawingBrush.onMouseUp();
 							_this.setup.fabric.remove( _this.setup.fabric._objects.pop() );
 
@@ -1641,7 +1635,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				// OBSERVE OBJECT MODIFICATIONS
 				_this.setup.fabric.on( "object:added", function( e ) {
 					var item = e.target;
-					var state = _this.deepMerge( item.saveState().originalState, {
+					var state = _this.deepMerge( item.saveState()._stateProperties, {
 						cfg: {
 							color: _this.drawing.color,
 							width: _this.drawing.width,
@@ -1653,15 +1647,15 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					state = JSON.stringify( state );
 					item.recentState = state;
 
-					if ( item.selectable && !item.known ) {
+					if ( _this.drawing.buffer.ignoreUndoOnMouseUp || !_this.drawing.buffer.isDrawing ) {
+						_this.drawing.buffer.ignoreUndoOnMouseUp = false;
+						return;
+					}
+
+					if ( item.selectable && !item.known && !item.ignoreUndo ) {
 						item.isAnnotation = true;
 						_this.drawing.undos.push( {
 							action: "added",
-							target: item,
-							state: state
-						} );
-						_this.drawing.undos.push( {
-							action: "addified",
 							target: item,
 							state: state
 						} );
@@ -1674,7 +1668,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				_this.setup.fabric.on( "object:modified", function( e ) {
 					var item = e.target;
 					var recentState = JSON.parse( item.recentState );
-					var state = _this.deepMerge( item.saveState().originalState, {
+					var state = _this.deepMerge( item.saveState()._stateProperties, {
 						cfg: recentState.cfg
 					} );
 
@@ -1693,7 +1687,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					var item = e.target;
 					clearTimeout( item.timer );
 					item.timer = setTimeout( function() {
-						var state = JSON.stringify( item.saveState().originalState );
+						var state = JSON.stringify( item.saveState()._stateProperties );
 
 						item.recentState = state;
 
@@ -2224,6 +2218,11 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				cfg.format = cfg.format.toLowerCase();
 				var data;
 
+				// DISABLE SCALING ON IOS DEVICES
+				if ( /iP(hone|od|ad)/.test(navigator.platform) ) {
+					cfg.multiplier = 1;
+				}
+
 				// NAMESPACE CHECK
 				if ( !_this.handleNamespace( "fabric", {
 						scope: this,
@@ -2252,6 +2251,11 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					multiplier: _this.config.multiplier
 				}, options || {} );
 				var data;
+
+				// DISABLE SCALING ON IOS DEVICES
+				if ( /iP(hone|od|ad)/.test(navigator.platform) ) {
+					cfg.multiplier = 1;
+				}
 
 				// NAMESPACE CHECK
 				if ( !_this.handleNamespace( "fabric", {
@@ -2393,6 +2397,11 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				}, _this.config.pdfMake ), options || {}, true );
 				var data;
 
+				// DISABLE SCALING ON IOS DEVICES
+				if ( /iP(hone|od|ad)/.test(navigator.platform) ) {
+					cfg.multiplier = 1;
+				}
+
 				// NAMESPACE CHECK
 				if ( !_this.handleNamespace( "pdfMake", {
 						scope: this,
@@ -2401,9 +2410,6 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					} ) ) {
 					return false;
 				}
-
-				// Create PDF instance
-				data = new pdfMake.createPdf( cfg );
 
 				// Get image data
 				cfg.images.reference = _this.toPNG( cfg );
@@ -2483,6 +2489,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 					cfg.content = pageContent;
 				}
+
+				// Create PDF instance
+				data = new pdfMake.createPdf( cfg );
 
 				if ( callback ) {
 					data.getDataUrl( ( function( callback ) {
@@ -3591,31 +3600,32 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 						// ADD LINK ATTR
 						a.setAttribute( "href", "#" );
-						a.addEventListener( "click", ( function( callback, item ) {
-							return function( e ) {
-								e.preventDefault();
-								var args = [ e, item ];
-
-								// DELAYED
-								if ( ( item.action == "draw" || item.format == "PRINT" || ( item.format != "UNDEFINED" && item.capture ) ) && !_this.drawing.enabled ) {
-
-									// VALIDATE DELAY
-									if ( !isNaN( item.delay ) || !isNaN( _this.config.delay ) ) {
-										item.delay = !isNaN( item.delay ) ? item.delay : _this.config.delay;
-										_this.delay( item, callback );
-										return;
-									}
-								}
-
-								callback.apply( _this, args );
-							}
-						} )( item.click || function( e ) {
-							e.preventDefault();
-						}, item ) );
 
 						// ENABLE MANUAL ACTIVE STATE ON TOUCH DEVICES
 						if ( _this.setup.hasTouch && li.classList ) {
-							a.addEventListener( "click", ( function( item ) {
+							a.addEventListener( "touchend", ( function( callback, item ) {
+								return function( e ) {
+									e.preventDefault();
+									var args = [ e, item ];
+
+									// DELAYED
+									if ( ( item.action == "draw" || item.format == "PRINT" || ( item.format != "UNDEFINED" && item.capture ) ) && !_this.drawing.enabled ) {
+
+										// VALIDATE DELAY
+										if ( !isNaN( item.delay ) || !isNaN( _this.config.delay ) ) {
+											item.delay = !isNaN( item.delay ) ? item.delay : _this.config.delay;
+											_this.delay( item, callback );
+											return;
+										}
+									}
+
+									callback.apply( _this, args );
+								}
+							} )( item.click || function( e ) {
+								e.preventDefault();
+							}, item ) );
+
+							a.addEventListener( "touchend", ( function( item ) {
 								return function( e ) {
 									e.preventDefault();
 									var li = item.elements.li;
@@ -3691,6 +3701,30 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 									}
 								}
 							} )( item ) );
+
+						// NON TOUCH DEVICES
+						} else {
+							a.addEventListener( "click", ( function( callback, item ) {
+								return function( e ) {
+									e.preventDefault();
+									var args = [ e, item ];
+
+									// DELAYED
+									if ( ( item.action == "draw" || item.format == "PRINT" || ( item.format != "UNDEFINED" && item.capture ) ) && !_this.drawing.enabled ) {
+
+										// VALIDATE DELAY
+										if ( !isNaN( item.delay ) || !isNaN( _this.config.delay ) ) {
+											item.delay = !isNaN( item.delay ) ? item.delay : _this.config.delay;
+											_this.delay( item, callback );
+											return;
+										}
+									}
+
+									callback.apply( _this, args );
+								}
+							} )( item.click || function( e ) {
+								e.preventDefault();
+							}, item ) );
 						}
 
 						li.appendChild( a );
