@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.67
+Version: 1.4.68
 
 
 ## Description
@@ -880,7 +880,7 @@ chart.export.setAnnotations({
 
 
 },function() {
-  // Callback when finished 
+  // Callback when finished
 });
 ```
 
@@ -972,6 +972,11 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.68
+* Fixed: PDFmake dependency version (jsZIP)
+* Fixed: XLSX export issue (caused by jsZIP dependency)
+* Fixed: Issue on given functions in given config for fabric instance creation
 
 ### 1.4.67
 * Fixed: PDFmake multiplier issue on iOS devices; forced to 1
@@ -1092,7 +1097,7 @@ http://www.apache.org/licenses/LICENSE-2.0
 * Fixed: Shallow copy of compared graphs in data exports (stock only)
 
 ### 1.4.33
-* Fixed: fill/stroke polyfilling issue on svg elements with color validation/preparation for fabric 
+* Fixed: fill/stroke polyfilling issue on svg elements with color validation/preparation for fabric
 
 ### 1.4.32
 * Fixed: Issue polyfilling the color attributes with "rgba" color codes

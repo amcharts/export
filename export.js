@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.66
+Version: 1.4.68
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -71,7 +71,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 		var _timer;
 		var _this = {
 			name: "export",
-			version: "1.4.66",
+			version: "1.4.68",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -1467,14 +1467,15 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				_this.setup.canvas = document.createElement( "canvas" );
 				_this.setup.wrapper.appendChild( _this.setup.canvas );
 
-				// REMOVE CLICK 
-				cfg.click = cfg.onClick = undefined;
-
-				_this.setup.fabric = new fabric.Canvas( _this.setup.canvas, _this.deepMerge( {
+				// PREPARE CONFIG FOR FABRIC INSTANCE
+				var fabricCFG = _this.removeFunctionsFromObject(_this.deepMerge( {
 					width: offset.width,
 					height: offset.height,
 					isDrawingMode: true
-				}, cfg ) );
+				}, cfg ));
+
+				// INITIATE FABRIC INSTANCE
+				_this.setup.fabric = new fabric.Canvas( _this.setup.canvas, fabricCFG );
 
 				// REAPPLY FOR SOME REASON
 				_this.deepMerge( _this.setup.fabric, cfg );
@@ -1542,7 +1543,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						l.x2 = p.x2;
 						l.y2 = p.y2;
 
-						// // RESET INTERNAL FLAGS	
+						// // RESET INTERNAL FLAGS
 						// _this.drawing.buffer.isDrawing = true;
 						// _this.drawing.buffer.isPressed = true;
 						// _this.drawing.buffer.hasLine = true;
@@ -2900,6 +2901,18 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			},
 
 			/**
+			 * Method to remove functions from given object
+			 */
+			removeFunctionsFromObject: function( obj ) {
+				for (var key in obj) {
+					if ( typeof obj[key] === "function" ) {
+						delete obj[key];
+					}
+				}
+				return obj;
+			},
+
+			/**
 			 * Callback handler; injects additional arguments to callback
 			 */
 			handleCallback: function( callback ) {
@@ -3434,7 +3447,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 								}
 
 								this.parentNode.classList.add( "active" );
-								this.parentNode.parentNode.parentNode.classList.add( "active" );	
+								this.parentNode.parentNode.parentNode.classList.add( "active" );
 							}
 						} );
 
