@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.68
+Version: 1.4.69
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -71,7 +71,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 		var _timer;
 		var _this = {
 			name: "export",
-			version: "1.4.68",
+			version: "1.4.69",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -581,6 +581,11 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			},
 
 			/**
+			 * Buffer for latter listener clearance
+			 */
+			listenersToRemove: [],
+
+			/**
 			 * Returns translated message, takes english as default
 			 */
 			i18l: function( key, language ) {
@@ -675,7 +680,11 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				var i1, exist, node, item, check, type;
 				var url = src.indexOf( "//" ) != -1 ? src : [ _this.libs.path, src ].join( "" );
 
-				var loadCallback = function callback() {
+				function errorCallback() {
+						_this.handleLog( [ "amCharts[export]: Loading error on ", this.src || this.href ].join( "" ) );
+				}
+
+				function loadCallback() {
 					if ( addons ) {
 						for ( i1 = 0; i1 < addons.length; i1++ ) {
 							_this.loadResource( addons[ i1 ] );
@@ -726,21 +735,24 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 				if ( !exist || _this.libs.reload ) {
 					node.addEventListener( "load", loadCallback );
-					node.addEventListener( "error", function() {
-						_this.handleLog( [ "amCharts[export]: Loading error on ", this.src || this.href ].join( "" ) );
-					} );
+					_this.addListenerToRemove( "load", node, loadCallback );
+					node.addEventListener( "error", errorCallback );
+					_this.addListenerToRemove( "error", node, errorCallback );
+
 					document.head.appendChild( node );
 
-					if ( !_this.listenersToRemove ) {
-						_this.listenersToRemove = [];
-					}
-
-					_this.listenersToRemove.push( {
-						node: node,
-						method: loadCallback,
-						event: "load"
-					} );
 				}
+			},
+
+			/**
+			 * Adds listeners to the buffer for latter listener clearance
+			 */
+			addListenerToRemove: function(event,node,method) {
+				_this.listenersToRemove.push( {
+					node: node,
+					method: method,
+					event: event
+				} );
 			},
 
 			/**
@@ -3910,19 +3922,33 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				return cfg;
 			},
 
+			/*
+			 ** Method to clear all listeners
+			 */
 			clear: function() {
-				_this.setup = undefined;
-				if ( _this.docListener ) {
-					document.removeEventListener( "keydown", _this.docListener );
+				var i1, listener;
+
+				// Loop through the buffered listeners
+				for ( i1 = 0; i1 < _this.listenersToRemove.length; i1++ ) {
+					listener = _this.listenersToRemove[ i1 ];
+					listener.node.removeEventListener( listener.event, listener.method );
 				}
-				var listenersToRemove = _this.listenersToRemove;
-				if ( listenersToRemove ) {
-					for ( var i = 0; i < listenersToRemove.length; i++ ) {
-						var listenerToRemove = listenersToRemove[ i ];
-						listenerToRemove.node.removeEventListener( listenerToRemove.event, listenerToRemove.method )
-					}
+
+				// Remove wrapper
+				if ( _this.isElement(_this.setup.wrapper) ) {
+					_this.setup.wrapper.parentNode.removeChild(_this.setup.wrapper);
 				}
+
+				// Remove menu
+				if ( _this.isElement(_this.setup.menu) ) {
+					_this.setup.menu.parentNode.removeChild(_this.setup.menu);
+				}
+
+				// Remove references
 				_this.listenersToRemove = [];
+				_this.setup.chart.AmExport = undefined;
+				_this.setup.chart.export = undefined;
+				_this.setup = undefined;
 			},
 
 			/*
@@ -3938,8 +3964,6 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						_this.setup.fabric.add( clone );
 					}
 				}
-
-
 
 				// OBSERVE; KEY LISTENER; DRAWING FEATURES
 				if ( _this.config.keyListener && _this.config.keyListener != "attached" ) {
@@ -4126,13 +4150,17 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					_this.config.keyListener = "attached";
 
 					document.addEventListener( "keydown", _this.docListener );
+					_this.addListenerToRemove( "keydown", document, _this.docListener );
 				}
 
 				// OBSERVE; DRAG AND DROP LISTENER; DRAWING FEATURE
 				if ( _this.config.fileListener ) {
 					_this.setup.chart.containerDiv.addEventListener( "dragover", _this.handleDropbox );
+					_this.addListenerToRemove( "dragover", _this.setup.chart.containerDiv, _this.handleDropbox );
 					_this.setup.chart.containerDiv.addEventListener( "dragleave", _this.handleDropbox );
+					_this.addListenerToRemove( "dragleave", _this.setup.chart.containerDiv, _this.handleDropbox );
 					_this.setup.chart.containerDiv.addEventListener( "drop", _this.handleDropbox );
+					_this.addListenerToRemove( "drop", _this.setup.chart.containerDiv, _this.handleDropbox );
 				}
 			},
 

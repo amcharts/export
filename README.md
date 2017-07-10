@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.68
+Version: 1.4.69
 
 
 ## Description
@@ -973,6 +973,8 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 ## Changelog
 
+### 1.4.69
+* Fixed: Memory leak issue on observed listeners on document
 ### 1.4.68
 * Fixed: PDFmake dependency version (jsZIP)
 * Fixed: XLSX export issue (caused by jsZIP dependency)
