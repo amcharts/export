@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.69
+Version: 1.4.70
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -71,7 +71,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 		var _timer;
 		var _this = {
 			name: "export",
-			version: "1.4.69",
+			version: "1.4.70",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -2038,11 +2038,11 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 										var style_text = fabric.parseStyleAttribute( elm_parent.childNodes[ 0 ] );
 										var fabric_label = new fabric.Text( elm_parent.innerText || elm_parent.textContent || elm_parent.innerHTML, {
 											selectable: false,
-											top: style_parent.top + group.offset.y,
-											left: style_parent.left + group.offset.x,
+											top: _this.pxToNumber(style_parent.top) + group.offset.y,
+											left: _this.pxToNumber(style_parent.left) + group.offset.x,
 											fill: style_text[ "color" ],
-											fontSize: style_text[ "fontSize" ],
-											fontFamily: style_text[ "fontFamily" ],
+											fontSize: _this.pxToNumber(style_text[ "fontSize" ] || style_text[ "font-size" ]),
+											fontFamily: style_text[ "fontFamily" ] || style_text[ "font-family" ],
 											textAlign: style_text[ "text-align" ],
 											isCoreElement: true
 										} );
@@ -2057,11 +2057,11 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 								var style_parent = fabric.parseStyleAttribute( elm_parent );
 								var fabric_label = new fabric.Text( elm_parent.innerText || elm_parent.textContent || elm_parent.innerHTML, {
 									selectable: false,
-									top: style_parent.top + group.offset.y,
-									left: style_parent.left + group.offset.x,
+									top: _this.pxToNumber(style_parent.top) + group.offset.y,
+									left: _this.pxToNumber(style_parent.left) + group.offset.x,
 									fill: style_parent[ "color" ],
-									fontSize: style_parent[ "fontSize" ],
-									fontFamily: style_parent[ "fontFamily" ],
+									fontSize: _this.pxToNumber(style_parent[ "fontSize" ] || style_parent[ "font-size" ]),
+									fontFamily: style_parent[ "fontFamily" ] || style_parent[ "font-family" ],
 									opacity: style_parent[ "opacity" ],
 									isCoreElement: true
 								} );
@@ -2523,7 +2523,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			toPRINT: function( options, callback ) {
 				var i1;
 				var cfg = _this.deepMerge( {
-					delay: 0.01,
+					delay: 1,
 					lossless: false
 				}, options || {} );
 				var data = _this.toImage( cfg );
@@ -2542,19 +2542,19 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 				document.body.appendChild( data );
 
+				// CONVERT TO SECONDS
+				cfg.delay *= 1000;
+
+				// IOS EXCEPTION DELAY MIN. 1 SECOND
+				var isIOS = /iPad|iPhone|iPod/.test( navigator.userAgent ) && !window.MSStream;
+				if ( isIOS && cfg.delay < 1000 ) {
+					cfg.delay = 1000;
+				}
+
 				// DELAY WHOLE PROCESS
 				setTimeout(function() {
 					// PRINT
 					window.print();
-
-					// CONVERT TO SECONDS
-					cfg.delay *= 1000;
-
-					// IOS EXCEPTION DELAY MIN. 1 SECOND
-					var isIOS = /iPad|iPhone|iPod/.test( navigator.userAgent ) && !window.MSStream;
-					if ( isIOS && cfg.delay < 1000 ) {
-						cfg.delay = 1000;
-					}
 
 					setTimeout( function() {
 						for ( i1 = 0; i1 < items.length; i1++ ) {
@@ -2568,7 +2568,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						// TRIGGER CALLBACK
 						_this.handleCallback( callback, data, cfg );
 					}, cfg.delay );
-				},1);
+				}, cfg.delay);
 
 				return data;
 			},
