@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.70
+Version: 1.4.71
 
 
 ## Description
@@ -972,6 +972,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.71
+* Fixed: Added additional node existance checks before removing
 
 ### 1.4.70
 * Fixed: Safari export issue on text labels

@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.70
+Version: 1.4.71
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -71,7 +71,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 		var _timer;
 		var _this = {
 			name: "export",
-			version: "1.4.70",
+			version: "1.4.71",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -171,8 +171,8 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						_this.createMenu( _this.config.menu );
 						_this.setup.fabric.deactivateAll();
 
-						if ( _this.setup.wrapper ) {
-							_this.setup.chart.containerDiv.removeChild( _this.setup.wrapper );
+						if ( _this.isElement(_this.setup.wrapper) && _this.isElement(_this.setup.wrapper.parentNode) && _this.setup.wrapper.parentNode.removeChild ) {
+							_this.setup.wrapper.parentNode.removeChild( _this.setup.wrapper );
 							_this.setup.wrapper = false;
 						}
 					},
@@ -634,7 +634,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						label: "Done",
 						click: function() {
 							_this.createMenu( _this.config.menu );
-							_this.setup.chart.containerDiv.removeChild( div );
+							if ( _this.isElement(_this.setup.chart.containerDiv) ) {
+								_this.setup.chart.containerDiv.removeChild( div );
+							}
 						}
 					} ] );
 
@@ -661,7 +663,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						label: "Done",
 						click: function() {
 							_this.createMenu( _this.config.menu );
-							_this.setup.chart.containerDiv.removeChild( div );
+							if ( _this.isElement(_this.setup.chart.containerDiv) ) {
+								_this.setup.chart.containerDiv.removeChild( div );
+							}
 						}
 					} ] );
 
@@ -3935,12 +3939,12 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				}
 
 				// Remove wrapper
-				if ( _this.isElement(_this.setup.wrapper) ) {
+				if ( _this.isElement(_this.setup.wrapper) && _this.isElement(_this.setup.wrapper.parentNode) && _this.setup.wrapper.parentNode.removeChild ) {
 					_this.setup.wrapper.parentNode.removeChild(_this.setup.wrapper);
 				}
 
 				// Remove menu
-				if ( _this.isElement(_this.setup.menu) ) {
+				if ( _this.isElement(_this.setup.menu) && _this.isElement(_this.setup.wrapper.parentNode) && _this.setup.wrapper.parentNode.removeChild ) {
 					_this.setup.menu.parentNode.removeChild(_this.setup.menu);
 				}
 
