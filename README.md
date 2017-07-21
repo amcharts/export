@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.71
+Version: 1.4.72
 
 
 ## Description
@@ -972,6 +972,9 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.72
+* Fixed: Memory leak within clear method, calls removeListeners on fabric instance.
 
 ### 1.4.71
 * Fixed: Added additional node existance checks before removing
