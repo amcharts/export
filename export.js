@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.74
+Version: 1.4.75
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -71,7 +71,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 		var _timer;
 		var _this = {
 			name: "export",
-			version: "1.4.74",
+			version: "1.4.75",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -116,50 +116,79 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					}
 				},
 				handler: {
-					undo: function( options, skipped ) {
+					undo: function() {
 						var item = _this.drawing.undos.pop();
+
 						if ( item ) {
 							item.selectable = true;
 							_this.drawing.redos.push( item );
 
+							// Simply remove
 							if ( item.action == "added" ) {
 								_this.setup.fabric.remove( item.target );
-							}
 
-							var state = JSON.parse( item.state );
-							item.target.set( state );
+							// Skip if unchanged
+							} else if ( !item.target.changed && item.action == "added:modified" ) {
+							 	_this.drawing.handler.undo();
+							 	return;
 
-							if ( item.target instanceof fabric.Group ) {
-								_this.drawing.handler.change( {
-									color: state.cfg.color,
-									width: state.cfg.width,
-									opacity: state.cfg.opacity
-								}, true, item.target );
+							// Apply changes
+							} else {
+								var state = JSON.parse( item.state );
+								item.target.recentState = item.state;
+
+								// Group exception
+								if ( item.target instanceof fabric.Group ) {
+									state = _this.prepareGroupState(state);
+									item.target.set( state );
+									_this.drawing.handler.change( {
+										color: state.cfg.color,
+										width: state.cfg.width,
+										opacity: state.cfg.opacity
+									}, true, item.target );
+
+								// Single item
+								} else {
+									item.target.set( state );
+								}
 							}
 
 							_this.setup.fabric.renderAll();
 						}
 					},
-					redo: function( options, skipped ) {
+					redo: function() {
 						var item = _this.drawing.redos.pop();
 						if ( item ) {
+
 							item.selectable = true;
 							_this.drawing.undos.push( item );
 
+							// Simply add
 							if ( item.action == "added" ) {
 								_this.setup.fabric.add( item.target );
+
+							// This aciton is only for undo;
+							} else if ( item.action == "added:modified" ) {
+								_this.drawing.handler.redo();
+								return;
 							}
 
 							var state = JSON.parse( item.state );
 							item.target.recentState = item.state;
-							item.target.set( state );
 
+							// Group exception
 							if ( item.target instanceof fabric.Group ) {
+								state = _this.prepareGroupState(state);
+								item.target.set( state );
 								_this.drawing.handler.change( {
 									color: state.cfg.color,
 									width: state.cfg.width,
 									opacity: state.cfg.opacity
 								}, true, item.target );
+
+							// Single item
+							} else {
+								item.target.set( state );
 							}
 
 							_this.setup.fabric.renderAll();
@@ -272,6 +301,8 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 								cfg.color = "rgba(" + rgba.join() + ")";
 							}
 
+							current.changed = true;
+
 							// UPDATE OBJECTS
 							for ( i1 = 0; i1 < objects.length; i1++ ) {
 								if (
@@ -316,7 +347,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 							// ADD UNDO
 							if ( !skipped ) {
-								state = JSON.stringify( _this.deepMerge( current.saveState()._stateProperties, {
+								state = JSON.stringify( _this.deepMerge( _this.getState(current), {
 									cfg: {
 										color: cfg.color,
 										width: cfg.width,
@@ -595,6 +626,28 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				var catalog = AmCharts.translations[ _this.name ][ lang ] || AmCharts.translations[ _this.name ][ "en" ];
 
 				return catalog[ key ] || key;
+			},
+
+			/**
+			 * Modifcations on given state to apply correctly on group elements
+			 */
+			prepareGroupState(state) {
+				state = state || {};
+
+				delete state.width;
+				delete state.strokeWidth;
+
+				return state;
+			},
+
+			/**
+			 * Method to retrieve the state of the given item
+			 */
+			getState(item) {
+				var state = item.saveState();
+
+				return state._stateProperties || state.originalState;
+
 			},
 
 			/**
@@ -1666,7 +1719,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				// OBSERVE OBJECT MODIFICATIONS
 				_this.setup.fabric.on( "object:added", function( e ) {
 					var item = e.target;
-					var state = _this.deepMerge( item.saveState()._stateProperties, {
+					var state = _this.deepMerge( _this.getState(item), {
 						cfg: {
 							color: _this.drawing.color,
 							width: _this.drawing.width,
@@ -1690,6 +1743,11 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							target: item,
 							state: state
 						} );
+						_this.drawing.undos.push( {
+							action: "added:modified",
+							target: item,
+							state: state
+						} );
 						_this.drawing.redos = [];
 					}
 
@@ -1698,8 +1756,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				} );
 				_this.setup.fabric.on( "object:modified", function( e ) {
 					var item = e.target;
+					console.log(item);
 					var recentState = JSON.parse( item.recentState );
-					var state = _this.deepMerge( item.saveState()._stateProperties, {
+					var state = _this.deepMerge( _this.getState(item), {
 						cfg: recentState.cfg
 					} );
 
@@ -1718,7 +1777,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					var item = e.target;
 					clearTimeout( item.timer );
 					item.timer = setTimeout( function() {
-						var state = JSON.stringify( item.saveState()._stateProperties );
+						var state = JSON.stringify( _this.getState(item) );
 
 						item.recentState = state;
 
