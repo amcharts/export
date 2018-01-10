@@ -631,7 +631,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			/**
 			 * Modifcations on given state to apply correctly on group elements
 			 */
-			prepareGroupState(state) {
+			prepareGroupState: function(state) {
 				state = state || {};
 
 				delete state.width;
@@ -643,7 +643,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			/**
 			 * Method to retrieve the state of the given item
 			 */
-			getState(item) {
+			getState: function(item) {
 				var state = item.saveState();
 
 				return state._stateProperties || state.originalState;
