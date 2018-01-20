@@ -3134,9 +3134,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				_this.handleCallback( callback, "data", false );
 
 				// READY CALLBACK FOR EACH DEPENDENCY
-				for ( var filename in _this.libs.namespaces ) {
-					var namespace = _this.libs.namespaces[ filename ];
-
+				Object.values( _this.libs.namespaces ).forEach( function ( namespace ) {
 					( function( namespace ) {
 						var t1 = setInterval( function() {
 							var tsEnd = Number( new Date() );
@@ -3147,7 +3145,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							}
 						}, AmCharts.updateRate )
 					} )( namespace );
-				}
+				})
 			},
 
 			/**
