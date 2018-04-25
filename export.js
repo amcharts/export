@@ -2,7 +2,7 @@
 Plugin Name: amCharts Export
 Description: Adds export capabilities to amCharts products
 Author: Benjamin Maertz, amCharts
-Version: 1.4.75
+Version: 1.4.76
 Author URI: http://www.amcharts.com/
 
 Copyright 2016 amCharts
@@ -71,7 +71,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 		var _timer;
 		var _this = {
 			name: "export",
-			version: "1.4.75",
+			version: "1.4.76",
 			libs: {
 				async: true,
 				autoLoad: true,
@@ -782,7 +782,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				}
 
 				// NAMESPACE CHECK
-				for ( i1 in _this.libs.namespaces ) {
+				Object.keys( _this.libs.namespaces ).some(function( i1 ) {
 					var namespace = _this.libs.namespaces[ i1 ];
 					var check = src.toLowerCase();
 					var item = i1.toLowerCase();
@@ -792,17 +792,17 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						// SKIP UNSUPPORTED IE9 LIBS
 						if ( _this.setup.isIE && _this.setup.IEversion <= 9 ) {
 							if ( _this.libs.unsupportedIE9libs && _this.libs.unsupportedIE9libs.indexOf(item) != -1 ) {
-								return;
+								return false; // continue
 							}
 						}
 
 						// NAMESPACE EXISTS; BREAK LOOP; NEXT
 						if ( window[ namespace ] !== undefined ) {
 							exist = true;
-							break;
+							return true; // break;
 						}
 					}
-				}
+				});
 
 				// EXISTS NOT NEEDED TO LOAD
 				if ( !exist || _this.libs.reload ) {
@@ -834,9 +834,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				if ( _this.libs.autoLoad ) {
 					for ( i1 = 0; i1 < _this.libs.resources.length; i1++ ) {
 						if ( _this.libs.resources[ i1 ] instanceof Object ) {
-							for ( i2 in _this.libs.resources[ i1 ] ) {
+							Object.keys( _this.libs.resources[ i1 ] ).some(function( i2 ) {
 								_this.loadResource( i2, _this.libs.resources[ i1 ][ i2 ] );
-							}
+							});
 						} else {
 							_this.loadResource( _this.libs.resources[ i1 ] );
 						}
@@ -869,14 +869,14 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				clone = Array.isArray( o ) ? [] : {};
 
 				// Walkthrough values
-				for ( k in o ) {
+				Object.keys( o ).some(function( k ) {
 					v = o[ k ];
 					isObject = typeof v === "object";
 					isDate = v instanceof Date;
 
 					// Set value; call recursivly if value is an object
 					clone[ k ] = isObject && !isDate ? _this.cloneObject( v ) : v;
-				}
+				});
 				return clone;
 			},
 
@@ -893,11 +893,11 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				}
 
 				// WALKTHOUGH SOURCE
-				for ( i1 in b ) {
+				Object.keys( b ).some(function( i1 ) {
 
 					// PREVENT METHODS
 					if ( type == "array" && isNaN( i1 ) ) {
-						continue;
+						return false; // continue
 					}
 
 					// ASSIGN VALUE
@@ -937,7 +937,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							a[ i1 ] = v;
 						}
 					}
-				}
+				});
 				return a;
 			},
 
@@ -2694,11 +2694,11 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				buffer = _this.toArray( cfg );
 
 				// MERGE
-				for ( row in buffer ) {
+				Object.keys( buffer ).some(function( row ) {
 					if ( !isNaN( row ) ) {
 						data += buffer[ row ].join( cfg.delimiter ) + "\n";
 					}
-				}
+				});
 
 				// TRIGGER CALLBACK
 				_this.handleCallback( callback, data, cfg );
@@ -2866,19 +2866,19 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				// HEADER
 				if ( cfg.withHeader ) {
 					buffer = [];
-					for ( col in cols ) {
+					Object.keys( cols ).some(function( col ) {
 						if ( !isNaN( col ) ) {
 							buffer.push( enchant( cols[ col ] ) );
 						}
-					}
+					});
 					data.push( buffer );
 				}
 
 				// BODY
-				for ( row in cfg.data ) {
+				Object.keys( cfg.data ).some(function( row ) {
 					buffer = [];
 					if ( !isNaN( row ) ) {
-						for ( col in cols ) {
+						Object.keys( cols ).some(function( col ) {
 							if ( !isNaN( col ) ) {
 								var col = cols[ col ];
 								var value = cfg.data[ row ][ col ];
@@ -2891,10 +2891,10 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 								}
 								buffer.push( enchant( value ) );
 							}
-						}
+						});
 						data.push( buffer );
 					}
-				}
+				});
 
 				// TRIGGER CALLBACK
 				_this.handleCallback( callback, data, cfg );
@@ -2989,11 +2989,11 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			 * Method to remove functions from given object
 			 */
 			removeFunctionsFromObject: function( obj ) {
-				for (var key in obj) {
+				Object.keys( obj ).some(function( key ) {
 					if ( typeof obj[key] === "function" ) {
 						delete obj[key];
 					}
-				}
+				});
 				return obj;
 			},
 
@@ -3134,7 +3134,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				_this.handleCallback( callback, "data", false );
 
 				// READY CALLBACK FOR EACH DEPENDENCY
-				Object.keys(_this.libs.namespaces).forEach(function (key) {
+				Object.keys( _this.libs.namespaces ).some(function( key ) {
 					var namespace = _this.libs.namespaces[key];
 					( function( namespace ) {
 						var t1 = setInterval( function() {
@@ -3395,12 +3395,12 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				if ( cfg.data.length ) {
 					// GATHER MISSING FIELDS
 					for ( i1 = 0; i1 < cfg.data.length; i1++ ) {
-						for ( i2 in cfg.data[ i1 ] ) {
+						Object.keys( cfg.data[ i1 ] ).some(function( i2 ) {
 							if ( cfg.dataFields.indexOf( i2 ) == -1 ) {
 								cfg.dataFields.push( i2 );
 								cfg.dataFieldsMap[ i2 ] = i2;
 							}
-						}
+						});
 					}
 
 					// REMOVE FIELDS SELECTIVELY
@@ -3970,7 +3970,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 				function crawler( object ) {
 					var key;
-					for ( key in object ) {
+					Object.keys( object ).some(function( key ) {
 						var value = object[ key ];
 
 						if ( key.slice( 0, 6 ) == "export" && value ) {
@@ -3984,7 +3984,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						} else if ( typeof key == "string" ) {
 							cfg[ key ] = value;
 						}
-					}
+					});
 				}
 
 				crawler( setup );

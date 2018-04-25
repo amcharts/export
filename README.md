@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.4.75
+Version: 1.4.76
 
 
 ## Description
@@ -972,6 +972,10 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.4.76
+* Fixed: Issue with AmCharts filename error
+* Fixed: Replaced for loops with generic approach
 
 ### 1.4.75
 * Fixed: Render, state management issue in annotation mode using undo/redo.
