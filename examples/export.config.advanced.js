@@ -128,7 +128,7 @@ AmCharts.exportCFG = {
         action: false, // Avoids automatical downloads
         afterCapture: function() {
           var canvas = this.setup.fabric;
-          var watermark = new fabric.Text("watermark",{
+          var watermark = new AmCharts.fabric.Text("watermark",{
             originX: "center",
             originY: "center",
             top: canvas.height / 2,
