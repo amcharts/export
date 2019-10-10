@@ -597,7 +597,7 @@ your exported images.
 ```
 "export": {
   "afterCapture": function(menuConfig) {
-      var text = new AmCharts.fabric.Text("This is shown on exported image only", {
+      var text = new fabric.Text("This is shown on exported image only", {
         top: 50,
         left: 100,
         family: this.setup.chart.fontFamily,
@@ -610,9 +610,9 @@ your exported images.
 
   "menu": [{
     "label": "PNG",
-    "format": "PNG",
+    "format": "PNG",  
     "afterCapture": function(menuConfig) {
-        var text = new AmCharts.fabric.Text("This is shown on exported image only", {
+        var text = new fabric.Text("This is shown on exported image only", {
           top: 50,
           left: 100,
           family: this.setup.chart.fontFamily,

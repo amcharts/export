@@ -138,7 +138,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 								item.target.recentState = item.state;
 
 								// Group exception
-								if ( item.target instanceof AmCharts.fabric.Group ) {
+								if ( item.target instanceof fabric.Group ) {
 									state = _this.prepareGroupState(state);
 									item.target.set( state );
 									_this.drawing.handler.change( {
@@ -177,7 +177,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							item.target.recentState = item.state;
 
 							// Group exception
-							if ( item.target instanceof AmCharts.fabric.Group ) {
+							if ( item.target instanceof fabric.Group ) {
 								state = _this.prepareGroupState(state);
 								item.target.set( state );
 								_this.drawing.handler.change( {
@@ -212,10 +212,10 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							top: _this.setup.fabric.height / 2,
 							left: _this.setup.fabric.width / 2
 						}, options || {} );
-						var method = cfg.url.indexOf( ".svg" ) != -1 ? AmCharts.fabric.loadSVGFromURL : AmCharts.fabric.Image.fromURL;
+						var method = cfg.url.indexOf( ".svg" ) != -1 ? fabric.loadSVGFromURL : fabric.Image.fromURL;
 
 						method( cfg.url, function( objects, options ) {
-							var group = options !== undefined ? AmCharts.fabric.util.groupSVGElements( objects, options ) : objects;
+							var group = options !== undefined ? fabric.util.groupSVGElements( objects, options ) : objects;
 							var ratio = false;
 
 							// RESCALE ONLY IF IT EXCEEDS THE CANVAS
@@ -306,9 +306,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							// UPDATE OBJECTS
 							for ( i1 = 0; i1 < objects.length; i1++ ) {
 								if (
-									objects[ i1 ] instanceof AmCharts.fabric.Text ||
-									objects[ i1 ] instanceof AmCharts.fabric.PathGroup ||
-									objects[ i1 ] instanceof AmCharts.fabric.Triangle
+									objects[ i1 ] instanceof fabric.Text ||
+									objects[ i1 ] instanceof fabric.PathGroup ||
+									objects[ i1 ] instanceof fabric.Triangle
 								) {
 									if ( cfg.color || cfg.opacity ) {
 										objects[ i1 ].set( {
@@ -321,10 +321,10 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 										} );
 									}
 								} else if (
-									objects[ i1 ] instanceof AmCharts.fabric.Path ||
-									objects[ i1 ] instanceof AmCharts.fabric.Line
+									objects[ i1 ] instanceof fabric.Path ||
+									objects[ i1 ] instanceof fabric.Line
 								) {
-									if ( current instanceof AmCharts.fabric.Group ) {
+									if ( current instanceof fabric.Group ) {
 										if ( cfg.color || cfg.opacity ) {
 											objects[ i1 ].set( {
 												stroke: cfg.color
@@ -378,7 +378,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 						cfg.click = function() {};
 
-						var text = new AmCharts.fabric.IText( cfg.text, cfg );
+						var text = new fabric.IText( cfg.text, cfg );
 
 						// SET DRAWING FLAG
 						_this.drawing.buffer.isDrawing = true;
@@ -405,7 +405,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 							group: [],
 						}, options || {} );
 						var i1, arrow, arrowTop, arrowLeft;
-						var line = new AmCharts.fabric.Line( [ cfg.x1, cfg.y1, cfg.x2, cfg.y2 ], {
+						var line = new fabric.Line( [ cfg.x1, cfg.y1, cfg.x2, cfg.y2 ], {
 							stroke: cfg.color,
 							strokeWidth: cfg.width,
 							strokeLineCap: cfg.strokeLineCap
@@ -427,7 +427,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 								arrowLeft = cfg.x2 + ( cfg.width / 2 );
 							}
 
-							arrow = new AmCharts.fabric.Triangle( {
+							arrow = new fabric.Triangle( {
 								top: arrowTop,
 								left: arrowLeft,
 								fill: cfg.color,
@@ -445,7 +445,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 						if ( cfg.action != "config" ) {
 							if ( cfg.arrow ) {
-								var group = new AmCharts.fabric.Group( cfg.group );
+								var group = new fabric.Group( cfg.group );
 								group.set( {
 									cfg: cfg,
 									fill: cfg.color,
@@ -731,18 +731,6 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				return data;
 			},
 
-			_namespaceExists: function(scope, namespace) {
-				if (namespace === "fabric") {
-					return !!AmCharts.fabric;
-
-				} else if (namespace === "pdfMake") {
-					return !!scope[namespace] && !!scope[namespace].vfs;
-
-				} else {
-					return !!scope[namespace];
-				}
-			},
-
 			/**
 			 * Generates script, links tags and places them into the document's head
 			 * In case of reload it replaces the node to force the download
@@ -809,7 +797,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						}
 
 						// NAMESPACE EXISTS; BREAK LOOP; NEXT
-						if ( _this._namespaceExists(window, namespace) ) {
+						if ( window[ namespace ] !== undefined ) {
 							exist = true;
 							return true; // break;
 						}
@@ -1132,7 +1120,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					// CLIPPATH
 					if ( childNode.tagName == "clipPath" ) {
 						var bbox = {};
-						var transform = AmCharts.fabric.parseTransformAttribute( _this.gatherAttribute( childNode, "transform" ) );
+						var transform = fabric.parseTransformAttribute( _this.gatherAttribute( childNode, "transform" ) );
 
 						// HIDE SIBLINGS; GATHER IT'S DIMENSIONS
 						for ( i2 = 0; i2 < childNode.childNodes.length; i2++ ) {
@@ -1171,7 +1159,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 								// IMAGE
 							} else if ( childNode.childNodes[ i2 ].tagName == "image" ) {
-								var attrs = AmCharts.fabric.parseAttributes( childNode.childNodes[ i2 ], AmCharts.fabric.SHARED_ATTRIBUTES );
+								var attrs = fabric.parseAttributes( childNode.childNodes[ i2 ], fabric.SHARED_ATTRIBUTES );
 
 								if ( attrs.transformMatrix ) {
 									props.offsetX = attrs.transformMatrix[ 4 ];
@@ -1192,7 +1180,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						images.included++;
 
 						// LOAD IMAGE MANUALLY; TO RERENDER THE CANVAS
-						AmCharts.fabric.Image.fromURL( childNode.getAttribute( "xlink:href" ), function( img ) {
+						fabric.Image.fromURL( childNode.getAttribute( "xlink:href" ), function( img ) {
 							images.loaded++;
 						} );
 
@@ -1222,7 +1210,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			getRGBA: function( source, returnInstance ) {
 
 				if ( source != "none" && source != "transparent" && !_this.isHashbanged( source ) ) {
-					source = new AmCharts.fabric.Color( source );
+					source = new fabric.Color( source );
 
 					if ( source._source ) {
 						return returnInstance ? source : source.getSource();
@@ -1237,7 +1225,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			 */
 			gatherPosition: function( event, type ) {
 				var ref = _this.drawing.buffer.position;
-				var ivt = AmCharts.fabric.util.invertTransform( _this.setup.fabric.viewportTransform );
+				var ivt = fabric.util.invertTransform( _this.setup.fabric.viewportTransform );
 				var pos;
 
 				if ( event.type == "touchmove" ) {
@@ -1248,7 +1236,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					}
 				}
 
-				pos = AmCharts.fabric.util.transformPoint( _this.setup.fabric.getPointer( event, true ), ivt );
+				pos = fabric.util.transformPoint( _this.setup.fabric.getPointer( event, true ), ivt );
 
 				if ( type == 1 ) {
 					ref.x1 = pos.x;
@@ -1266,15 +1254,15 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			modifyFabric: function() {
 
 				// ADAPTED THE WAY TO RECEIVE THE GRADIENTID
-				AmCharts.fabric.ElementsParser.prototype.resolveGradient = function( obj, property ) {
+				fabric.ElementsParser.prototype.resolveGradient = function( obj, property ) {
 
 					var instanceFillValue = obj.get( property );
 					if ( !( /^url\(/ ).test( instanceFillValue ) ) {
 						return;
 					}
 					var gradientId = instanceFillValue.slice( instanceFillValue.indexOf( "#" ) + 1, instanceFillValue.length - 1 );
-					if ( AmCharts.fabric.gradientDefs[ this.svgUid ][ gradientId ] ) {
-						var tmp = AmCharts.fabric.Gradient.fromElement( AmCharts.fabric.gradientDefs[ this.svgUid ][ gradientId ], obj );
+					if ( fabric.gradientDefs[ this.svgUid ][ gradientId ] ) {
+						var tmp = fabric.Gradient.fromElement( fabric.gradientDefs[ this.svgUid ][ gradientId ], obj );
 
 						// WORKAROUND FOR VERTICAL GRADIENT ISSUE; FOR NONE PIE CHARTS
 						if ( tmp.coords.y1 && _this.setup.chart.type != "pie" ) {
@@ -1286,13 +1274,13 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				};
 
 				// MULTILINE SUPPORT; TODO: BETTER POSITIONING
-				AmCharts.fabric.Text.fromElement = function( element, options ) {
+				fabric.Text.fromElement = function( element, options ) {
 					if ( !element ) {
 						return null;
 					}
 
-					var parsedAttributes = AmCharts.fabric.parseAttributes( element, AmCharts.fabric.Text.ATTRIBUTE_NAMES );
-					options = AmCharts.fabric.util.object.extend( ( options ? AmCharts.fabric.util.object.clone( options ) : {} ), parsedAttributes );
+					var parsedAttributes = fabric.parseAttributes( element, fabric.Text.ATTRIBUTE_NAMES );
+					options = fabric.util.object.extend( ( options ? fabric.util.object.clone( options ) : {} ), parsedAttributes );
 
 					options.top = options.top || 0;
 					options.left = options.left || 0;
@@ -1303,7 +1291,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						options.top += parsedAttributes.dy;
 					}
 					if ( !( 'fontSize' in options ) ) {
-						options.fontSize = AmCharts.fabric.Text.DEFAULT_SVG_FONT_SIZE;
+						options.fontSize = fabric.Text.DEFAULT_SVG_FONT_SIZE;
 					}
 
 					if ( !options.originX ) {
@@ -1333,7 +1321,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					textContent = textBuffer.join( "\n" );
 					//textContent = textContent.replace(/^\s+|\s+$|\n+/g, '').replace(/\s+/g, ' ');
 
-					var text = new AmCharts.fabric.Text( textContent, options ),
+					var text = new fabric.Text( textContent, options ),
 						/*
 						  Adjust positioning:
 						    x/y attributes in SVG correspond to the bottom-left corner of text bounding box
@@ -1570,7 +1558,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				}, cfg ));
 
 				// INITIATE FABRIC INSTANCE
-				_this.setup.fabric = new AmCharts.fabric.Canvas( _this.setup.canvas, fabricCFG );
+				_this.setup.fabric = new fabric.Canvas( _this.setup.canvas, fabricCFG );
 
 				// REAPPLY FOR SOME REASON
 				_this.deepMerge( _this.setup.fabric, cfg );
@@ -1646,12 +1634,12 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						for ( i1 = 0; i1 < l.group.length; i1++ ) {
 							obj = l.group[ i1 ];
 
-							if ( obj instanceof AmCharts.fabric.Line ) {
+							if ( obj instanceof fabric.Line ) {
 								obj.set( {
 									x2: l.x2,
 									y2: l.y2
 								} );
-							} else if ( obj instanceof AmCharts.fabric.Triangle ) {
+							} else if ( obj instanceof fabric.Triangle ) {
 								l.angle = ( _this.getAngle( l.x1, l.y1, l.x2, l.y2 ) + 90 );
 
 								if ( l.arrow == "start" ) {
@@ -1917,10 +1905,10 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 					}
 
 					// ADD TO CANVAS
-					AmCharts.fabric.parseSVGDocument( group.svg, ( function( group ) {
+					fabric.parseSVGDocument( group.svg, ( function( group ) {
 						return function( objects, options ) {
 							var i1, i2;
-							var g = AmCharts.fabric.util.groupSVGElements( objects, options );
+							var g = fabric.util.groupSVGElements( objects, options );
 							var paths = [];
 							var tmp = {
 								selectable: false,
@@ -1986,7 +1974,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 											images.included++;
 
 											// LOAD IMAGE MANUALLY; TO RERENDER THE CANVAS
-											AmCharts.fabric.Image.fromURL( props.source, ( function( props, i1 ) {
+											fabric.Image.fromURL( props.source, ( function( props, i1 ) {
 												return function( img ) {
 													images.loaded++;
 
@@ -2009,7 +1997,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 													}
 
 													// CREATE CANVAS WITH BACKGROUND COLOR
-													var patternSourceCanvas = new AmCharts.fabric.StaticCanvas( undefined, {
+													var patternSourceCanvas = new fabric.StaticCanvas( undefined, {
 														backgroundColor: props.fill,
 														width: img.getWidth(),
 														height: img.getHeight()
@@ -2017,7 +2005,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 													patternSourceCanvas.add( img );
 
 													// CREATE PATTERN OBTAIN OFFSET TO TARGET
-													var pattern = new AmCharts.fabric.Pattern( {
+													var pattern = new fabric.Pattern( {
 														source: patternSourceCanvas.getElement(),
 														offsetX: g.paths[ i1 ].width / 2,
 														offsetY: g.paths[ i1 ].height / 2,
@@ -2119,9 +2107,9 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 										cfg.balloonFunction.apply( _this, [ balloons[ i1 ], group ] );
 									} else {
 										var elm_parent = balloons[ i1 ];
-										var style_parent = AmCharts.fabric.parseStyleAttribute( elm_parent );
-										var style_text = AmCharts.fabric.parseStyleAttribute( elm_parent.childNodes[ 0 ] );
-										var fabric_label = new AmCharts.fabric.Text( elm_parent.innerText || elm_parent.textContent || elm_parent.innerHTML, {
+										var style_parent = fabric.parseStyleAttribute( elm_parent );
+										var style_text = fabric.parseStyleAttribute( elm_parent.childNodes[ 0 ] );
+										var fabric_label = new fabric.Text( elm_parent.innerText || elm_parent.textContent || elm_parent.innerHTML, {
 											selectable: false,
 											top: _this.pxToNumber(style_parent.top) + group.offset.y,
 											left: _this.pxToNumber(style_parent.left) + group.offset.x,
@@ -2139,8 +2127,8 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 
 							if ( group.svg.nextSibling && group.svg.nextSibling.tagName == "A" ) {
 								var elm_parent = group.svg.nextSibling;
-								var style_parent = AmCharts.fabric.parseStyleAttribute( elm_parent );
-								var fabric_label = new AmCharts.fabric.Text( elm_parent.innerText || elm_parent.textContent || elm_parent.innerHTML, {
+								var style_parent = fabric.parseStyleAttribute( elm_parent );
+								var fabric_label = new fabric.Text( elm_parent.innerText || elm_parent.textContent || elm_parent.innerHTML, {
 									selectable: false,
 									top: _this.pxToNumber(style_parent.top) + group.offset.y,
 									left: _this.pxToNumber(style_parent.left) + group.offset.x,
@@ -3038,18 +3026,27 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			 */
 			handleNamespace: function( namespace, opts ) {
 				var scope = _this.config.scope || window;
+				var exists = false;
 				var startTS = Number( new Date() );
 				var timer;
 
 				// SIMPLE CHECK
-				var exists = _this._namespaceExists(scope, namespace);
+				exists = !!( namespace in scope );
 
 				// RESURSIVE DEPENDENCY CHECK
 				function waitForIt() {
 					var tmpTS = Number( new Date() );
 
+					// SIMPLE CHECK
+					exists = !!( namespace in scope );
+
+					// PDFMAKE EXCEPTION; WAIT ADDITIONALLY FOR FONTS
+					if ( namespace == "pdfMake" && exists ) {
+						exists = scope.pdfMake.vfs;
+					}
+
 					// FOUND TRIGGER GIVEN CALLBACK
-					if ( _this._namespaceExists(scope, namespace) ) {
+					if ( exists ) {
 						clearTimeout( timer );
 						opts.cb.apply( opts.scope, opts.args );
 						_this.handleLog( [ "AmCharts [export]: Namespace \"", namespace, "\" showed up in: ", String( scope ) ].join( "" ) );
@@ -3079,7 +3076,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 			handleBorder: function( options ) {
 				if ( _this.config.border instanceof Object ) {
 					var cfg = _this.deepMerge( _this.defaults.fabric.border, options.border || {}, true );
-					var border = new AmCharts.fabric.Rect();
+					var border = new fabric.Rect();
 
 					cfg.width = _this.setup.fabric.width - cfg.strokeWidth;
 					cfg.height = _this.setup.fabric.height - cfg.strokeWidth;
@@ -3143,7 +3140,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 						var t1 = setInterval( function() {
 							var tsEnd = Number( new Date() );
 
-							if ( tsEnd - tsStart > _this.libs.loadTimeout || _this._namespaceExists(window, namespace) ) {
+							if ( tsEnd - tsStart > _this.libs.loadTimeout || namespace in window ) {
 								clearTimeout( t1 );
 								_this.handleCallback( callback, namespace, tsEnd - tsStart > _this.libs.loadTimeout );
 							}
@@ -3358,7 +3355,7 @@ if ( !AmCharts.translations[ "export" ][ "en" ] ) {
 				}, options || {}, true );
 
 				// Convert annotations objects into fabric instances
-				AmCharts.fabric.util.enlivenObjects( cfg.data, function( enlivenedObjects ) {
+				fabric.util.enlivenObjects( cfg.data, function( enlivenedObjects ) {
 					enlivenedObjects.forEach( function( obj, i1 ) {
 
 						// Revive before adding to allow modifying the object

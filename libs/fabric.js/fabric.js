@@ -11,7 +11,6 @@ if (typeof document !== 'undefined' && typeof window !== 'undefined') {
   fabric.window = window;
   // ensure globality even if entire library were function wrapped (as in Meteor.js packaging system)
   window.fabric = fabric;
-  AmCharts.fabric = fabric;
 }
 else {
   // assume we're running under node.js when document/window are not present
@@ -3297,7 +3296,7 @@ if (typeof console !== 'undefined') {
    * @namespace
    */
 
-  var fabric = AmCharts.fabric || (AmCharts.fabric = { }),
+  var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       clone = fabric.util.object.clone,
       toFixed = fabric.util.toFixed,
@@ -4377,7 +4376,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
 
   /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
 
-  var fabric = AmCharts.fabric || (AmCharts.fabric = { });
+  var fabric = global.fabric || (global.fabric = { });
 
   if (fabric.Point) {
     fabric.warn('fabric.Point is already defined');
@@ -4715,7 +4714,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
   'use strict';
 
   /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
-  var fabric = AmCharts.fabric || (AmCharts.fabric = { });
+  var fabric = global.fabric || (global.fabric = { });
 
   if (fabric.Intersection) {
     fabric.warn('fabric.Intersection is already defined');
@@ -4888,7 +4887,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
 
   'use strict';
 
-  var fabric = AmCharts.fabric || (AmCharts.fabric = { });
+  var fabric = global.fabric || (global.fabric = { });
 
   if (fabric.Color) {
     fabric.warn('fabric.Color is already defined.');
@@ -6032,7 +6031,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
 
   'use strict';
 
-  var fabric = AmCharts.fabric || (AmCharts.fabric = { }),
+  var fabric = global.fabric || (global.fabric = { }),
       toFixed = fabric.util.toFixed;
 
   if (fabric.Shadow) {
@@ -11756,7 +11755,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
   'use strict';
 
-  var fabric = AmCharts.fabric || (AmCharts.fabric = { }),
+  var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       clone = fabric.util.object.clone,
       toFixed = fabric.util.toFixed,
@@ -15506,7 +15505,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   'use strict';
 
-  var fabric = AmCharts.fabric || (AmCharts.fabric = { }),
+  var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       clone = fabric.util.object.clone,
       coordProps = { x1: 1, x2: 1, y1: 1, y2: 1 },
@@ -15874,7 +15873,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   'use strict';
 
-  var fabric = AmCharts.fabric || (AmCharts.fabric = { }),
+  var fabric = global.fabric || (global.fabric = { }),
       pi = Math.PI,
       extend = fabric.util.object.extend;
 
@@ -16115,7 +16114,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   'use strict';
 
-  var fabric = AmCharts.fabric || (AmCharts.fabric = { });
+  var fabric = global.fabric || (global.fabric = { });
 
   if (fabric.Triangle) {
     fabric.warn('fabric.Triangle is already defined');
@@ -16232,7 +16231,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   'use strict';
 
-  var fabric = AmCharts.fabric || (AmCharts.fabric = { }),
+  var fabric = global.fabric || (global.fabric = { }),
       piBy2   = Math.PI * 2,
       extend = fabric.util.object.extend;
 
@@ -16441,7 +16440,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   'use strict';
 
-  var fabric = AmCharts.fabric || (AmCharts.fabric = { }),
+  var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend;
 
   if (fabric.Rect) {
@@ -16668,7 +16667,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   'use strict';
 
-  var fabric = AmCharts.fabric || (AmCharts.fabric = { }),
+  var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       min = fabric.util.array.min,
       max = fabric.util.array.max,
@@ -16933,7 +16932,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   'use strict';
 
-  var fabric = AmCharts.fabric || (AmCharts.fabric = { }),
+  var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend;
 
   if (fabric.Polygon) {
@@ -17031,7 +17030,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   'use strict';
 
-  var fabric = AmCharts.fabric || (AmCharts.fabric = { }),
+  var fabric = global.fabric || (global.fabric = { }),
       min = fabric.util.array.min,
       max = fabric.util.array.max,
       extend = fabric.util.object.extend,
@@ -18008,7 +18007,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   'use strict';
 
-  var fabric = AmCharts.fabric || (AmCharts.fabric = { }),
+  var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend;
 
   if (fabric.PathGroup) {
@@ -18345,7 +18344,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   'use strict';
 
-  var fabric = AmCharts.fabric || (AmCharts.fabric = { }),
+  var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       min = fabric.util.array.min,
       max = fabric.util.array.max;
@@ -18999,11 +18998,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   var extend = fabric.util.object.extend;
 
-  if (!AmCharts.fabric) {
-    AmCharts.fabric = { };
+  if (!global.fabric) {
+    global.fabric = { };
   }
 
-  if (AmCharts.fabric.Image) {
+  if (global.fabric.Image) {
     fabric.warn('fabric.Image is already defined.');
     return;
   }
@@ -19854,7 +19853,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
   'use strict';
 
-  var fabric  = AmCharts.fabric || (AmCharts.fabric = { }),
+  var fabric  = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       filters = fabric.Image.filters,
       createClass = fabric.util.createClass;
@@ -19939,7 +19938,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
   'use strict';
 
-  var fabric  = AmCharts.fabric || (AmCharts.fabric = { }),
+  var fabric  = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       filters = fabric.Image.filters,
       createClass = fabric.util.createClass;
@@ -20098,7 +20097,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
   'use strict';
 
-  var fabric  = AmCharts.fabric || (AmCharts.fabric = { }),
+  var fabric  = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       filters = fabric.Image.filters,
       createClass = fabric.util.createClass;
@@ -20183,7 +20182,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
   'use strict';
 
-  var fabric  = AmCharts.fabric || (AmCharts.fabric = { }),
+  var fabric  = global.fabric || (global.fabric = { }),
       filters = fabric.Image.filters,
       createClass = fabric.util.createClass;
 
@@ -20252,7 +20251,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
   'use strict';
 
-  var fabric  = AmCharts.fabric || (AmCharts.fabric = { }),
+  var fabric  = global.fabric || (global.fabric = { }),
       filters = fabric.Image.filters,
       createClass = fabric.util.createClass;
 
@@ -20317,7 +20316,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
   'use strict';
 
-  var fabric  = AmCharts.fabric || (AmCharts.fabric = { }),
+  var fabric  = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       filters = fabric.Image.filters,
       createClass = fabric.util.createClass;
@@ -20426,7 +20425,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
   'use strict';
 
-  var fabric  = AmCharts.fabric || (AmCharts.fabric = { }),
+  var fabric  = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       filters = fabric.Image.filters,
       createClass = fabric.util.createClass;
@@ -20514,7 +20513,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
   'use strict';
 
-  var fabric  = AmCharts.fabric || (AmCharts.fabric = { }),
+  var fabric  = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       filters = fabric.Image.filters,
       createClass = fabric.util.createClass;
@@ -20627,7 +20626,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
   'use strict';
 
-  var fabric  = AmCharts.fabric || (AmCharts.fabric = { }),
+  var fabric  = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       filters = fabric.Image.filters,
       createClass = fabric.util.createClass;
@@ -20730,7 +20729,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
   'use strict';
 
-  var fabric  = AmCharts.fabric || (AmCharts.fabric = { }),
+  var fabric  = global.fabric || (global.fabric = { }),
       filters = fabric.Image.filters,
       createClass = fabric.util.createClass;
 
@@ -20796,7 +20795,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
   'use strict';
 
-  var fabric  = AmCharts.fabric || (AmCharts.fabric = { }),
+  var fabric  = global.fabric || (global.fabric = { }),
       filters = fabric.Image.filters,
       createClass = fabric.util.createClass;
 
@@ -20865,7 +20864,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
   'use strict';
 
-  var fabric  = AmCharts.fabric || (AmCharts.fabric = { }),
+  var fabric  = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       filters = fabric.Image.filters,
       createClass = fabric.util.createClass;
@@ -20980,7 +20979,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
   'use strict';
 
-  var fabric  = AmCharts.fabric || (AmCharts.fabric = { }),
+  var fabric  = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       filters = fabric.Image.filters,
       createClass = fabric.util.createClass;
@@ -21073,7 +21072,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 (function(global) {
   'use strict';
 
-  var fabric = AmCharts.fabric,
+  var fabric = global.fabric,
       filters = fabric.Image.filters,
       createClass = fabric.util.createClass;
 
@@ -21230,7 +21229,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
   'use strict';
 
-  var fabric  = AmCharts.fabric || (AmCharts.fabric = { }), pow = Math.pow, floor = Math.floor,
+  var fabric  = global.fabric || (global.fabric = { }), pow = Math.pow, floor = Math.floor,
       sqrt = Math.sqrt, abs = Math.abs, max = Math.max, round = Math.round, sin = Math.sin,
       ceil = Math.ceil,
       filters = fabric.Image.filters,
@@ -21595,7 +21594,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
   'use strict';
 
-  var fabric  = AmCharts.fabric || (AmCharts.fabric = { }),
+  var fabric  = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       filters = fabric.Image.filters,
       createClass = fabric.util.createClass;
@@ -21704,7 +21703,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
   'use strict';
 
-  var fabric  = AmCharts.fabric || (AmCharts.fabric = { }),
+  var fabric  = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       filters = fabric.Image.filters,
       createClass = fabric.util.createClass;
@@ -21789,7 +21788,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
   'use strict';
 
-  var fabric  = AmCharts.fabric || (AmCharts.fabric = { }),
+  var fabric  = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       filters = fabric.Image.filters,
       createClass = fabric.util.createClass;
@@ -21875,7 +21874,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
   'use strict';
 
-  var fabric = AmCharts.fabric || (AmCharts.fabric = { }),
+  var fabric = global.fabric || (global.fabric = { }),
       toFixed = fabric.util.toFixed,
       NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
       MIN_TEXT_WIDTH = 2;
@@ -26222,7 +26221,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
   'use strict';
 
-  var fabric = AmCharts.fabric || (AmCharts.fabric = {});
+  var fabric = global.fabric || (global.fabric = {});
 
   /**
    * Textbox class, based on IText, allows the user to resize the text rectangle
